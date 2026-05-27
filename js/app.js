@@ -18,9 +18,9 @@ let state = {
   formMode: 'add',    // 'add' | 'edit'
   pendingPhotoFile: null,
   pendingNotePhotoFile: null,
-  selectedCondition: 'sun',
+  selectedConditions: ['sun'],
   roomFilter: 'all',  // room filter for plants tab
-  selectedPotSize: null,
+  selectedPotSizes: [],
   lang: localStorage.getItem('lang') || 'uk',
 }
 
@@ -371,8 +371,7 @@ function buildPlantCard(plant) {
   const textBlock = createElement('div', 'plant-card-text')
   const nameEl = createElement('div', 'plant-card-name', plant.name)
   const roomEl = createElement('div', 'plant-card-room')
-  const c = CONDITIONS[plant.conditions]
-  const condText = c ? t(c.key) : plant.conditions
+  const condText = conditionsLabel(plant.conditions)
   roomEl.innerHTML = `<span>${condText}</span><span>·</span><span>${plant.room}</span>`
   textBlock.append(nameEl, roomEl)
 
@@ -437,7 +436,7 @@ function renderPlantDetail(plant) {
   // Name + meta (conditions · room · pot size)
   document.getElementById('detail-name').textContent = plant.name
   const metaParts = [conditionsLabel(plant.conditions), plant.room]
-  if (plant.pot_size && POT_SIZES[plant.pot_size]) metaParts.push(potSizeLabel(plant.pot_size))
+  if (plant.pot_size) metaParts.push(potSizeLabel(plant.pot_size))
   document.getElementById('detail-meta').textContent = metaParts.join(' · ')
 
   // Next watering badge
@@ -577,13 +576,13 @@ function openAddPlantForm() {
   document.getElementById('field-repotting-notes').value = ''
 
   // Reset conditions
-  state.selectedCondition = 'sun'
+  state.selectedConditions = ['sun']
   document.querySelectorAll('.condition-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.value === 'sun')
   })
 
   // Reset pot size
-  state.selectedPotSize = null
+  state.selectedPotSizes = []
   document.querySelectorAll('.pot-btn').forEach(btn => btn.classList.remove('active'))
 
   openSheet('sheet-plant-form')
@@ -625,16 +624,16 @@ function openEditPlantForm() {
     placeholder.style.display = ''
   }
 
-  // Conditions
-  state.selectedCondition = plant.conditions
+  // Conditions (comma-separated for multi-select)
+  state.selectedConditions = plant.conditions ? plant.conditions.split(',') : ['sun']
   document.querySelectorAll('.condition-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.value === plant.conditions)
+    btn.classList.toggle('active', state.selectedConditions.includes(btn.dataset.value))
   })
 
-  // Pot size
-  state.selectedPotSize = plant.pot_size || null
+  // Pot size (comma-separated for multi-select)
+  state.selectedPotSizes = plant.pot_size ? plant.pot_size.split(',') : []
   document.querySelectorAll('.pot-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.pot === plant.pot_size)
+    btn.classList.toggle('active', state.selectedPotSizes.includes(btn.dataset.pot))
   })
 
   openSheet('sheet-plant-form')
@@ -662,13 +661,13 @@ async function submitPlantForm(e) {
       user_id: state.user.id,
       name: document.getElementById('field-name').value.trim(),
       room: document.getElementById('field-room').value,
-      conditions: state.selectedCondition,
+      conditions: state.selectedConditions.join(',') || 'sun',
       watering_frequency_days: parseInt(document.getElementById('field-watering-freq').value) || 7,
       fertilizing_frequency_days: parseInt(document.getElementById('field-fertilizing-freq').value) || null,
       next_repotting_date: document.getElementById('field-repotting-date').value || null,
       repotting_notes: document.getElementById('field-repotting-notes').value.trim() || null,
       photo_url: photoUrl,
-      pot_size: state.selectedPotSize || null,
+      pot_size: state.selectedPotSizes.length ? state.selectedPotSizes.join(',') : null,
     }
 
     if (state.formMode === 'add') {
@@ -1659,8 +1658,11 @@ const CONDITIONS = {
   shade:   { key: 'cond_shade' },
 }
 function conditionsLabel(val) {
-  const c = CONDITIONS[val]
-  return c ? t(c.key) : val
+  if (!val) return ''
+  return val.split(',').map(v => {
+    const c = CONDITIONS[v.trim()]
+    return c ? t(c.key) : v.trim()
+  }).join(', ')
 }
 
 const POT_SIZES = {
@@ -1669,9 +1671,11 @@ const POT_SIZES = {
   small:  { label_uk: 'Малий', label_en: 'Small' },
 }
 function potSizeLabel(val) {
-  const p = POT_SIZES[val]
-  if (!p) return ''
-  return state.lang === 'en' ? p.label_en : p.label_uk
+  if (!val) return ''
+  return val.split(',').map(v => {
+    const p = POT_SIZES[v.trim()]
+    return p ? (state.lang === 'en' ? p.label_en : p.label_uk) : v.trim()
+  }).join(', ')
 }
 
 /* ═══════════════════════════════════════
@@ -1771,25 +1775,34 @@ function bindEvents() {
     )
   })
 
-  // Conditions picker
+  // Conditions picker — multi-select toggle, must keep at least one
   document.querySelectorAll('.condition-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      state.selectedCondition = btn.dataset.value
-      document.querySelectorAll('.condition-btn').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
+      const val = btn.dataset.value
+      const idx = state.selectedConditions.indexOf(val)
+      if (idx !== -1) {
+        if (state.selectedConditions.length > 1) {
+          state.selectedConditions.splice(idx, 1)
+          btn.classList.remove('active')
+        }
+        // if last one — do nothing (keep at least one selected)
+      } else {
+        state.selectedConditions.push(val)
+        btn.classList.add('active')
+      }
     })
   })
 
-  // Pot picker
+  // Pot picker — multi-select toggle
   document.querySelectorAll('.pot-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const newVal = btn.dataset.pot
-      if (state.selectedPotSize === newVal) {
-        state.selectedPotSize = null
+      const idx = state.selectedPotSizes.indexOf(newVal)
+      if (idx !== -1) {
+        state.selectedPotSizes.splice(idx, 1)
         btn.classList.remove('active')
       } else {
-        state.selectedPotSize = newVal
-        document.querySelectorAll('.pot-btn').forEach(b => b.classList.remove('active'))
+        state.selectedPotSizes.push(newVal)
         btn.classList.add('active')
       }
     })
