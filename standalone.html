@@ -1,0 +1,4357 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+  <meta name="theme-color" content="#0f0f0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Plant Diary</title>
+  <style>
+/* ═══════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════ */
+:root {
+  --bg: #111211;
+  --bg2: #191a19;
+  --bg3: #202220;
+  --bg4: #2a2d2a;
+  --card: #1a1c1a;
+  --card2: #1e211e;
+  --border: #2a2d2a;
+  --border2: rgba(255,255,255,0.06);
+  --text: #F7FFE7;
+  --text2: rgba(247,255,231,0.5);
+  --text3: #505850;
+  --accent: #ADDC58;
+  --accent2: #93c43e;
+  --accent-dim: rgba(173,220,88,0.14);
+  --accent-glow: rgba(173,220,88,0.22);
+  --accent-glow2: rgba(173,220,88,0.08);
+  --danger: #d05f72;
+  --danger-dim: rgba(208,95,114,0.12);
+  --warn: #e0a04a;
+  --warn-dim: rgba(224,160,74,0.14);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 22px;
+  --r-pill: 100px;
+  --tab-h: 98px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --hdr-h: 60px;
+  --max-w: 430px;
+  --trans: 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  --trans-fast: 140ms cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-card: 0 2px 16px rgba(0,0,0,0.4), 0 0 0 1px var(--border2);
+  --shadow-accent: 0 4px 24px var(--accent-glow);
+}
+
+/* ═══════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  height: 100%;
+  background: #0c0c0c;
+  overflow: hidden;
+}
+
+body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  background: transparent;
+  color: var(--text);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 40% at 50% -10%, rgba(173,220,88,0.06) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+button { cursor: pointer; border: none; background: none; font-family: inherit; color: inherit; }
+input, select, textarea { font-family: inherit; color: inherit; }
+img { display: block; max-width: 100%; }
+
+/* ═══════════════════════════════════════
+   LAYOUT — VIEW SYSTEM
+═══════════════════════════════════════ */
+.view {
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  z-index: 1;
+}
+.view.active { display: flex; }
+
+/* Center app on desktop */
+.view-app {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  background-color: #0c0c0c;
+  box-shadow: 0 0 80px rgba(0,0,0,0.9);
+}
+
+/* ═══════════════════════════════════════
+   AUTH VIEW
+═══════════════════════════════════════ */
+.view-auth {
+  background: var(--bg);
+  align-items: center;
+  justify-content: center;
+}
+.btn-auth-back {
+  position: absolute;
+  top: 20px;
+  left: 16px;
+  z-index: 10;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text2);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: var(--r-pill);
+  padding: 8px 14px;
+  transition: color var(--trans-fast), background var(--trans-fast);
+}
+.btn-auth-back:active { color: var(--text); background: rgba(255,255,255,0.10); }
+
+.auth-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+}
+.auth-orb-1 {
+  width: 340px; height: 340px;
+  background: radial-gradient(circle, rgba(93,186,106,0.25), transparent 70%);
+  top: -100px; left: -100px;
+  animation: orb-drift 8s ease-in-out infinite alternate;
+}
+.auth-orb-2 {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(60,140,80,0.15), transparent 70%);
+  bottom: -80px; right: -80px;
+  animation: orb-drift 10s ease-in-out infinite alternate-reverse;
+}
+@keyframes orb-drift {
+  from { transform: translate(0, 0); }
+  to { transform: translate(30px, 20px); }
+}
+
+.auth-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 32px;
+  width: 100%;
+  max-width: 360px;
+  gap: 36px;
+}
+
+.auth-logo { text-align: center; }
+.auth-logo-icon {
+  font-size: 72px;
+  display: block;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 6px 24px rgba(93,186,106,0.5));
+}
+.auth-title {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--text);
+}
+.auth-subtitle {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--text2);
+}
+
+.auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.btn-oauth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: var(--r-pill);
+  font-size: 16px;
+  font-weight: 600;
+  transition: transform var(--trans-fast), opacity var(--trans-fast);
+}
+.btn-oauth:active { transform: scale(0.97); opacity: 0.85; }
+
+.btn-google {
+  background: #fff;
+  color: #1a1a1a;
+}
+.btn-apple {
+  background: var(--text);
+  color: #000;
+}
+
+.auth-note {
+  font-size: 12px;
+  color: var(--text3);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════ */
+.view-app {
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: calc(var(--tab-h) + var(--safe-bottom));
+}
+.tab-content.hidden { display: none; }
+
+/* ═══════════════════════════════════════
+   PAGE HEADER
+═══════════════════════════════════════ */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + 18px) 16px 16px;
+  background: transparent;
+  flex-shrink: 0;
+}
+.page-title {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+.header-actions { display: flex; gap: 8px; }
+
+/* ═══════════════════════════════════════
+   TAB BAR
+═══════════════════════════════════════ */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: var(--max-w);
+  padding: 14px 8px calc(var(--safe-bottom) + 40px);
+  background: #0c0c0c;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  border-radius: 24px 24px 0 0;
+  display: flex;
+  align-items: flex-start;
+  z-index: 100;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: rgba(247,255,231,0.3);
+  font-size: 12px;
+  font-weight: 600;
+  transition: color var(--trans-fast);
+}
+.tab-item.active { color: var(--accent); }
+.tab-item span { opacity: 0.45; transition: opacity var(--trans-fast); }
+.tab-item.active span { opacity: 1; }
+.tab-item svg { transition: transform var(--trans-fast); }
+.tab-item.active svg { transform: scale(1.05); }
+.tab-item:active svg { transform: scale(0.94); }
+.tab-item span { }
+
+/* ═══════════════════════════════════════
+   PLANTS LIST
+═══════════════════════════════════════ */
+.plants-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: none;
+}
+.plants-list::-webkit-scrollbar { display: none; }
+
+.plant-card {
+  background: rgba(255,255,255,0.03);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  cursor: pointer;
+  transition: transform var(--trans-fast), opacity var(--trans-fast);
+  position: relative;
+}
+.plant-card:active { transform: scale(0.985); opacity: 0.85; }
+
+.plant-card-photo {
+  width: 74px;
+  height: 74px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-size: 28px;
+}
+.plant-card-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plant-card-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.plant-card-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  flex: 1;
+  align-items: flex-start;
+  height: 74px;
+}
+.plant-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.plant-card-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #F7FFE7;
+}
+.plant-card-room {
+  font-size: 12px;
+  color: rgba(247,255,231,0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.plant-card-room .cond-emoji { color: rgba(255,255,255,1); }
+.plant-card-status { }
+
+.status-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 117px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+.status-badge svg { flex-shrink: 0; display: block; }
+.status-badge.ok { background: var(--accent-dim); color: var(--accent); }
+.status-badge.soon { background: var(--accent-dim); color: var(--accent); }
+.status-badge.overdue { background: rgba(237,156,51,0.15); color: #ed9c33; }
+.status-badge.today { background: var(--accent-dim); color: var(--accent); }
+
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: calc(var(--tab-h) + var(--safe-bottom) + 18px);
+  right: calc(50% - var(--max-w)/2 + 18px);
+  width: 56px;
+  height: 56px;
+  background: var(--accent);
+  color: #0c0c0c;
+  border-radius: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-accent);
+  z-index: 90;
+  transition: transform var(--trans-fast), box-shadow var(--trans-fast);
+}
+.fab:active { transform: scale(0.91); }
+@media (max-width: 430px) {
+  .fab { right: 18px; }
+}
+
+/* ═══════════════════════════════════════
+   LOADING & EMPTY STATES
+═══════════════════════════════════════ */
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+.spinner {
+  width: 30px; height: 30px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 12px;
+  text-align: center;
+}
+.empty-icon {
+  font-size: 60px;
+  opacity: 1;
+  filter: drop-shadow(0 4px 12px rgba(93,186,106,0.2));
+}
+.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text2); }
+.empty-state p { font-size: 14px; color: var(--text3); }
+
+.hidden { display: none !important; }
+
+/* ═══════════════════════════════════════
+   PLANT DETAIL OVERLAY
+═══════════════════════════════════════ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.overlay.open { display: flex; }
+
+.overlay-inner {
+  flex: 1;
+  background: var(--bg);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+}
+.overlay-inner::-webkit-scrollbar { display: none; }
+
+/* Detail header photo */
+.detail-header {
+  position: relative;
+  height: 270px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.04);
+  overflow: hidden;
+}
+.detail-photo-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.detail-photo-placeholder {
+  font-size: 88px;
+  opacity: 0.3;
+  filter: drop-shadow(0 6px 20px rgba(93,186,106,0.3));
+}
+.detail-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.detail-header-gradient {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 220px;
+  background: linear-gradient(to top, var(--bg) 0%, rgba(17,18,17,0.85) 35%, rgba(17,18,17,0.4) 65%, transparent 100%);
+  pointer-events: none;
+}
+
+.btn-back {
+  position: absolute;
+  top: calc(var(--safe-top) + 14px);
+  left: 14px;
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  z-index: 2;
+  border: none;
+  transition: transform var(--trans-fast), background var(--trans-fast);
+}
+.btn-back:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+
+.btn-photo-action {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  border: none;
+  transition: transform var(--trans-fast), background var(--trans-fast);
+}
+.btn-photo-action:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+
+/* Detail content */
+.detail-content {
+  flex: 1;
+  padding: 20px 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-title-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+.detail-name {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.detail-meta {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 5px;
+}
+
+.btn-edit {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-sm);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  flex-shrink: 0;
+  margin-top: 4px;
+  transition: background var(--trans-fast), color var(--trans-fast);
+}
+.btn-edit:active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+
+/* Detail sections */
+.detail-section {
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.section-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+}
+/* Badge shown next to section title */
+.detail-watering-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+.detail-watering-badge svg { flex-shrink: 0; }
+.detail-watering-badge.overdue {
+  background: rgba(224,160,74,0.15);
+  color: var(--warn);
+}
+
+/* Watering actions (kept for compatibility) */
+.watering-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-water {
+  flex: 1;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0C0C0C;
+  padding: 15px 20px;
+  border-radius: var(--r-pill);
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: var(--shadow-accent);
+  transition: transform var(--trans-fast), opacity var(--trans-fast);
+}
+.btn-water:active { transform: scale(0.97); opacity: 0.85; }
+
+/* Fertilizer toggle row — sits before the water button */
+.fertilizer-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 46px;
+  padding: 0 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--r-md);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: 10px;
+}
+.fertilizer-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* Subsection header row (e.g. "Історія Поливу" + "Переглянути Всі") */
+.subsection-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.subsection-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: opacity var(--trans-fast);
+}
+.btn-link svg { flex-shrink: 0; }
+.btn-link:active { opacity: 0.6; }
+
+/* Log repotting button */
+
+/* Section header actions row (title + "+" + "Переглянути Всі") */
+.section-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Watering history */
+.watering-history {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 12px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.history-item-icon { display: flex; align-items: center; flex-shrink: 0; color: rgba(255,255,255,0.3); width: 20px; height: 20px; }
+.history-item-icon svg { width: 20px; height: 20px; }
+.history-item-date { color: var(--text); flex: 1; font-size: 13px; }
+.history-item-badge {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  background: rgba(168,85,247,0.15);
+  color: #a855f7;
+  font-weight: 600;
+}
+
+/* Repotting */
+.repotting-date { font-size: 14px; color: var(--text2); margin-top: 8px; }
+
+/* Compact "+ Додати" pill button (accent text, used in section headers) */
+.btn-add-compact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  border: none;
+  transition: background var(--trans-fast), transform var(--trans-fast);
+}
+.btn-add-compact svg { flex-shrink: 0; stroke: var(--accent); }
+.btn-add-compact:active { background: rgba(255,255,255,0.09); transform: scale(0.95); }
+
+/* Icon-only arrow button (ic_next in section headers) */
+.btn-icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  background: none;
+  border: none;
+  padding: 0;
+  transition: opacity var(--trans-fast);
+}
+.btn-icon-only:active { opacity: 0.6; }
+
+/* Notes */
+.btn-add-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  border: none;
+  transition: background var(--trans-fast), transform var(--trans-fast);
+}
+.btn-add-note:active { background: rgba(255,255,255,0.09); transform: scale(0.95); }
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.note-item {
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.note-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.note-item-text { font-size: 12px; line-height: 1.5; color: var(--text); }
+.note-item-thumbs {
+  display: flex;
+  gap: 8px;
+}
+.note-item-thumb {
+  width: 42px; height: 42px;
+  border-radius: 8px;
+  object-fit: cover;
+  display: block;
+}
+.note-item-date { font-size: 12px; color: var(--text2); }
+
+/* Repotting log list */
+.repotting-log {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.repotting-empty {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.detail-spacer { height: calc(var(--tab-h) + var(--safe-bottom) + 20px); }
+
+/* ═══════════════════════════════════════
+   SHEETS (BOTTOM DRAWER)
+═══════════════════════════════════════ */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: flex-end;
+  pointer-events: none;
+  max-width: var(--max-w);
+  margin: 0 auto;
+}
+.sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0);
+  transition: background var(--trans);
+}
+.sheet.open::before {
+  background: rgba(0,0,0,0.65);
+  pointer-events: all;
+}
+
+.sheet-inner {
+  position: relative;
+  width: 100%;
+  background: #181818;
+  border-radius: var(--r-xl) var(--r-xl) 0 0;
+  max-height: 90vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  transform: translateY(100%);
+  transition: transform var(--trans);
+  padding-bottom: calc(var(--safe-bottom) + 8px);
+  border-top: 1px solid var(--border2);
+}
+.sheet-inner::-webkit-scrollbar { display: none; }
+.sheet.open .sheet-inner {
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.sheet-handle {
+  width: 32px; height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  margin: 12px auto 4px;
+}
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px 16px;
+}
+.sheet-title { font-size: 19px; font-weight: 800; }
+
+/* ═══════════════════════════════════════
+   FORM STYLES
+═══════════════════════════════════════ */
+.form {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(247,255,231,0.5);
+}
+.form-field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.form-optional {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(247,255,231,0.3);
+}
+.form-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-md);
+  color: var(--text);
+  font-size: 15px;
+  padding: 13px 14px;
+  outline: none;
+  transition: border-color var(--trans-fast), box-shadow var(--trans-fast);
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+.form-input::placeholder { color: rgba(255,255,255,0.3); }
+
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: '';
+  position: absolute;
+  right: 12px; top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.66675 6.66669L8.00008 10L11.3334 6.66669' stroke='%23F7FFE7' stroke-opacity='0.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  pointer-events: none;
+}
+.form-select { padding-right: 36px; }
+.form-textarea { resize: none; min-height: 100px; }
+
+/* Number input */
+.number-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.num-btn {
+  width: 49px; height: 49px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-md);
+  padding: 0;
+  font-size: 0;
+  line-height: 0;
+  color: #F7FFE7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--trans-fast), color var(--trans-fast);
+}
+.num-btn svg { display: block; flex-shrink: 0; width: 11px; height: auto; }
+.num-btn:active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+.num-input { text-align: center; flex: 1; }
+.num-input::-webkit-inner-spin-button,
+.num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+/* Conditions picker */
+.conditions-picker { display: flex; gap: 8px; }
+.condition-btn, .pot-btn {
+  flex: 1;
+  padding: 0 12px;
+  height: 40px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font-size: 14px;
+  font-weight: 400;
+  color: #F7FFE7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all var(--trans-fast);
+  min-width: 0;
+}
+.condition-btn .picker-emoji {
+  color: var(--text);
+}
+.condition-btn.active, .pot-btn.active {
+  background: rgba(173,220,88,0.1);
+  border-color: var(--accent);
+}
+.condition-btn.active .picker-txt,
+.pot-btn.active .picker-txt {
+  color: var(--accent);
+}
+.condition-btn:active, .pot-btn:active { transform: scale(0.96); }
+
+/* Photo section in form */
+.form-photo-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.form-photo-preview {
+  width: 80px; height: 80px;
+  border-radius: var(--r-lg);
+  background: rgba(255,255,255,0.05);
+  border: 1px dashed rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.form-photo-preview img { width: 100%; height: 100%; object-fit: cover; }
+.form-photo-buttons { display: flex; flex-direction: column; gap: 8px; }
+
+/* Photo action buttons — pill-shaped, 5% white container */
+.form-photo-buttons .btn-outline,
+.note-photo-section .form-photo-buttons .btn-outline {
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Note photo */
+.note-photo-section { display: flex; flex-direction: column; gap: 10px; }
+.note-photo-preview { width: 100%; max-height: 160px; object-fit: cover; border-radius: var(--r-md); }
+.note-photo-section .form-photo-buttons { flex-direction: row; }
+
+/* ═══════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════ */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0C0C0C;
+  padding: 15px 20px;
+  border-radius: var(--r-pill);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: var(--shadow-accent);
+  transition: transform var(--trans-fast), opacity var(--trans-fast);
+}
+.btn-primary:active { transform: scale(0.97); opacity: 0.85; }
+.btn-full { width: 100%; }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: #F7FFE7;
+  padding: 9px 14px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--trans-fast), color var(--trans-fast);
+}
+.btn-outline:active { border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 8px 12px; font-size: 12px; }
+
+.btn-icon {
+  width: 36px; height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-sm);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--text2);
+  transition: background var(--trans-fast), color var(--trans-fast);
+}
+.btn-icon:active { background: var(--accent-dim); color: var(--accent); }
+
+/* Sheet close button — circular, 5% white */
+.sheet-header .btn-icon {
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  border: none;
+}
+
+.btn-danger {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border: 1px solid rgba(208,95,114,0.2);
+  padding: 13px 20px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 700;
+  width: 100%;
+  text-align: center;
+  transition: opacity var(--trans-fast);
+}
+.btn-danger:active { opacity: 0.7; }
+
+/* ═══════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════ */
+.calendar-container {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 16px;
+}
+.calendar-container::-webkit-scrollbar { display: none; }
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.calendar-month-label {
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+.calendar-nav-btn {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-sm);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text2);
+  font-size: 18px;
+  transition: background var(--trans-fast), color var(--trans-fast);
+}
+.calendar-nav-btn:active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 6px;
+}
+.calendar-weekday {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 0;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background var(--trans-fast);
+  padding: 3px 2px;
+}
+.calendar-day:active { background: rgba(255,255,255,0.06); }
+.calendar-day.today .calendar-day-num {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+.calendar-day.other-month .calendar-day-num { color: var(--text3); }
+.calendar-day.has-events .calendar-day-num { font-weight: 700; }
+.calendar-day-num {
+  font-size: 14px;
+  color: var(--text);
+  width: 30px; height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.calendar-day-dots {
+  display: flex;
+  gap: 2px;
+  height: 5px;
+  align-items: center;
+}
+.dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+}
+.dot-water { background: var(--accent); }
+.dot-fertilizer { background: #a855f7; }
+.dot-repotting { background: var(--warn); }
+
+.calendar-day-events {
+  margin-top: 16px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--r-xl);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.day-events-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 15px;
+  font-weight: 700;
+}
+#day-events-list {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.day-event-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--r-md);
+  font-size: 14px;
+  transition: background var(--trans-fast);
+}
+.day-event-item.done { opacity: 0.55; }
+.day-event-item.done .day-event-plant { text-decoration: line-through; }
+
+/* Checklist circle */
+.day-event-check {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.25);
+  background: none;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: transparent;
+  transition: background var(--trans-fast), border-color var(--trans-fast), color var(--trans-fast);
+  cursor: pointer;
+}
+.day-event-check.done {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0C0C0C;
+}
+.day-event-check.done.fertilizer-done {
+  background: #a855f7;
+  border-color: #a855f7;
+  color: #fff;
+}
+
+.day-event-icon { display: flex; align-items: center; flex-shrink: 0; color: var(--text2); width: 18px; height: 18px; }
+.day-event-icon svg { width: 18px; height: 18px; }
+.day-event-info { flex: 1; }
+.day-event-plant { font-weight: 600; font-size: 13px; }
+.day-event-type { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* ═══════════════════════════════════════
+   JOURNAL
+═══════════════════════════════════════ */
+.journal-filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.journal-filters::-webkit-scrollbar { display: none; }
+.filter-chip {
+  white-space: nowrap;
+  height: 32px;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 117px;
+  font-size: 14px;
+  font-weight: 400;
+  color: rgba(247,255,231,0.5);
+  transition: all var(--trans-fast);
+  flex-shrink: 0;
+}
+.filter-chip.active {
+  background: rgba(173,220,88,0.15);
+  color: var(--accent);
+  font-weight: 500;
+  border: 1px solid var(--accent);
+}
+.filter-chip-all { min-width: 60px; text-align: center; }
+.filter-chip:active { transform: scale(0.95); }
+
+.journal-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+}
+.journal-list::-webkit-scrollbar { display: none; }
+
+.journal-date-group { margin-bottom: 20px; }
+.journal-date-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin-bottom: 10px;
+  padding-left: 4px;
+}
+.journal-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.journal-item {
+  display: flex;
+  gap: 0;
+  background: rgba(255,255,255,0.04);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  transition: transform var(--trans-fast);
+}
+.journal-item:active { transform: scale(0.985); }
+
+.journal-item-accent {
+  width: 4px;
+  flex-shrink: 0;
+}
+.journal-item-accent.water { background: var(--accent); }
+.journal-item-accent.fertilizer { background: #a855f7; }
+.journal-item-accent.note { background: #9b8dd4; }
+.journal-item-accent.repotting { background: var(--warn); }
+
+.journal-item-content {
+  flex: 1;
+  padding: 12px 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.journal-item-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.journal-item-icon { display: flex; align-items: center; flex-shrink: 0; }
+.journal-item-title { font-size: 14px; font-weight: 700; }
+.journal-item-plant { font-size: 12px; color: var(--text2); }
+.journal-item-note-text { font-size: 13px; color: var(--text2); margin-top: 4px; line-height: 1.4; }
+.journal-item-time { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+.journal-item-photo {
+  width: 70px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.journal-item-photo img { width: 100%; height: 100%; object-fit: cover; }
+
+/* ═══════════════════════════════════════
+   PROFILE TAB
+═══════════════════════════════════════ */
+.profile-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 16px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.profile-scroll::-webkit-scrollbar { display: none; }
+
+.profile-user-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-xl);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.profile-avatar {
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 4px rgba(93,186,106,0.1);
+}
+.profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-user-info { flex: 1; }
+.profile-display-name { font-size: 18px; font-weight: 800; color: var(--text); }
+.profile-email-text { font-size: 13px; color: var(--text2); margin-top: 3px; }
+
+.profile-stats {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-xl);
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+}
+.profile-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.profile-stat-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+.profile-stat-label { font-size: 12px; color: var(--text2); font-weight: 500; }
+.profile-stat-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.06); }
+
+.profile-section-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+}
+.profile-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  padding: 14px 16px 6px;
+}
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  gap: 12px;
+}
+.profile-row-input { flex-wrap: wrap; }
+.profile-row-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+.profile-row-icon { font-size: 18px; }
+
+.profile-email-edit {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 2px;
+}
+.profile-input {
+  flex: 1;
+  font-size: 14px !important;
+  padding: 9px 12px !important;
+}
+.btn-save-email {
+  background: var(--accent-dim);
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  padding: 9px 14px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background var(--trans-fast);
+}
+.btn-save-email:active { background: var(--accent); color: #0c0c0c; }
+
+/* Toggle switch */
+.toggle-switch { position: relative; display: inline-block; width: 50px; height: 28px; flex-shrink: 0; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--bg4);
+  border-radius: 14px;
+  transition: all var(--trans-fast);
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+}
+.toggle-track::before {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px;
+  left: 3px; top: 2px;
+  background: rgba(247,255,231,0.5);
+  border-radius: 50%;
+  transition: transform var(--trans-fast), background var(--trans-fast);
+}
+.toggle-switch input:checked + .toggle-track {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+}
+.toggle-switch input:checked + .toggle-track::before {
+  transform: translateX(22px);
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+
+.profile-action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 15px;
+  color: var(--text);
+  text-align: left;
+  transition: background var(--trans-fast);
+}
+.profile-action-row:active { background: rgba(255,255,255,0.06); }
+.profile-action-row span:last-of-type { flex: 1; }
+.profile-action-danger { color: var(--danger); }
+.profile-chevron { color: var(--text3); flex-shrink: 0; }
+
+.profile-footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--text3);
+  padding: 8px 0 4px;
+}
+
+/* Language switcher */
+.lang-switcher {
+  display: flex;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 2px;
+}
+.lang-btn {
+  padding: 5px 14px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(247,255,231,0.45);
+  transition: all 0.18s;
+}
+.lang-btn.active {
+  background: var(--accent);
+  color: #0c0c0c;
+}
+
+/* ═══════════════════════════════════════
+   CONFIRM DIALOG
+═══════════════════════════════════════ */
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.dialog {
+  background: #1c1e1c;
+  border-radius: var(--r-xl);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 24px;
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.8);
+  animation: dialog-in 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes dialog-in {
+  from { transform: scale(0.88); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.dialog-title { font-size: 18px; font-weight: 800; }
+.dialog-message { font-size: 14px; color: var(--text2); line-height: 1.5; }
+.dialog-buttons { display: flex; gap: 10px; margin-top: 4px; }
+.dialog-buttons .btn-outline,
+.dialog-buttons .btn-danger { flex: 1; justify-content: center; }
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast {
+  position: fixed;
+  bottom: calc(var(--tab-h) + var(--safe-bottom) + 16px);
+  left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 20px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border2);
+  z-index: 600;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  max-width: calc(var(--max-w) - 40px);
+  text-align: center;
+  pointer-events: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ═══════════════════════════════════════
+   LOADING OVERLAY
+═══════════════════════════════════════ */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17,18,17,0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 700;
+  backdrop-filter: blur(6px);
+}
+
+/* ═══════════════════════════════════════
+   ROOM FILTER BAR (Plants tab)
+═══════════════════════════════════════ */
+.room-filter-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  padding: 4px 16px 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.room-filter-bar::-webkit-scrollbar { display: none; }
+
+/* ═══════════════════════════════════════
+   PLANT CARD — MORE BUTTON
+═══════════════════════════════════════ */
+.plant-card-more {
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(247,255,231,0.5);
+  flex-shrink: 0;
+  transition: background var(--trans-fast);
+}
+.plant-card-more:active { background: rgba(255,255,255,0.08); }
+
+/* ═══════════════════════════════════════
+   DETAIL — MORE BUTTON (top right)
+═══════════════════════════════════════ */
+.btn-detail-more {
+  position: absolute;
+  top: calc(var(--safe-top) + 14px);
+  right: 14px;
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  z-index: 2;
+  border: none;
+  transition: transform var(--trans-fast), background var(--trans-fast);
+}
+.btn-detail-more:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+
+/* ═══════════════════════════════════════
+   MORE ACTIONS SHEET
+═══════════════════════════════════════ */
+.sheet-inner-compact { padding-bottom: calc(var(--safe-bottom) + 12px); }
+
+.more-actions-list {
+  display: flex;
+  flex-direction: column;
+  margin: 8px 16px 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  border: none;
+}
+.more-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #F7FFE7;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: background var(--trans-fast);
+}
+.more-action-btn:last-child { border-bottom: none; }
+.more-action-btn:active { background: rgba(255,255,255,0.08); }
+.more-action-danger { color: #FF3232; }
+
+.more-actions-cancel {
+  margin: 10px 16px 0;
+}
+.more-cancel-btn {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-xl);
+  font-size: 16px;
+  font-weight: 700;
+  color: #F7FFE7;
+  text-align: center;
+  border: none;
+  transition: background var(--trans-fast);
+}
+.more-cancel-btn:active { background: rgba(255,255,255,0.1); }
+
+/* ═══════════════════════════════════════
+   SUB-PAGE OVERLAYS (History / Notes)
+═══════════════════════════════════════ */
+.subpage-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: calc(var(--safe-top) + 14px) 16px 14px;
+  background: var(--bg);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+.subpage-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.subpage-content {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.subpage-content::-webkit-scrollbar { display: none; }
+
+/* ═══════════════════════════════════════
+   VIEW ALL BUTTON
+═══════════════════════════════════════ */
+.btn-view-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 11px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-top: 6px;
+  transition: background var(--trans-fast), border-color var(--trans-fast);
+}
+.btn-view-all:active { background: var(--accent-dim); border-color: var(--accent); }
+
+/* ═══════════════════════════════════════
+   DATE INPUT — ic_calendar icon
+═══════════════════════════════════════ */
+.date-input-wrap {
+  position: relative;
+}
+.date-input-wrap .form-input {
+  padding-right: 42px;
+}
+.date-ic-cal {
+  position: absolute;
+  right: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  width: 42px;
+  height: 100%;
+  cursor: pointer;
+}
+.detail-pot-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: rgba(247,255,231,0.5);
+}
+
+</style>
+  <style>
+    /* Critical: ensure views hide/show correctly regardless of external CSS loading */
+    body { margin: 0; background: #0f0f0f; overflow: hidden; height: 100vh; }
+    .view { display: none; flex-direction: column; position: fixed; inset: 0; }
+    .view.active { display: flex; }
+    .tab-content { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    .tab-content.hidden { display: none; }
+    .overlay { display: none; flex-direction: column; position: fixed; inset: 0; z-index: 200;
+               transform: translateX(100%); transition: transform 250ms ease;
+               max-width: 430px; margin: 0 auto; }
+    .overlay.open { transform: translateX(0); }
+    .overlay-inner { flex: 1; background: #0f0f0f; overflow-y: auto; display: flex; flex-direction: column; }
+    .sheet { position: fixed; inset: 0; z-index: 300; display: flex; align-items: flex-end;
+             pointer-events: none; max-width: 430px; margin: 0 auto; }
+    .sheet.open { pointer-events: all; }
+    .sheet-inner { width: 100%; background: #181818; border-radius: 24px 24px 0 0;
+                   max-height: 90vh; overflow-y: auto; transform: translateY(100%);
+                   transition: transform 250ms ease; }
+    .sheet.open .sheet-inner { transform: translateY(0); }
+    .hidden { display: none !important; }
+    .dialog-backdrop.hidden { display: none !important; }
+    .dialog-backdrop { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ AUTH VIEW ═══ -->
+<div id="view-auth" class="view view-auth active">
+  <div class="auth-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+  </div>
+  <button class="btn-auth-back hidden" id="btn-auth-back">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M9.33325 11.1666L5.99994 7.8333L9.33325 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Повернутись
+  </button>
+  <div class="auth-content">
+    <div class="auth-logo">
+      <span class="auth-logo-icon">🌱</span>
+      <h1 class="auth-title">Plant Diary</h1>
+      <p class="auth-subtitle">Щоденник догляду за рослинами</p>
+    </div>
+    <div class="auth-buttons">
+      <button class="btn-oauth btn-google" id="btn-google">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Увійти через Google
+      </button>
+      <button class="btn-oauth btn-apple" id="btn-apple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.39.07 2.35.74 3.15.8 1.18-.24 2.32-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.39-1.32 2.76-2.6 3.97zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+        </svg>
+        Увійти через Apple
+      </button>
+    </div>
+    <p class="auth-note">Ваші дані зберігаються захищено і доступні тільки вам</p>
+  </div>
+</div>
+
+<!-- ═══ APP SHELL ═══ -->
+<div id="view-app" class="view view-app">
+
+  <!-- TAB CONTENTS -->
+  <div class="tab-content" id="tab-plants">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_plants">Мої Рослини</h1>
+    </div>
+    <div class="room-filter-bar" id="room-filter-bar">
+      <button class="filter-chip active" data-room="all">Всі</button>
+    </div>
+    <div class="plants-list" id="plants-list">
+      <div class="loading-state" id="plants-loading">
+        <div class="spinner"></div>
+      </div>
+      <div class="empty-state hidden" id="plants-empty">
+        <div class="empty-icon">🪴</div>
+        <h3>Ще Немає Рослин</h3>
+        <p>Додайте першу рослину, натиснувши +</p>
+      </div>
+    </div>
+    <button class="fab" id="btn-add-plant">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M4 12H12M12 12H20M12 12V4M12 12V20" stroke="#0C0C0C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="tab-content hidden" id="tab-calendar">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_calendar">Календар</h1>
+    </div>
+    <div class="calendar-container" id="calendar-container"></div>
+    <div class="calendar-day-events hidden" id="calendar-day-events">
+      <div class="day-events-header">
+        <span id="day-events-title"></span>
+        <button class="btn-icon" id="btn-close-day-events">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="day-events-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content hidden" id="tab-journal">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_journal">Журнал догляду</h1>
+    </div>
+    <div class="journal-filters" id="journal-filters">
+      <button class="filter-chip active" data-filter="all" data-i18n="filter_all">Всі</button>
+      <button class="filter-chip" data-filter="water" data-i18n="filter_water">Полив</button>
+      <button class="filter-chip" data-filter="fertilizer" data-i18n="filter_fertilizer">Добриво</button>
+      <button class="filter-chip" data-filter="note" data-i18n="filter_note">Нотатки</button>
+    </div>
+    <div class="journal-list" id="journal-list">
+      <div class="loading-state" id="journal-loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: PROFILE -->
+  <div class="tab-content hidden" id="tab-profile">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_profile">Профіль</h1>
+    </div>
+    <div class="profile-scroll">
+
+      <!-- User card -->
+      <div class="profile-user-card">
+        <div class="profile-avatar" id="profile-avatar">🌿</div>
+        <div class="profile-user-info">
+          <div class="profile-display-name" id="profile-display-name">—</div>
+          <div class="profile-email-text" id="profile-email-text">—</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="profile-stat-item">
+          <span class="profile-stat-value" id="profile-plant-count">0</span>
+          <span class="profile-stat-label" data-i18n="stat_plants">Рослин</span>
+        </div>
+        <div class="profile-stat-divider"></div>
+        <div class="profile-stat-item">
+          <span class="profile-stat-value" id="profile-watering-count">0</span>
+          <span class="profile-stat-label" data-i18n="stat_waterings">Поливів</span>
+        </div>
+        <div class="profile-stat-divider"></div>
+        <div class="profile-stat-item">
+          <span class="profile-stat-value" id="profile-notes-count">0</span>
+          <span class="profile-stat-label" data-i18n="stat_notes">Нотаток</span>
+        </div>
+      </div>
+
+      <!-- Notifications section -->
+      <div class="profile-section-card">
+        <div class="profile-section-title" data-i18n="section_notifications">Сповіщення</div>
+
+        <div class="profile-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">🔔</span>
+            <span data-i18n="toggle_notifications">Увімкнути сповіщення</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-notifications" checked>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="profile-row profile-row-input" id="notif-email-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">✉️</span>
+            <span data-i18n="notif_email">Пошта для сповіщень</span>
+          </div>
+          <div class="profile-email-edit">
+            <input type="email" id="field-notif-email" class="form-input profile-input" placeholder="your@email.com">
+            <button class="btn-save-email" id="btn-save-notif-email">Зберегти</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account section -->
+      <div class="profile-section-card">
+        <div class="profile-section-title" data-i18n="section_account">Акаунт</div>
+        <button class="profile-action-row" id="btn-profile-signout">
+          <span class="profile-row-icon">🚪</span>
+          <span data-i18n="signout">Вийти з акаунту</span>
+          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="profile-action-row profile-action-danger" id="btn-delete-account">
+          <span class="profile-row-icon">🗑</span>
+          <span data-i18n="delete_account">Видалити акаунт</span>
+          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="profile-action-row" id="btn-preview-login">
+          <span class="profile-row-icon">👁</span>
+          <span>Переглянути екран логіну</span>
+          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <!-- Settings section -->
+      <div class="profile-section-card">
+        <div class="profile-section-title" data-i18n="section_settings">Налаштування</div>
+        <div class="profile-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">🌐</span>
+            <span data-i18n="language">Мова</span>
+          </div>
+          <div class="lang-switcher">
+            <button class="lang-btn active" id="btn-lang-uk">УКР</button>
+            <button class="lang-btn" id="btn-lang-en">ENG</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-footer">Plant Diary v1.0</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <nav class="tab-bar">
+    <button class="tab-item active" data-tab="plants">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M20.998 3V5C20.998 6.85652 20.2606 8.63699 18.9478 9.94975C17.635 11.2625 15.8546 12 13.998 12H12.998V13H17.998V20C17.998 20.5304 17.7873 21.0391 17.4123 21.4142C17.0372 21.7893 16.5285 22 15.998 22H7.99805C7.46761 22 6.95891 21.7893 6.58383 21.4142C6.20876 21.0391 5.99805 20.5304 5.99805 20V13H10.998V10C10.998 8.14349 11.7355 6.36301 13.0483 5.05025C14.3611 3.7375 16.1415 3 17.998 3H20.998Z" fill="currentColor"/>
+        <path d="M8.9464 2.83788C7.88067 2.28639 6.69802 1.99903 5.49805 2H1.99805V3.5C1.99805 5.48913 2.78822 7.39678 4.19475 8.8033C5.60127 10.2098 7.50892 11 9.49805 11H9.99805V10C9.99528 8.2552 10.5659 6.55783 11.622 5.169C10.9298 4.18885 10.0121 3.38937 8.9464 2.83788Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_plants">Рослини</span>
+    </button>
+    <button class="tab-item" data-tab="calendar">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M7.74998 2.5C7.74998 2.30109 7.67096 2.11032 7.53031 1.96967C7.38966 1.82902 7.19889 1.75 6.99998 1.75C6.80107 1.75 6.6103 1.82902 6.46965 1.96967C6.329 2.11032 6.24998 2.30109 6.24998 2.5V4.08C4.80998 4.195 3.86598 4.477 3.17198 5.172C2.47698 5.866 2.19498 6.811 2.07898 8.25H21.921C21.805 6.81 21.523 5.866 20.828 5.172C20.134 4.477 19.189 4.195 17.75 4.079V2.5C17.75 2.30109 17.671 2.11032 17.5303 1.96967C17.3897 1.82902 17.1989 1.75 17 1.75C16.8011 1.75 16.6103 1.82902 16.4696 1.96967C16.329 2.11032 16.25 2.30109 16.25 2.5V4.013C15.585 4 14.839 4 14 4H9.99998C9.16098 4 8.41498 4 7.74998 4.013V2.5Z" fill="currentColor"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 11.161 2 10.415 2.013 9.75H21.987C22 10.415 22 11.161 22 12V14C22 17.771 22 19.657 20.828 20.828C19.656 21.999 17.771 22 14 22H10C6.229 22 4.343 22 3.172 20.828C2.001 19.656 2 17.771 2 14V12ZM17 14C17.2652 14 17.5196 13.8946 17.7071 13.7071C17.8946 13.5196 18 13.2652 18 13C18 12.7348 17.8946 12.4804 17.7071 12.2929C17.5196 12.1054 17.2652 12 17 12C16.7348 12 16.4804 12.1054 16.2929 12.2929C16.1054 12.4804 16 12.7348 16 13C16 13.2652 16.1054 13.5196 16.2929 13.7071C16.4804 13.8946 16.7348 14 17 14ZM17 18C17.2652 18 17.5196 17.8946 17.7071 17.7071C17.8946 17.5196 18 17.2652 18 17C18 16.7348 17.8946 16.4804 17.7071 16.2929C17.5196 16.1054 17.2652 16 17 16C16.7348 16 16.4804 16.1054 16.2929 16.2929C16.1054 16.4804 16 16.7348 16 17C16 17.2652 16.1054 17.5196 16.2929 17.7071C16.4804 17.8946 16.7348 18 17 18ZM13 13C13 13.2652 12.8946 13.5196 12.7071 13.7071C12.5196 13.8946 12.2652 14 12 14C11.7348 14 11.4804 13.8946 11.2929 13.7071C11.1054 13.5196 11 13.2652 11 13C11 12.7348 11.1054 12.4804 11.2929 12.2929C11.4804 12.1054 11.7348 12 12 12C12.2652 12 12.5196 12.1054 12.7071 12.2929C12.8946 12.4804 13 12.7348 13 13ZM13 17C13 17.2652 12.8946 17.5196 12.7071 17.7071C12.5196 17.8946 12.2652 18 12 18C11.7348 18 11.4804 17.8946 11.2929 17.7071C11.1054 17.5196 11 17.2652 11 17C11 16.7348 11.1054 16.4804 11.2929 16.2929C11.4804 16.1054 11.7348 16 12 16C12.2652 16 12.5196 16.1054 12.7071 16.2929C12.8946 16.4804 13 16.7348 13 17ZM7 14C7.26522 14 7.51957 13.8946 7.70711 13.7071C7.89464 13.5196 8 13.2652 8 13C8 12.7348 7.89464 12.4804 7.70711 12.2929C7.51957 12.1054 7.26522 12 7 12C6.73478 12 6.48043 12.1054 6.29289 12.2929C6.10536 12.4804 6 12.7348 6 13C6 13.2652 6.10536 13.5196 6.29289 13.7071C6.48043 13.8946 6.73478 14 7 14ZM7 18C7.26522 18 7.51957 17.8946 7.70711 17.7071C7.89464 17.5196 8 17.2652 8 17C8 16.7348 7.89464 16.4804 7.70711 16.2929C7.51957 16.1054 7.26522 16 7 16C6.73478 16 6.48043 16.1054 6.29289 16.2929C6.10536 16.4804 6 16.7348 6 17C6 17.2652 6.10536 17.5196 6.29289 17.7071C6.48043 17.8946 6.73478 18 7 18Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_calendar">Календар</span>
+    </button>
+    <button class="tab-item" data-tab="journal">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M22 5.33333C22 4.67029 21.7366 4.03441 21.2678 3.56557C20.7989 3.09673 20.163 2.83333 19.5 2.83333H18.8583C18.7845 2.83271 18.7121 2.81324 18.6479 2.77678C18.5838 2.74032 18.53 2.68808 18.4917 2.625C18.3832 2.43551 18.2268 2.27796 18.038 2.16823C17.8493 2.0585 17.635 2.00048 17.4167 2H5.33333C5.00181 2 4.68387 2.1317 4.44945 2.36612C4.21503 2.60054 4.08333 2.91848 4.08333 3.25V3.875C4.08333 3.93025 4.10528 3.98324 4.14435 4.02231C4.18342 4.06138 4.23641 4.08333 4.29167 4.08333H5.33333C5.55435 4.08333 5.76631 4.17113 5.92259 4.32741C6.07887 4.48369 6.16667 4.69565 6.16667 4.91667C6.16667 5.13768 6.07887 5.34964 5.92259 5.50592C5.76631 5.6622 5.55435 5.75 5.33333 5.75H2.83333C2.61232 5.75 2.40036 5.8378 2.24408 5.99408C2.0878 6.15036 2 6.36232 2 6.58333C2 6.80435 2.0878 7.01631 2.24408 7.17259C2.40036 7.32887 2.61232 7.41667 2.83333 7.41667H3.90833C3.96359 7.41667 4.01658 7.43862 4.05565 7.47769C4.09472 7.51676 4.11667 7.56975 4.11667 7.625V10.125C4.11667 10.1803 4.13862 10.2332 4.17769 10.2723C4.21676 10.3114 4.26975 10.3333 4.325 10.3333H5.33333C5.55435 10.3333 5.76631 10.4211 5.92259 10.5774C6.07887 10.7337 6.16667 10.9457 6.16667 11.1667C6.16667 11.3877 6.07887 11.5996 5.92259 11.7559C5.76631 11.9122 5.55435 12 5.33333 12H2.83333C2.61232 12 2.40036 12.0878 2.24408 12.2441C2.0878 12.4004 2 12.6123 2 12.8333C2 13.0543 2.0878 13.2663 2.24408 13.4226C2.40036 13.5789 2.61232 13.6667 2.83333 13.6667H3.90833C3.96359 13.6667 4.01658 13.6886 4.05565 13.7277C4.09472 13.7668 4.11667 13.8197 4.11667 13.875V16.375C4.11667 16.4303 4.13862 16.4832 4.17769 16.5223C4.21676 16.5614 4.26975 16.5833 4.325 16.5833H5.33333C5.55435 16.5833 5.76631 16.6711 5.92259 16.8274C6.07887 16.9837 6.16667 17.1957 6.16667 17.4167C6.16667 17.6377 6.07887 17.8496 5.92259 18.0059C5.76631 18.1622 5.55435 18.25 5.33333 18.25H2.83333C2.61232 18.25 2.40036 18.3378 2.24408 18.4941C2.0878 18.6504 2 18.8623 2 19.0833C2 19.3043 2.0878 19.5163 2.24408 19.6726C2.40036 19.8289 2.61232 19.9167 2.83333 19.9167H3.90833C3.96359 19.9167 4.01658 19.9386 4.05565 19.9777C4.09472 20.0168 4.11667 20.0697 4.11667 20.125V20.75C4.11655 21.0758 4.24366 21.3888 4.47092 21.6223C4.69818 21.8558 5.00762 21.9913 5.33333 22H17.4167C17.635 21.9995 17.8493 21.9415 18.038 21.8318C18.2268 21.722 18.3832 21.5645 18.4917 21.375C18.53 21.3119 18.5838 21.2597 18.6479 21.2232C18.7121 21.1868 18.7845 21.1673 18.8583 21.1667H19.5C20.163 21.1667 20.7989 20.9033 21.2678 20.4344C21.7366 19.9656 22 19.3297 22 18.6667V5.33333ZM14.675 8.66667C14.675 8.99819 14.5433 9.31613 14.3089 9.55055C14.0745 9.78497 13.7565 9.91667 13.425 9.91667H9.91667C9.58515 9.91667 9.2672 9.78497 9.03278 9.55055C8.79836 9.31613 8.66667 8.99819 8.66667 8.66667V6.58333C8.66667 6.25181 8.79836 5.93387 9.03278 5.69945C9.2672 5.46503 9.58515 5.33333 9.91667 5.33333H13.425C13.7565 5.33333 14.0745 5.46503 14.3089 5.69945C14.5433 5.93387 14.675 6.25181 14.675 6.58333V8.66667ZM20.3333 10.9583C20.3333 11.0136 20.3114 11.0666 20.2723 11.1056C20.2332 11.1447 20.1803 11.1667 20.125 11.1667H18.875C18.8197 11.1667 18.7668 11.1447 18.7277 11.1056C18.6886 11.0666 18.6667 11.0136 18.6667 10.9583V8.875C18.6667 8.81975 18.6886 8.76676 18.7277 8.72769C18.7668 8.68862 18.8197 8.66667 18.875 8.66667H20.125C20.1803 8.66667 20.2332 8.68862 20.2723 8.72769C20.3114 8.76676 20.3333 8.81975 20.3333 8.875V10.9583ZM18.6667 13.0417C18.6667 12.9864 18.6886 12.9334 18.7277 12.8944C18.7668 12.8553 18.8197 12.8333 18.875 12.8333H20.125C20.1803 12.8333 20.2332 12.8553 20.2723 12.8944C20.3114 12.9334 20.3333 12.9864 20.3333 13.0417V15.125C20.3333 15.1803 20.3114 15.2332 20.2723 15.2723C20.2332 15.3114 20.1803 15.3333 20.125 15.3333H18.875C18.8197 15.3333 18.7668 15.3114 18.7277 15.2723C18.6886 15.2332 18.6667 15.1803 18.6667 15.125V13.0417ZM20.3333 5.33333V6.79167C20.3333 6.84692 20.3114 6.89991 20.2723 6.93898C20.2332 6.97805 20.1803 7 20.125 7H18.875C18.8197 7 18.7668 6.97805 18.7277 6.93898C18.6886 6.89991 18.6667 6.84692 18.6667 6.79167V4.70833C18.6667 4.65308 18.6886 4.60009 18.7277 4.56102C18.7668 4.52195 18.8197 4.5 18.875 4.5H19.5C19.721 4.5 19.933 4.5878 20.0893 4.74408C20.2455 4.90036 20.3333 5.11232 20.3333 5.33333ZM20.3333 18.6667C20.3333 18.8877 20.2455 19.0996 20.0893 19.2559C19.933 19.4122 19.721 19.5 19.5 19.5H18.875C18.8197 19.5 18.7668 19.4781 18.7277 19.439C18.6886 19.3999 18.6667 19.3469 18.6667 19.2917V17.2083C18.6667 17.1531 18.6886 17.1001 18.7277 17.061C18.7668 17.0219 18.8197 17 18.875 17H20.125C20.1803 17 20.2332 17.0219 20.2723 17.061C20.3114 17.1001 20.3333 17.1531 20.3333 17.2083V18.6667Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_journal">Журнал</span>
+    </button>
+    <button class="tab-item" data-tab="profile">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 13C14.396 13 16.575 13.694 18.178 14.671C18.978 15.161 19.662 15.736 20.156 16.361C20.642 16.977 21 17.713 21 18.5C21 19.345 20.589 20.011 19.997 20.486C19.437 20.936 18.698 21.234 17.913 21.442C16.335 21.859 14.229 22 12 22C9.771 22 7.665 21.86 6.087 21.442C5.302 21.234 4.563 20.936 4.003 20.486C3.41 20.01 3 19.345 3 18.5C3 17.713 3.358 16.977 3.844 16.361C4.338 15.736 5.021 15.161 5.822 14.671C7.425 13.694 9.605 13 12 13Z" fill="currentColor"/>
+        <path d="M12 2C15.849 2 18.255 6.167 16.33 9.5C15.8912 10.2601 15.26 10.8913 14.4999 11.3301C13.7398 11.7689 12.8777 12 12 12C8.15099 12 5.74499 7.833 7.66999 4.5C8.10882 3.73992 8.73999 3.10875 9.50006 2.6699C10.2601 2.23106 11.1223 2.00002 12 2Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_profile">Профіль</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ═══ PLANT DETAIL OVERLAY ═══ -->
+<div id="overlay-detail" class="overlay overlay-slide-right">
+  <div class="overlay-inner">
+    <div class="detail-header" id="detail-header">
+      <div class="detail-photo-wrap" id="detail-photo-wrap">
+        <div class="detail-photo-placeholder" id="detail-photo-placeholder">🪴</div>
+        <img id="detail-photo-img" class="detail-photo hidden" alt="">
+      </div>
+      <div class="detail-header-gradient"></div>
+      <button class="btn-back" id="btn-detail-back">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M9.33325 11.1666L5.99994 7.8333L9.33325 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="btn-detail-more" id="btn-detail-more">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/>
+        </svg>
+      </button>
+      <input type="file" id="input-change-photo" accept="image/*" class="hidden">
+    </div>
+
+    <div class="detail-content">
+      <div class="detail-title-row">
+        <h1 class="detail-name" id="detail-name"></h1>
+        <p class="detail-meta" id="detail-meta"></p>
+      </div>
+
+      <!-- Watering section -->
+      <div class="detail-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Полив</h2>
+          <span class="detail-watering-badge" id="detail-next-watering"></span>
+        </div>
+        <div class="fertilizer-toggle-row">
+          <span class="fertilizer-label">З добривом</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-fertilizer">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <button class="btn-water" id="btn-water">Полити</button>
+      </div>
+
+      <!-- Watering history section -->
+      <div class="detail-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Історія Поливу</h2>
+          <button class="btn-icon-only" id="btn-view-all-history"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="watering-history" id="watering-history"></div>
+      </div>
+
+      <!-- Repotting section -->
+      <div class="detail-section" id="detail-repotting-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Пересадка</h2>
+          <div class="section-header-actions">
+            <button class="btn-add-compact" id="btn-log-repotting">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3.33331V12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.33325 8H12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Додати
+            </button>
+            <button class="btn-icon-only"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+        <div class="repotting-log" id="repotting-log"></div>
+      </div>
+
+      <!-- Notes section -->
+      <div class="detail-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Нотатки</h2>
+          <div class="section-header-actions">
+            <button class="btn-add-compact" id="btn-add-note">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3.33331V12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.33325 8H12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Додати
+            </button>
+            <button class="btn-icon-only" id="btn-view-all-notes"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+        <div class="notes-list" id="notes-list"></div>
+      </div>
+
+      <div class="detail-spacer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FULL HISTORY OVERLAY ═══ -->
+<div id="overlay-history" class="overlay">
+  <div class="overlay-inner">
+    <div class="subpage-header">
+      <button class="btn-back" id="btn-history-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1 class="subpage-title">Історія Поливів</h1>
+    </div>
+    <div class="subpage-content" id="full-history-list"></div>
+  </div>
+</div>
+
+<!-- ═══ FULL NOTES OVERLAY ═══ -->
+<div id="overlay-notes" class="overlay">
+  <div class="overlay-inner">
+    <div class="subpage-header">
+      <button class="btn-back" id="btn-notes-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1 class="subpage-title">Всі Нотатки</h1>
+    </div>
+    <div class="subpage-content" id="full-notes-list"></div>
+  </div>
+</div>
+
+<!-- ═══ ADD / EDIT PLANT SHEET ═══ -->
+<div id="sheet-plant-form" class="sheet">
+  <div class="sheet-inner">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title" id="plant-form-title">Нова Рослина</h2>
+      <button class="btn-icon" id="btn-close-plant-form">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <form id="plant-form" class="form" autocomplete="off">
+      <!-- Photo -->
+      <div class="form-photo-section">
+        <div class="form-photo-preview" id="form-photo-preview">
+          <span class="form-photo-placeholder">🪴</span>
+          <img id="form-photo-img" class="hidden" alt="">
+        </div>
+        <div class="form-photo-buttons">
+          <label class="btn-outline btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18.512 10.077C18.512 10.816 17.887 11.415 17.116 11.415C16.345 11.415 15.721 10.815 15.721 10.077C15.721 9.33899 16.346 8.73999 17.116 8.73999C17.886 8.73999 18.512 9.33799 18.512 10.077Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18.036 5.532C16.976 5.396 15.622 5.396 13.913 5.396H10.087C8.377 5.396 7.023 5.396 5.964 5.532C4.874 5.673 3.99 5.969 3.294 6.636C2.598 7.304 2.289 8.15 2.142 9.196C2 10.21 2 11.508 2 13.147V13.247C2 14.886 2 16.184 2.142 17.2C2.289 18.245 2.598 19.091 3.294 19.758C3.99 20.426 4.874 20.722 5.964 20.862C7.024 21 8.378 21 10.087 21H13.913C15.623 21 16.977 21 18.036 20.863C19.126 20.723 20.01 20.427 20.706 19.759C21.402 19.092 21.711 18.246 21.858 17.201C22 16.185 22 14.887 22 13.248V13.148C22 11.508 22 10.211 21.858 9.195C21.711 8.15 21.402 7.304 20.706 6.636C20.01 5.969 19.126 5.673 18.036 5.532ZM6.15 6.858C5.214 6.978 4.675 7.205 4.28 7.582C3.887 7.96 3.651 8.476 3.525 9.373C3.425 10.093 3.402 10.993 3.397 12.169L3.867 11.774C4.992 10.831 6.686 10.885 7.742 11.897L11.732 15.722C11.9297 15.9085 12.1849 16.0223 12.4558 16.0448C12.7267 16.0673 12.9972 15.9972 13.223 15.846L13.501 15.659C14.1531 15.2229 14.9297 15.0114 15.7129 15.0565C16.4961 15.1016 17.2433 15.4009 17.841 15.909L20.248 17.987C20.346 17.723 20.421 17.407 20.475 17.022C20.603 16.106 20.605 14.898 20.605 13.198C20.605 11.498 20.603 10.29 20.475 9.373C20.349 8.476 20.113 7.96 19.719 7.583C19.326 7.205 18.786 6.979 17.85 6.858C16.894 6.735 15.634 6.733 13.86 6.733H10.14C8.366 6.733 7.106 6.735 6.15 6.858Z" fill="currentColor"/><path d="M17.086 2.61C16.226 2.5 15.132 2.5 13.767 2.5H10.677C9.31302 2.5 8.21802 2.5 7.35802 2.61C6.46802 2.725 5.72602 2.968 5.13702 3.53C4.81196 3.84202 4.56407 4.22549 4.41302 4.65C4.91702 4.42 5.48702 4.284 6.12702 4.2C7.21102 4.06 8.59702 4.06 10.347 4.06H14.261C16.011 4.06 17.396 4.06 18.481 4.2C19.039 4.273 19.545 4.386 20 4.566C19.847 4.17497 19.6109 3.82183 19.308 3.531C18.719 2.968 17.977 2.725 17.086 2.611" fill="currentColor"/></svg>
+            Галерея
+            <input type="file" id="input-plant-photo-gallery" accept="image/*" class="hidden">
+          </label>
+          <label class="btn-outline btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.574 4.336C7.84793 3.92507 8.21908 3.58812 8.6545 3.35506C9.08991 3.122 9.57613 3.00004 10.07 3H13.93C14.4239 3.00004 14.9101 3.122 15.3455 3.35506C15.7809 3.58812 16.1521 3.92507 16.426 4.336L17.238 5.555C17.3293 5.69192 17.4531 5.80417 17.5982 5.88179C17.7434 5.95942 17.9054 6.00002 18.07 6H19C19.7956 6 20.5587 6.31607 21.1213 6.87868C21.6839 7.44129 22 8.20435 22 9V18C22 18.7956 21.6839 19.5587 21.1213 20.1213C20.5587 20.6839 19.7956 21 19 21H5C4.20435 21 3.44129 20.6839 2.87868 20.1213C2.31607 19.5587 2 18.7956 2 18V9C2 8.20435 2.31607 7.44129 2.87868 6.87868C3.44129 6.31607 4.20435 6 5 6H5.93C6.09459 6.00002 6.25665 5.95942 6.40178 5.88179C6.54692 5.80417 6.67065 5.69192 6.762 5.555L7.574 4.336ZM10 13C10 12.4696 10.2107 11.9609 10.5858 11.5858C10.9609 11.2107 11.4696 11 12 11C12.5304 11 13.0391 11.2107 13.4142 11.5858C13.7893 11.9609 14 12.4696 14 13C14 13.5304 13.7893 14.0391 13.4142 14.4142C13.0391 14.7893 12.5304 15 12 15C11.4696 15 10.9609 14.7893 10.5858 14.4142C10.2107 14.0391 10 13.5304 10 13ZM12 9C10.9391 9 9.92172 9.42143 9.17157 10.1716C8.42143 10.9217 8 11.9391 8 13C8 14.0609 8.42143 15.0783 9.17157 15.8284C9.92172 16.5786 10.9391 17 12 17C13.0609 17 14.0783 16.5786 14.8284 15.8284C15.5786 15.0783 16 14.0609 16 13C16 11.9391 15.5786 10.9217 14.8284 10.1716C14.0783 9.42143 13.0609 9 12 9Z" fill="currentColor"/></svg>
+            Камера
+            <input type="file" id="input-plant-photo-camera" accept="image/*" capture="environment" class="hidden">
+          </label>
+        </div>
+      </div>
+
+      <!-- Name -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Назва Рослини</label>
+        </div>
+        <input type="text" id="field-name" class="form-input" placeholder="Наприклад: Монстера" required>
+      </div>
+
+      <!-- Room -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Кімната</label>
+        </div>
+        <div class="select-wrap">
+          <select id="field-room" class="form-input form-select">
+            <option>Вітальня</option>
+            <option>Спальня</option>
+            <option>Кухня</option>
+            <option>Кабінет</option>
+            <option>Балкон</option>
+            <option>Інша</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Conditions -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Умови Освітлення</label>
+        </div>
+        <div class="conditions-picker" id="conditions-picker">
+          <button type="button" class="condition-btn active" data-value="sun"><span class="picker-txt">Сонце</span></button>
+          <button type="button" class="condition-btn" data-value="partial"><span class="picker-txt">Напівтінь</span></button>
+          <button type="button" class="condition-btn" data-value="shade"><span class="picker-txt">Тінь</span></button>
+        </div>
+      </div>
+
+      <!-- Watering frequency -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Полив Кожні N Днів</label>
+        </div>
+        <div class="number-input-wrap">
+          <button type="button" class="num-btn" onclick="adjustNum('field-watering-freq', -1)">
+            <svg width="14" height="2" viewBox="0 0 14 2" fill="none"><path d="M1 1H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <input type="number" id="field-watering-freq" class="form-input num-input" value="7" min="1" max="90">
+          <button type="button" class="num-btn" onclick="adjustNum('field-watering-freq', 1)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Fertilizing frequency -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Підживлення Кожні N Днів</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <div class="number-input-wrap">
+          <button type="button" class="num-btn" onclick="adjustNum('field-fertilizing-freq', -1)">
+            <svg width="14" height="2" viewBox="0 0 14 2" fill="none"><path d="M1 1H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <input type="number" id="field-fertilizing-freq" class="form-input num-input" value="" min="1" max="365" placeholder="—">
+          <button type="button" class="num-btn" onclick="adjustNum('field-fertilizing-freq', 1)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pot size -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Горщик</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <div class="conditions-picker" id="pot-picker">
+          <button type="button" class="pot-btn" data-pot="large"><span class="picker-txt">Великий</span></button>
+          <button type="button" class="pot-btn" data-pot="medium"><span class="picker-txt">Середній</span></button>
+          <button type="button" class="pot-btn" data-pot="small"><span class="picker-txt">Малий</span></button>
+        </div>
+      </div>
+
+      <!-- Next repotting date -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Дата Пересаджування</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <div class="date-input-wrap">
+          <input type="date" id="field-repotting-date" class="form-input">
+          <span class="date-ic-cal" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M7.74998 2.5C7.74998 2.30109 7.67096 2.11032 7.53031 1.96967C7.38966 1.82902 7.19889 1.75 6.99998 1.75C6.80107 1.75 6.6103 1.82902 6.46965 1.96967C6.329 2.11032 6.24998 2.30109 6.24998 2.5V4.08C4.80998 4.195 3.86598 4.477 3.17198 5.172C2.47698 5.866 2.19498 6.811 2.07898 8.25H21.921C21.805 6.81 21.523 5.866 20.828 5.172C20.134 4.477 19.189 4.195 17.75 4.079V2.5C17.75 2.30109 17.671 2.11032 17.5303 1.96967C17.3897 1.82902 17.1989 1.75 17 1.75C16.8011 1.75 16.6103 1.82902 16.4696 1.96967C16.329 2.11032 16.25 2.30109 16.25 2.5V4.013C15.585 4 14.839 4 14 4H9.99998C9.16098 4 8.41498 4 7.74998 4.013V2.5Z" fill="currentColor"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 11.161 2 10.415 2.013 9.75H21.987C22 10.415 22 11.161 22 12V14C22 17.771 22 19.657 20.828 20.828C19.656 21.999 17.771 22 14 22H10C6.229 22 4.343 22 3.172 20.828C2.001 19.656 2 17.771 2 14V12ZM17 14C17.2652 14 17.5196 13.8946 17.7071 13.7071C17.8946 13.5196 18 13.2652 18 13C18 12.7348 17.8946 12.4804 17.7071 12.2929C17.5196 12.1054 17.2652 12 17 12C16.7348 12 16.4804 12.1054 16.2929 12.2929C16.1054 12.4804 16 12.7348 16 13C16 13.2652 16.1054 13.5196 16.2929 13.7071C16.4804 13.8946 16.7348 14 17 14ZM17 18C17.2652 18 17.5196 17.8946 17.7071 17.7071C17.8946 17.5196 18 17.2652 18 17C18 16.7348 17.8946 16.4804 17.7071 16.2929C17.5196 16.1054 17.2652 16 17 16C16.7348 16 16.4804 16.1054 16.2929 16.2929C16.1054 16.4804 16 16.7348 16 17C16 17.2652 16.1054 17.5196 16.2929 17.7071C16.4804 17.8946 16.7348 18 17 18ZM13 13C13 13.2652 12.8946 13.5196 12.7071 13.7071C12.5196 13.8946 12.2652 14 12 14C11.7348 14 11.4804 13.8946 11.2929 13.7071C11.1054 13.5196 11 13.2652 11 13C11 12.7348 11.1054 12.4804 11.2929 12.2929C11.4804 12.1054 11.7348 12 12 12C12.2652 12 12.5196 12.1054 12.7071 12.2929C12.8946 12.4804 13 12.7348 13 13ZM13 17C13 17.2652 12.8946 17.5196 12.7071 17.7071C12.5196 17.8946 12.2652 18 12 18C11.7348 18 11.4804 17.8946 11.2929 17.7071C11.1054 17.5196 11 17.2652 11 17C11 16.7348 11.1054 16.4804 11.2929 16.2929C11.4804 16.1054 11.7348 16 12 16C12.2652 16 12.5196 16.1054 12.7071 16.2929C12.8946 16.4804 13 16.7348 13 17ZM7 14C7.26522 14 7.51957 13.8946 7.70711 13.7071C7.89464 13.5196 8 13.2652 8 13C8 12.7348 7.89464 12.4804 7.70711 12.2929C7.51957 12.1054 7.26522 12 7 12C6.73478 12 6.48043 12.1054 6.29289 12.2929C6.10536 12.4804 6 12.7348 6 13C6 13.2652 6.10536 13.5196 6.29289 13.7071C6.48043 13.8946 6.73478 14 7 14ZM7 18C7.26522 18 7.51957 17.8946 7.70711 17.7071C7.89464 17.5196 8 17.2652 8 17C8 16.7348 7.89464 16.4804 7.70711 16.2929C7.51957 16.1054 7.26522 16 7 16C6.73478 16 6.48043 16.1054 6.29289 16.2929C6.10536 16.4804 6 16.7348 6 17C6 17.2652 6.10536 17.5196 6.29289 17.7071C6.48043 17.8946 6.73478 18 7 18Z" fill="currentColor"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary btn-full" id="btn-plant-form-submit">
+        Додати Рослину
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ ADD NOTE SHEET ═══ -->
+<div id="sheet-note-form" class="sheet">
+  <div class="sheet-inner">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Нова Нотатка</h2>
+      <button class="btn-icon" id="btn-close-note-form">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <form id="note-form" class="form">
+      <div class="form-field">
+        <label class="form-label">Текст нотатки <span class="form-optional">(необов'язково)</span></label>
+        <textarea id="field-note-text" class="form-input form-textarea" rows="4" placeholder="Що спостерігаєте?"></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Фото <span class="form-optional">(необов'язково)</span></label>
+        <div class="note-photo-section">
+          <img id="note-photo-preview" class="note-photo-preview hidden" alt="">
+          <div class="form-photo-buttons">
+            <label class="btn-outline btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18.512 10.077C18.512 10.816 17.887 11.415 17.116 11.415C16.345 11.415 15.721 10.815 15.721 10.077C15.721 9.33899 16.346 8.73999 17.116 8.73999C17.886 8.73999 18.512 9.33799 18.512 10.077Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18.036 5.532C16.976 5.396 15.622 5.396 13.913 5.396H10.087C8.377 5.396 7.023 5.396 5.964 5.532C4.874 5.673 3.99 5.969 3.294 6.636C2.598 7.304 2.289 8.15 2.142 9.196C2 10.21 2 11.508 2 13.147V13.247C2 14.886 2 16.184 2.142 17.2C2.289 18.245 2.598 19.091 3.294 19.758C3.99 20.426 4.874 20.722 5.964 20.862C7.024 21 8.378 21 10.087 21H13.913C15.623 21 16.977 21 18.036 20.863C19.126 20.723 20.01 20.427 20.706 19.759C21.402 19.092 21.711 18.246 21.858 17.201C22 16.185 22 14.887 22 13.248V13.148C22 11.508 22 10.211 21.858 9.195C21.711 8.15 21.402 7.304 20.706 6.636C20.01 5.969 19.126 5.673 18.036 5.532ZM6.15 6.858C5.214 6.978 4.675 7.205 4.28 7.582C3.887 7.96 3.651 8.476 3.525 9.373C3.425 10.093 3.402 10.993 3.397 12.169L3.867 11.774C4.992 10.831 6.686 10.885 7.742 11.897L11.732 15.722C11.9297 15.9085 12.1849 16.0223 12.4558 16.0448C12.7267 16.0673 12.9972 15.9972 13.223 15.846L13.501 15.659C14.1531 15.2229 14.9297 15.0114 15.7129 15.0565C16.4961 15.1016 17.2433 15.4009 17.841 15.909L20.248 17.987C20.346 17.723 20.421 17.407 20.475 17.022C20.603 16.106 20.605 14.898 20.605 13.198C20.605 11.498 20.603 10.29 20.475 9.373C20.349 8.476 20.113 7.96 19.719 7.583C19.326 7.205 18.786 6.979 17.85 6.858C16.894 6.735 15.634 6.733 13.86 6.733H10.14C8.366 6.733 7.106 6.735 6.15 6.858Z" fill="currentColor"/><path d="M17.086 2.61C16.226 2.5 15.132 2.5 13.767 2.5H10.677C9.31302 2.5 8.21802 2.5 7.35802 2.61C6.46802 2.725 5.72602 2.968 5.13702 3.53C4.81196 3.84202 4.56407 4.22549 4.41302 4.65C4.91702 4.42 5.48702 4.284 6.12702 4.2C7.21102 4.06 8.59702 4.06 10.347 4.06H14.261C16.011 4.06 17.396 4.06 18.481 4.2C19.039 4.273 19.545 4.386 20 4.566C19.847 4.17497 19.6109 3.82183 19.308 3.531C18.719 2.968 17.977 2.725 17.086 2.611" fill="currentColor"/></svg>
+              Галерея
+              <input type="file" id="input-note-photo-gallery" accept="image/*" class="hidden">
+            </label>
+            <label class="btn-outline btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.574 4.336C7.84793 3.92507 8.21908 3.58812 8.6545 3.35506C9.08991 3.122 9.57613 3.00004 10.07 3H13.93C14.4239 3.00004 14.9101 3.122 15.3455 3.35506C15.7809 3.58812 16.1521 3.92507 16.426 4.336L17.238 5.555C17.3293 5.69192 17.4531 5.80417 17.5982 5.88179C17.7434 5.95942 17.9054 6.00002 18.07 6H19C19.7956 6 20.5587 6.31607 21.1213 6.87868C21.6839 7.44129 22 8.20435 22 9V18C22 18.7956 21.6839 19.5587 21.1213 20.1213C20.5587 20.6839 19.7956 21 19 21H5C4.20435 21 3.44129 20.6839 2.87868 20.1213C2.31607 19.5587 2 18.7956 2 18V9C2 8.20435 2.31607 7.44129 2.87868 6.87868C3.44129 6.31607 4.20435 6 5 6H5.93C6.09459 6.00002 6.25665 5.95942 6.40178 5.88179C6.54692 5.80417 6.67065 5.69192 6.762 5.555L7.574 4.336ZM10 13C10 12.4696 10.2107 11.9609 10.5858 11.5858C10.9609 11.2107 11.4696 11 12 11C12.5304 11 13.0391 11.2107 13.4142 11.5858C13.7893 11.9609 14 12.4696 14 13C14 13.5304 13.7893 14.0391 13.4142 14.4142C13.0391 14.7893 12.5304 15 12 15C11.4696 15 10.9609 14.7893 10.5858 14.4142C10.2107 14.0391 10 13.5304 10 13ZM12 9C10.9391 9 9.92172 9.42143 9.17157 10.1716C8.42143 10.9217 8 11.9391 8 13C8 14.0609 8.42143 15.0783 9.17157 15.8284C9.92172 16.5786 10.9391 17 12 17C13.0609 17 14.0783 16.5786 14.8284 15.8284C15.5786 15.0783 16 14.0609 16 13C16 11.9391 15.5786 10.9217 14.8284 10.1716C14.0783 9.42143 13.0609 9 12 9Z" fill="currentColor"/></svg>
+              Камера
+              <input type="file" id="input-note-photo-camera" accept="image/*" capture="environment" class="hidden">
+            </label>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary btn-full">Зберегти Нотатку</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MORE ACTIONS SHEET ═══ -->
+<div id="sheet-more-actions" class="sheet">
+  <div class="sheet-inner sheet-inner-compact">
+    <div class="sheet-handle"></div>
+    <div class="more-actions-list">
+      <button class="more-action-btn" id="more-btn-edit">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.529 1.76402C10.7724 1.52062 11.0614 1.32754 11.3794 1.19581C11.6974 1.06408 12.0383 0.996277 12.3825 0.996277C12.7267 0.996277 13.0676 1.06408 13.3856 1.19581C13.7037 1.32754 13.9926 1.52062 14.236 1.76402C14.4794 2.00743 14.6725 2.29639 14.8042 2.61441C14.936 2.93244 15.0038 3.27329 15.0038 3.61752C15.0038 3.96175 14.936 4.3026 14.8042 4.62063C14.6725 4.93865 14.4794 5.22762 14.236 5.47102L13.457 6.25002L9.75002 2.54302L10.529 1.76402ZM9.04302 3.25002L2.65702 9.63602C2.28335 10.0103 2.01677 10.4778 1.88502 10.99L1.01502 14.376C0.993445 14.4603 0.994218 14.5487 1.01726 14.6325C1.0403 14.7164 1.08482 14.7928 1.14642 14.8542C1.20801 14.9156 1.28456 14.9599 1.36849 14.9826C1.45242 15.0054 1.54084 15.0059 1.62502 14.984L5.01002 14.115C5.5224 13.9837 5.99006 13.7171 6.36402 13.343L12.75 6.95702L9.04302 3.25002Z" fill="currentColor"/></svg>
+        Редагувати Рослину
+      </button>
+      <button class="more-action-btn more-action-danger" id="more-btn-delete">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6ZM7 6.5C7 6.36739 6.94732 6.24021 6.85355 6.14645C6.75979 6.05268 6.63261 6 6.5 6C6.36739 6 6.24021 6.05268 6.14645 6.14645C6.05268 6.24021 6 6.36739 6 6.5V11.5C6 11.6326 6.05268 11.7598 6.14645 11.8536C6.24021 11.9473 6.36739 12 6.5 12C6.63261 12 6.75979 11.9473 6.85355 11.8536C6.94732 11.7598 7 11.6326 7 11.5V6.5ZM9.5 6C9.36739 6 9.24021 6.05268 9.14645 6.14645C9.05268 6.24021 9 6.36739 9 6.5V11.5C9 11.6326 9.05268 11.7598 9.14645 11.8536C9.24021 11.9473 9.36739 12 9.5 12C9.63261 12 9.75979 11.9473 9.85355 11.8536C9.94732 11.7598 10 11.6326 10 11.5V6.5C10 6.36739 9.94732 6.24021 9.85355 6.14645C9.75979 6.05268 9.63261 6 9.5 6Z" fill="currentColor"/></svg>
+        Видалити Рослину
+      </button>
+    </div>
+    <div class="more-actions-cancel">
+      <button class="more-cancel-btn" id="more-btn-cancel">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONFIRM DIALOG ═══ -->
+<div id="dialog-confirm" class="dialog-backdrop hidden">
+  <div class="dialog">
+    <h3 class="dialog-title" id="dialog-title">Підтвердження</h3>
+    <p class="dialog-message" id="dialog-message"></p>
+    <div class="dialog-buttons">
+      <button class="btn-outline" id="dialog-cancel">Скасувати</button>
+      <button class="btn-danger" id="dialog-confirm-btn">Видалити</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+/* ═══════════════════════════════════════
+   PLANT DIARY — APP.JS
+═══════════════════════════════════════ */
+
+const SUPABASE_URL = 'https://vimboebhkseptetjlznb.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpbWJvZWJoa3NlcHRldGpsem5iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MDM2NjYsImV4cCI6MjA5NTI3OTY2Nn0.g1KXfAkddsZ44WgrfIrgvk7E0unOo3bMHJ8uov2nzMY'
+
+let sb
+let state = {
+  user: null,
+  plants: [],
+  wateringLogs: {},   // plantId → []
+  notes: {},          // plantId → []
+  currentPlantId: null,
+  activeTab: 'plants',
+  calendarDate: new Date(),
+  journalFilter: 'all',
+  formMode: 'add',    // 'add' | 'edit'
+  pendingPhotoFile: null,
+  pendingNotePhotoFile: null,
+  selectedCondition: 'sun',
+  roomFilter: 'all',  // room filter for plants tab
+  selectedPotSize: null,
+  lang: localStorage.getItem('lang') || 'uk',
+}
+
+/* ═══════════════════════════════════════
+   SHARED SVG ICONS
+═══════════════════════════════════════ */
+const IC_WATERDROP = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6.21375 1.40905C6.18735 1.37822 6.15458 1.35346 6.1177 1.33649C6.08083 1.31952 6.04071 1.31073 6.00012 1.31073C5.95952 1.31073 5.91941 1.31952 5.88253 1.33649C5.84565 1.35346 5.81289 1.37822 5.78648 1.40905C5.04445 2.27694 2.625 5.27741 2.625 7.49999C2.625 9.57116 3.92906 10.875 6 10.875C8.07094 10.875 9.375 9.57116 9.375 7.49999C9.375 5.27741 6.95555 2.27694 6.21375 1.40905Z" fill="currentColor"/></svg>`
+const IC_WARN_SVG = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6.64946 1.57401L10.9665 9.051C11.0323 9.16502 11.0669 9.29435 11.0669 9.426C11.0669 9.55765 11.0323 9.68698 10.9665 9.801C10.9006 9.91501 10.806 10.0097 10.692 10.0755C10.5779 10.1413 10.4486 10.176 10.317 10.176H1.68296C1.55131 10.176 1.42198 10.1413 1.30797 10.0755C1.19396 10.0097 1.09928 9.91501 1.03346 9.801C0.967636 9.68698 0.932983 9.55765 0.932983 9.426C0.932984 9.29435 0.967639 9.16502 1.03346 9.051L5.35046 1.57401C5.63896 1.07401 6.36046 1.07401 6.64946 1.57401ZM5.99996 7.50001C5.86736 7.50001 5.74018 7.55268 5.64641 7.64645C5.55264 7.74022 5.49996 7.8674 5.49996 8.00001C5.49996 8.13261 5.55264 8.25979 5.64641 8.35356C5.74018 8.44733 5.86736 8.50001 5.99996 8.50001C6.13257 8.50001 6.25975 8.44733 6.35352 8.35356C6.44729 8.25979 6.49996 8.13261 6.49996 8.00001C6.49996 7.8674 6.44729 7.74022 6.35352 7.64645C6.25975 7.55268 6.13257 7.50001 5.99996 7.50001ZM5.99996 4.00001C5.8775 4.00002 5.7593 4.04498 5.66778 4.12636C5.57626 4.20774 5.51779 4.31988 5.50346 4.44151L5.49996 4.50001V6.50001C5.50011 6.62745 5.5489 6.75002 5.63639 6.84269C5.72387 6.93536 5.84344 6.99112 5.97066 6.99859C6.09788 7.00606 6.22315 6.96467 6.32088 6.88287C6.41861 6.80108 6.48141 6.68505 6.49646 6.55851L6.49996 6.50001V4.50001C6.49996 4.3674 6.44729 4.24022 6.35352 4.14645C6.25975 4.05268 6.13257 4.00001 5.99996 4.00001Z" fill="currentColor"/></svg>`
+const IC_POT = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M7.975 19C7.43056 19 6.95417 18.8347 6.54583 18.5042C6.1375 18.1736 5.86528 17.7458 5.72917 17.2208L4.41667 12H19.5833L18.2708 17.2208C18.1347 17.7458 17.8625 18.1736 17.4542 18.5042C17.0458 18.8347 16.5694 19 16.025 19H7.975Z" fill="currentColor"/><path d="M21.8152 10.1485C22.2717 9.69117 22.5 9.14167 22.5 8.5V5H1.5V8.5C1.50078 9.14244 1.72944 9.69194 2.186 10.1485C2.64256 10.6051 3.19167 10.8333 3.83333 10.8333H20.1667C20.8091 10.8341 21.3586 10.6058 21.8152 10.1485Z" fill="currentColor"/></svg>`
+const IC_SOIL = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.29142 2.46054C7.44843 2.46054 6.63998 2.79541 6.0439 3.39149C5.44782 3.98757 5.11295 4.79603 5.11295 5.63901V10.4614L4.55354 11.0208C3.95767 11.6168 3.62292 12.4252 3.62292 13.268C3.62292 14.1108 3.95767 14.9191 4.55354 15.5151L8.58638 19.5467C8.88154 19.842 9.23197 20.0762 9.61765 20.2359C10.0033 20.3957 10.4167 20.478 10.8342 20.478C11.2517 20.478 11.665 20.3957 12.0507 20.2359C12.4364 20.0762 12.7868 19.842 13.082 19.5467L18.385 14.2438C18.6802 13.9486 18.9144 13.5982 19.0742 13.2125C19.234 12.8268 19.3162 12.4134 19.3162 11.9959C19.3162 11.5785 19.234 11.1651 19.0742 10.7794C18.9144 10.3937 18.6802 10.0433 18.385 9.74813L14.3534 5.71656C13.9704 5.33335 13.4958 5.0544 12.9746 4.9062C12.4535 4.758 11.9031 4.74548 11.3758 4.86982C11.2042 4.18169 10.8073 3.57072 10.2484 3.13414C9.6895 2.69756 9.00063 2.46045 8.29142 2.46054ZM10.1985 7.17357V11.3603H11.4699V6.16536C11.8093 6.0456 12.1756 6.0243 12.5266 6.10395C12.8775 6.18359 13.1988 6.36092 13.4533 6.61543L17.4861 10.647C17.6633 10.8241 17.8039 11.0344 17.8998 11.2659C17.9957 11.4973 18.0451 11.7454 18.0451 11.9959C18.0451 12.2465 17.9957 12.4946 17.8998 12.726C17.8039 12.9575 17.6633 13.1678 17.4861 13.3449L16.9267 13.903H5.00488C4.88511 13.5636 4.86382 13.1973 4.94346 12.8463C5.02311 12.4954 5.20043 12.1741 5.45495 11.9197L10.1985 7.17357ZM10.1871 5.42923C10.1337 4.94435 9.89657 4.49834 9.52443 4.18295C9.15229 3.86756 8.67344 3.70677 8.18637 3.73364C7.6993 3.76051 7.24105 3.973 6.90586 4.32741C6.57067 4.68182 6.38403 5.1512 6.38434 5.63901V9.18999L9.85777 5.71529C9.96202 5.61019 10.0718 5.51568 10.1871 5.42923Z" fill="currentColor"/><path d="M18.6469 14.84L20.5972 16.7903C20.983 17.1762 21.2457 17.6678 21.3522 18.2029C21.4586 18.7381 21.4039 19.2928 21.1951 19.7969C20.9863 20.301 20.6327 20.7319 20.179 21.035C19.7253 21.3382 19.1919 21.5 18.6462 21.5C18.1006 21.5 17.5672 21.3382 17.1135 21.035C16.6598 20.7319 16.3062 20.301 16.0974 19.7969C15.8885 19.2928 15.8339 18.7381 15.9403 18.2029C16.0468 17.6678 16.3095 17.1762 16.6953 16.7903L18.6469 14.84Z" fill="currentColor"/></svg>`
+const IC_NOTE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+async function init() {
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session) {
+      state.user = session.user
+      showApp()
+      await loadAllData()
+    } else if (event === 'SIGNED_OUT') {
+      state.user = null
+      showAuth()
+    }
+  })
+
+  // DEMO MODE: bypass auth to preview UI
+  const DEMO_MODE = true
+  if (DEMO_MODE) {
+    state.user = { id: 'demo-user', email: 'demo@plantdiary.app' }
+    loadDemoData()
+    showApp()
+    bindEvents()
+    return
+  }
+
+  const { data: { session } } = await sb.auth.getSession()
+  if (session) {
+    state.user = session.user
+    showApp()
+    await loadAllData()
+  } else {
+    showAuth()
+  }
+
+  bindEvents()
+}
+
+/* ═══════════════════════════════════════
+   DEMO DATA
+═══════════════════════════════════════ */
+function loadDemoData() {
+  const now = new Date()
+  const daysAgo = d => new Date(now - d * 86400000).toISOString()
+
+  state.plants = [
+    {
+      id: 'p1', user_id: 'demo-user',
+      name: 'Монстера', room: 'Вітальня', conditions: 'partial',
+      watering_frequency_days: 7, fertilizing_frequency_days: 14,
+      next_repotting_date: null, photo_url: null,
+      pot_size: 'large',
+      created_at: daysAgo(30)
+    },
+    {
+      id: 'p2', user_id: 'demo-user',
+      name: 'Фікус', room: 'Спальня', conditions: 'sun',
+      watering_frequency_days: 5, fertilizing_frequency_days: 21,
+      next_repotting_date: new Date(now.getTime() + 5 * 86400000).toISOString().split('T')[0],
+      photo_url: null, pot_size: 'medium', created_at: daysAgo(60)
+    },
+    {
+      id: 'p3', user_id: 'demo-user',
+      name: 'Кактус Санта', room: 'Балкон', conditions: 'sun',
+      watering_frequency_days: 14, fertilizing_frequency_days: null,
+      next_repotting_date: null, photo_url: null,
+      pot_size: 'small',
+      created_at: daysAgo(90)
+    },
+    {
+      id: 'p4', user_id: 'demo-user',
+      name: 'Спатіфіллум', room: 'Кухня', conditions: 'shade',
+      watering_frequency_days: 4, fertilizing_frequency_days: 30,
+      next_repotting_date: null, photo_url: null,
+      pot_size: null,
+      created_at: daysAgo(14)
+    },
+  ]
+
+  state.wateringLogs = {
+    p1: [
+      { id: 'w1', plant_id: 'p1', user_id: 'demo-user', watered_at: daysAgo(2), with_fertilizer: false },
+      { id: 'w2', plant_id: 'p1', user_id: 'demo-user', watered_at: daysAgo(9), with_fertilizer: true },
+      { id: 'w3', plant_id: 'p1', user_id: 'demo-user', watered_at: daysAgo(16), with_fertilizer: false },
+    ],
+    p2: [
+      { id: 'w4', plant_id: 'p2', user_id: 'demo-user', watered_at: daysAgo(6), with_fertilizer: false },
+      { id: 'w5', plant_id: 'p2', user_id: 'demo-user', watered_at: daysAgo(11), with_fertilizer: true },
+    ],
+    p3: [
+      { id: 'w6', plant_id: 'p3', user_id: 'demo-user', watered_at: daysAgo(10), with_fertilizer: false },
+    ],
+    p4: [
+      { id: 'w7', plant_id: 'p4', user_id: 'demo-user', watered_at: daysAgo(5), with_fertilizer: false },
+    ],
+  }
+
+  state.notes = {
+    p1: [
+      { id: 'n1', plant_id: 'p1', user_id: 'demo-user', text: 'З\'явився новий листок! Росте дуже швидко цього місяця 🌿', photo_url: null, created_at: daysAgo(3) },
+      { id: 'n2', plant_id: 'p1', user_id: 'demo-user', text: 'Помітила жовтий листок знизу — обрізала.', photo_url: null, created_at: daysAgo(12) },
+    ],
+    p2: [
+      { id: 'n3', plant_id: 'p2', user_id: 'demo-user', text: 'Переставила ближче до вікна — виглядає краще.', photo_url: null, created_at: daysAgo(7) },
+    ],
+    p3: [], p4: [],
+  }
+
+  renderPlantsTab()
+  renderCalendar()
+  renderJournal()
+  setTimeout(applyLang, 0)
+}
+
+/* ═══════════════════════════════════════
+   AUTH
+═══════════════════════════════════════ */
+async function signInWithGoogle() {
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin }
+  })
+}
+
+async function signInWithApple() {
+  await sb.auth.signInWithOAuth({
+    provider: 'apple',
+    options: { redirectTo: window.location.origin }
+  })
+}
+
+async function signOut() {
+  await sb.auth.signOut()
+}
+
+/* ═══════════════════════════════════════
+   DATA LOADING
+═══════════════════════════════════════ */
+async function loadAllData() {
+  await loadPlants()
+  renderPlantsTab()
+  renderCalendar()
+  await loadJournalData()
+}
+
+async function loadPlants() {
+  const { data, error } = await sb
+    .from('plants')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) { console.error(error); return }
+  state.plants = data || []
+}
+
+async function loadWateringLogs(plantId) {
+  const { data, error } = await sb
+    .from('watering_logs')
+    .select('*')
+    .eq('plant_id', plantId)
+    .order('watered_at', { ascending: false })
+
+  if (!error) state.wateringLogs[plantId] = data || []
+  return data || []
+}
+
+async function loadNotes(plantId) {
+  const { data, error } = await sb
+    .from('notes')
+    .select('*')
+    .eq('plant_id', plantId)
+    .order('created_at', { ascending: false })
+
+  if (!error) state.notes[plantId] = data || []
+  return data || []
+}
+
+async function loadJournalData() {
+  // Load all logs + notes for all plants
+  if (!state.plants.length) {
+    renderJournal()
+    return
+  }
+  const plantIds = state.plants.map(p => p.id)
+
+  const [{ data: logs }, { data: notes }] = await Promise.all([
+    sb.from('watering_logs').select('*').in('plant_id', plantIds).order('watered_at', { ascending: false }),
+    sb.from('notes').select('*').in('plant_id', plantIds).order('created_at', { ascending: false })
+  ])
+
+  for (const p of state.plants) {
+    state.wateringLogs[p.id] = (logs || []).filter(l => l.plant_id === p.id)
+    state.notes[p.id] = (notes || []).filter(n => n.plant_id === p.id)
+  }
+
+  renderJournal()
+}
+
+/* ═══════════════════════════════════════
+   PLANT STATUS CALCULATION
+═══════════════════════════════════════ */
+function getNextWatering(plant) {
+  const logs = state.wateringLogs[plant.id] || []
+  const last = logs[0]
+  const base = last ? new Date(last.watered_at) : new Date(plant.created_at)
+  const next = new Date(base)
+  next.setDate(next.getDate() + plant.watering_frequency_days)
+  return dayStart(next)
+}
+
+function getNextFertilizing(plant) {
+  if (!plant.fertilizing_frequency_days) return null
+  const logs = state.wateringLogs[plant.id] || []
+  const last = logs.find(l => l.with_fertilizer)
+  const base = last ? new Date(last.watered_at) : new Date(plant.created_at)
+  const next = new Date(base)
+  next.setDate(next.getDate() + plant.fertilizing_frequency_days)
+  return dayStart(next)
+}
+
+function getPlantStatus(plant) {
+  const today = dayStart(new Date())
+  const nw = getNextWatering(plant)
+  const diff = Math.round((nw - today) / 86400000)
+
+  if (diff < 0) return { type: 'overdue', label: t('status_overdue', Math.abs(diff)) }
+  if (diff === 0) return { type: 'today', label: t('status_today') }
+  if (diff === 1) return { type: 'soon', label: t('status_soon') }
+  return { type: 'ok', label: t('status_ok', diff) }
+}
+
+function dayStart(date) {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
+
+/* ═══════════════════════════════════════
+   RENDER — PLANTS TAB
+═══════════════════════════════════════ */
+function renderPlantsTab() {
+  const list = document.getElementById('plants-list')
+  const loading = document.getElementById('plants-loading')
+  const empty = document.getElementById('plants-empty')
+
+  loading.classList.add('hidden')
+  Array.from(list.querySelectorAll('.plant-card')).forEach(c => c.remove())
+
+  // Build room filter chips
+  renderRoomFilters()
+
+  // Filter plants by room
+  const filtered = state.roomFilter === 'all'
+    ? state.plants
+    : state.plants.filter(p => p.room === state.roomFilter)
+
+  if (!filtered.length) {
+    empty.classList.remove('hidden')
+    return
+  }
+
+  empty.classList.add('hidden')
+  for (const plant of filtered) {
+    list.appendChild(buildPlantCard(plant))
+  }
+}
+
+const ROOM_ORDER = ['Вітальня', 'Спальня', 'Кухня', 'Кабінет', 'Балкон']
+
+function renderRoomFilters() {
+  const bar = document.getElementById('room-filter-bar')
+  const usedRooms = new Set(state.plants.map(p => p.room))
+  const extra = [...usedRooms].filter(r => !ROOM_ORDER.includes(r)).sort()
+  const rooms = [...ROOM_ORDER, ...extra]
+  bar.innerHTML = ''
+
+  const allBtn = createElement('button', `filter-chip filter-chip-all${state.roomFilter === 'all' ? ' active' : ''}`, t('filter_all'))
+  allBtn.dataset.room = 'all'
+  allBtn.addEventListener('click', () => { state.roomFilter = 'all'; renderPlantsTab() })
+  bar.appendChild(allBtn)
+
+  for (const room of rooms) {
+    const btn = createElement('button', `filter-chip${state.roomFilter === room ? ' active' : ''}`, room)
+    btn.dataset.room = room
+    btn.addEventListener('click', () => { state.roomFilter = room; renderPlantsTab() })
+    bar.appendChild(btn)
+  }
+}
+
+function buildPlantCard(plant) {
+  const status = getPlantStatus(plant)
+  const statusIcon = status.type === 'overdue' ? IC_WARN_SVG : IC_WATERDROP
+
+  const card = createElement('div', 'plant-card')
+  card.dataset.plantId = plant.id
+  card.addEventListener('click', () => openPlantDetail(plant.id))
+
+  const photoDiv = createElement('div', 'plant-card-photo')
+  if (plant.photo_url) {
+    const img = document.createElement('img')
+    img.src = plant.photo_url
+    img.alt = plant.name
+    img.loading = 'lazy'
+    photoDiv.appendChild(img)
+  } else {
+    photoDiv.textContent = '🪴'
+  }
+
+  // Text block: name + conditions row
+  const textBlock = createElement('div', 'plant-card-text')
+  const nameEl = createElement('div', 'plant-card-name', plant.name)
+  const roomEl = createElement('div', 'plant-card-room')
+  const c = CONDITIONS[plant.conditions]
+  const condText = c ? t(c.key) : plant.conditions
+  roomEl.innerHTML = `<span>${condText}</span><span>·</span><span>${plant.room}</span>`
+  textBlock.append(nameEl, roomEl)
+
+  // Status badge
+  const statusBadge = createElement('span', `status-badge ${status.type}`)
+  statusBadge.innerHTML = (statusIcon ? statusIcon + ' ' : '') + status.label
+
+  // Info column
+  const infoDiv = createElement('div', 'plant-card-info')
+  infoDiv.append(textBlock, statusBadge)
+
+  // More button
+  const moreBtn = createElement('button', 'plant-card-more')
+  moreBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>`
+  moreBtn.addEventListener('click', e => {
+    e.stopPropagation()
+    state.currentPlantId = plant.id
+    openSheet('sheet-more-actions')
+  })
+
+  // Content row: info + more
+  const contentRow = createElement('div', 'plant-card-content')
+  contentRow.append(infoDiv, moreBtn)
+
+  card.append(photoDiv, contentRow)
+  return card
+}
+
+/* ═══════════════════════════════════════
+   RENDER — PLANT DETAIL
+═══════════════════════════════════════ */
+async function openPlantDetail(plantId) {
+  state.currentPlantId = plantId
+  const plant = state.plants.find(p => p.id === plantId)
+  if (!plant) return
+
+  // Load fresh data
+  showLoadingInDetail()
+  await Promise.all([loadWateringLogs(plantId), loadNotes(plantId)])
+  renderPlantDetail(plant)
+
+  openOverlay('overlay-detail')
+}
+
+function showLoadingInDetail() {
+  // We just open the overlay with existing DOM — data renders async
+}
+
+function renderPlantDetail(plant) {
+  // Photo
+  const photoImg = document.getElementById('detail-photo-img')
+  const photoPlaceholder = document.getElementById('detail-photo-placeholder')
+  if (plant.photo_url) {
+    photoImg.src = plant.photo_url
+    photoImg.classList.remove('hidden')
+    photoPlaceholder.classList.add('hidden')
+  } else {
+    photoImg.classList.add('hidden')
+    photoPlaceholder.classList.remove('hidden')
+  }
+
+  // Name + meta (conditions · room · pot size)
+  document.getElementById('detail-name').textContent = plant.name
+  const metaParts = [conditionsLabel(plant.conditions), plant.room]
+  if (plant.pot_size && POT_SIZES[plant.pot_size]) metaParts.push(potSizeLabel(plant.pot_size))
+  document.getElementById('detail-meta').textContent = metaParts.join(' · ')
+
+  // Next watering badge
+  const nw = getNextWatering(plant)
+  const today = dayStart(new Date())
+  const diff = Math.round((nw - today) / 86400000)
+  const nwEl = document.getElementById('detail-next-watering')
+  if (diff < 0) {
+    nwEl.innerHTML = IC_WARN_SVG + ` Прострочено ${Math.abs(diff)} дн.`
+    nwEl.className = 'detail-watering-badge overdue'
+  } else if (diff === 0) {
+    nwEl.innerHTML = IC_WATERDROP + ' Сьогодні'
+    nwEl.className = 'detail-watering-badge'
+  } else if (diff === 1) {
+    nwEl.innerHTML = IC_WATERDROP + ' Завтра'
+    nwEl.className = 'detail-watering-badge'
+  } else {
+    nwEl.innerHTML = IC_WATERDROP + ' ' + formatDate(nw)
+    nwEl.className = 'detail-watering-badge'
+  }
+
+  // Reset fertilizer toggle + button text
+  const fertToggle = document.getElementById('toggle-fertilizer')
+  if (fertToggle) fertToggle.checked = false
+  const waterBtn = document.getElementById('btn-water')
+  if (waterBtn) waterBtn.textContent = 'Полити'
+
+  // Watering history
+  renderWateringHistory(plant.id)
+
+  // Repotting — always visible, render as log card
+  document.getElementById('detail-repotting-section').classList.remove('hidden')
+  const repLog = document.getElementById('repotting-log')
+  repLog.innerHTML = ''
+  if (plant.next_repotting_date) {
+    const entry = createElement('div', 'history-item')
+    const iconEl = createElement('span', 'history-item-icon')
+    iconEl.innerHTML = IC_POT
+    const dateEl = createElement('span', 'history-item-date', formatDate(new Date(plant.next_repotting_date)))
+    entry.append(iconEl, dateEl)
+    repLog.appendChild(entry)
+  } else {
+    repLog.appendChild(createElement('p', 'repotting-empty', 'Пересадку не заплановано'))
+  }
+
+  // Notes
+  renderNotes(plant.id)
+}
+
+function renderWateringHistory(plantId) {
+  const container = document.getElementById('watering-history')
+  const logs = state.wateringLogs[plantId] || []
+  container.innerHTML = ''
+
+  if (!logs.length) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text3)">Ще не поливали</p>'
+    return
+  }
+
+  logs.slice(0, 3).forEach(log => {
+    container.appendChild(buildHistoryItem(log))
+  })
+}
+
+function buildHistoryItem(log) {
+  const item = createElement('div', 'history-item')
+  const iconEl = createElement('span', 'history-item-icon')
+  iconEl.innerHTML = log.with_fertilizer ? IC_SOIL : IC_WATERDROP
+  item.append(
+    iconEl,
+    createElement('span', 'history-item-date', formatDateTime(new Date(log.watered_at)))
+  )
+  if (log.with_fertilizer) {
+    item.appendChild(createElement('span', 'history-item-badge', 'З Добривом'))
+  }
+  return item
+}
+
+function renderNotes(plantId) {
+  const container = document.getElementById('notes-list')
+  const notes = state.notes[plantId] || []
+  container.innerHTML = ''
+
+  if (!notes.length) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text3)">Нотаток ще немає</p>'
+    return
+  }
+
+  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note)))
+}
+
+function buildNoteItem(note) {
+  const item = createElement('div', 'note-item')
+
+  const content = createElement('div', 'note-item-content')
+  if (note.text) content.appendChild(createElement('p', 'note-item-text', note.text))
+
+  if (note.photo_url) {
+    const thumbs = createElement('div', 'note-item-thumbs')
+    const img = document.createElement('img')
+    img.src = note.photo_url
+    img.className = 'note-item-thumb'
+    img.alt = ''
+    img.loading = 'lazy'
+    thumbs.appendChild(img)
+    content.appendChild(thumbs)
+  }
+
+  item.appendChild(content)
+  item.appendChild(createElement('p', 'note-item-date', formatDateTime(new Date(note.created_at))))
+  return item
+}
+
+/* ═══════════════════════════════════════
+   ADD / EDIT PLANT FORM
+═══════════════════════════════════════ */
+function openAddPlantForm() {
+  state.formMode = 'add'
+  state.pendingPhotoFile = null
+  document.getElementById('plant-form-title').textContent = 'Нова Рослина'
+  document.getElementById('btn-plant-form-submit').textContent = 'Додати Рослину'
+
+  // Reset form
+  document.getElementById('plant-form').reset()
+  document.getElementById('form-photo-img').classList.add('hidden')
+  document.getElementById('form-photo-preview').querySelector('.form-photo-placeholder').style.display = ''
+  document.getElementById('field-watering-freq').value = 7
+  document.getElementById('field-fertilizing-freq').value = ''
+  document.getElementById('field-repotting-date').value = ''
+
+  // Reset conditions
+  state.selectedCondition = 'sun'
+  document.querySelectorAll('.condition-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.value === 'sun')
+  })
+
+  // Reset pot size
+  state.selectedPotSize = null
+  document.querySelectorAll('.pot-btn').forEach(btn => btn.classList.remove('active'))
+
+  openSheet('sheet-plant-form')
+}
+
+function openEditPlantForm() {
+  const plant = state.plants.find(p => p.id === state.currentPlantId)
+  if (!plant) return
+
+  state.formMode = 'edit'
+  state.pendingPhotoFile = null
+  document.getElementById('plant-form-title').textContent = 'Редагувати Рослину'
+  document.getElementById('btn-plant-form-submit').textContent = 'Зберегти Зміни'
+
+  document.getElementById('field-name').value = plant.name
+  document.getElementById('field-room').value = plant.room
+  document.getElementById('field-watering-freq').value = plant.watering_frequency_days
+  document.getElementById('field-fertilizing-freq').value = plant.fertilizing_frequency_days || ''
+  document.getElementById('field-repotting-date').value = plant.next_repotting_date || ''
+
+  // Photo preview
+  const formImg = document.getElementById('form-photo-img')
+  const placeholder = document.getElementById('form-photo-preview').querySelector('.form-photo-placeholder')
+  if (plant.photo_url) {
+    formImg.src = plant.photo_url
+    formImg.classList.remove('hidden')
+    placeholder.style.display = 'none'
+  } else {
+    formImg.classList.add('hidden')
+    placeholder.style.display = ''
+  }
+
+  // Conditions
+  state.selectedCondition = plant.conditions
+  document.querySelectorAll('.condition-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.value === plant.conditions)
+  })
+
+  // Pot size
+  state.selectedPotSize = plant.pot_size || null
+  document.querySelectorAll('.pot-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.pot === plant.pot_size)
+  })
+
+  openSheet('sheet-plant-form')
+}
+
+async function submitPlantForm(e) {
+  e.preventDefault()
+  const btn = document.getElementById('btn-plant-form-submit')
+  btn.textContent = 'Збереження...'
+  btn.disabled = true
+
+  try {
+    let photoUrl = null
+
+    if (state.formMode === 'edit') {
+      const existing = state.plants.find(p => p.id === state.currentPlantId)
+      photoUrl = existing?.photo_url || null
+    }
+
+    if (state.pendingPhotoFile) {
+      photoUrl = await uploadPhoto(state.pendingPhotoFile)
+    }
+
+    const payload = {
+      user_id: state.user.id,
+      name: document.getElementById('field-name').value.trim(),
+      room: document.getElementById('field-room').value,
+      conditions: state.selectedCondition,
+      watering_frequency_days: parseInt(document.getElementById('field-watering-freq').value) || 7,
+      fertilizing_frequency_days: parseInt(document.getElementById('field-fertilizing-freq').value) || null,
+      next_repotting_date: document.getElementById('field-repotting-date').value || null,
+      photo_url: photoUrl,
+      pot_size: state.selectedPotSize || null,
+    }
+
+    if (state.formMode === 'add') {
+      const { data, error } = await sb.from('plants').insert(payload).select().single()
+      if (error) throw error
+      state.plants.unshift(data)
+      showToast('Рослину додано ✓')
+    } else {
+      const { data, error } = await sb
+        .from('plants')
+        .update(payload)
+        .eq('id', state.currentPlantId)
+        .select().single()
+      if (error) throw error
+      const idx = state.plants.findIndex(p => p.id === state.currentPlantId)
+      if (idx !== -1) state.plants[idx] = data
+      showToast('Збережено ✓')
+      renderPlantDetail(data)
+    }
+
+    closeSheet('sheet-plant-form')
+    renderPlantsTab()
+    renderCalendar()
+    state.pendingPhotoFile = null
+
+  } catch (err) {
+    console.error(err)
+    showToast('Помилка: ' + err.message)
+  } finally {
+    btn.disabled = false
+    btn.textContent = state.formMode === 'add' ? 'Додати Рослину' : 'Зберегти Зміни'
+  }
+}
+
+/* ═══════════════════════════════════════
+   WATERING ACTIONS
+═══════════════════════════════════════ */
+async function waterPlant() {
+  const plantId = state.currentPlantId
+  if (!plantId) return
+
+  const fertToggle = document.getElementById('toggle-fertilizer')
+  const withFertilizer = fertToggle ? fertToggle.checked : false
+
+  const btn = document.getElementById('btn-water')
+  btn.disabled = true
+
+  try {
+    const logEntry = { id: 'demo-' + Date.now(), plant_id: plantId, user_id: state.user.id, watered_at: new Date().toISOString(), with_fertilizer: withFertilizer }
+
+    if (!sb) {
+      // Demo mode: simulate locally
+      if (!state.wateringLogs[plantId]) state.wateringLogs[plantId] = []
+      state.wateringLogs[plantId].unshift(logEntry)
+    } else {
+      const { data, error } = await sb
+        .from('watering_logs')
+        .insert({ plant_id: plantId, user_id: state.user.id, with_fertilizer: withFertilizer })
+        .select().single()
+      if (error) throw error
+      if (!state.wateringLogs[plantId]) state.wateringLogs[plantId] = []
+      state.wateringLogs[plantId].unshift(data)
+    }
+
+    if (fertToggle) fertToggle.checked = false
+    if (btn) btn.textContent = 'Полити'
+
+    const plant = state.plants.find(p => p.id === plantId)
+    renderPlantDetail(plant)
+    renderPlantsTab()
+    renderCalendar()
+    if (sb) await loadJournalData()
+
+    showToast(withFertilizer ? 'Полив з добривом зафіксовано!' : 'Полив зафіксовано!')
+  } catch (err) {
+    console.error(err)
+    showToast('Помилка збереження')
+  } finally {
+    btn.disabled = false
+  }
+}
+
+/* ═══════════════════════════════════════
+   LOG REPOTTING
+═══════════════════════════════════════ */
+async function logRepotting() {
+  const plantId = state.currentPlantId
+  if (!plantId) return
+
+  try {
+    const today = new Date().toISOString().slice(0, 10)
+    const idx = state.plants.findIndex(p => p.id === plantId)
+
+    if (!sb) {
+      // Demo mode: simulate locally
+      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: today }
+      renderPlantDetail(state.plants[idx])
+    } else {
+      const { data, error } = await sb
+        .from('plants')
+        .update({ next_repotting_date: today })
+        .eq('id', plantId)
+        .select().single()
+      if (error) throw error
+      if (idx !== -1) state.plants[idx] = data
+      renderPlantDetail(data)
+    }
+
+    showToast('Пересадку зафіксовано!')
+  } catch (err) {
+    console.error(err)
+    showToast('Помилка збереження')
+  }
+}
+
+/* ═══════════════════════════════════════
+   CHANGE PLANT PHOTO (from detail)
+═══════════════════════════════════════ */
+async function changePlantPhoto(file) {
+  if (!file || !state.currentPlantId) return
+
+  showLoadingOverlay()
+  try {
+    if (!sb) {
+      // Demo mode: use object URL for in-session preview
+      const photoUrl = URL.createObjectURL(file)
+      const idx = state.plants.findIndex(p => p.id === state.currentPlantId)
+      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], photo_url: photoUrl }
+      renderPlantDetail(state.plants[idx])
+      renderPlantsTab()
+      showToast('Фото оновлено ✓')
+      return
+    }
+    const photoUrl = await uploadPhoto(file)
+    const { data, error } = await sb
+      .from('plants')
+      .update({ photo_url: photoUrl })
+      .eq('id', state.currentPlantId)
+      .select().single()
+    if (error) throw error
+
+    const idx = state.plants.findIndex(p => p.id === state.currentPlantId)
+    if (idx !== -1) state.plants[idx] = data
+
+    renderPlantDetail(data)
+    renderPlantsTab()
+    showToast('Фото оновлено ✓')
+  } catch (err) {
+    showToast('Помилка завантаження фото')
+  } finally {
+    hideLoadingOverlay()
+  }
+}
+
+/* ═══════════════════════════════════════
+   NOTES
+═══════════════════════════════════════ */
+function openAddNoteForm() {
+  state.pendingNotePhotoFile = null
+  document.getElementById('note-form').reset()
+  document.getElementById('note-photo-preview').classList.add('hidden')
+  openSheet('sheet-note-form')
+}
+
+async function submitNoteForm(e) {
+  e.preventDefault()
+  const btn = e.target.querySelector('button[type=submit]')
+  btn.textContent = 'Збереження...'
+  btn.disabled = true
+
+  const plantId = state.currentPlantId
+  try {
+    let photoUrl = null
+    if (state.pendingNotePhotoFile) {
+      if (!sb) {
+        photoUrl = URL.createObjectURL(state.pendingNotePhotoFile)
+      } else {
+        photoUrl = await uploadPhoto(state.pendingNotePhotoFile, 'notes')
+      }
+    }
+
+    const text = document.getElementById('field-note-text').value.trim()
+    if (!text && !photoUrl) {
+      showToast('Додайте текст або фото')
+      return
+    }
+
+    const noteData = { id: 'demo-note-' + Date.now(), plant_id: plantId, user_id: state.user.id, text: text || null, photo_url: photoUrl, created_at: new Date().toISOString() }
+
+    if (!sb) {
+      if (!state.notes[plantId]) state.notes[plantId] = []
+      state.notes[plantId].unshift(noteData)
+    } else {
+      const { data, error } = await sb
+        .from('notes')
+        .insert({ plant_id: plantId, user_id: state.user.id, text: text || null, photo_url: photoUrl })
+        .select().single()
+      if (error) throw error
+      if (!state.notes[plantId]) state.notes[plantId] = []
+      state.notes[plantId].unshift(data)
+    }
+
+    const plant = state.plants.find(p => p.id === plantId)
+    renderNotes(plantId)
+    closeSheet('sheet-note-form')
+    await loadJournalData()
+    showToast('Нотатку додано ✓')
+  } catch (err) {
+    console.error(err)
+    showToast('Помилка: ' + err.message)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Зберегти нотатку'
+    state.pendingNotePhotoFile = null
+  }
+}
+
+/* ═══════════════════════════════════════
+   DELETE PLANT
+═══════════════════════════════════════ */
+async function deletePlant() {
+  const plantId = state.currentPlantId
+  if (!plantId) return
+
+  showConfirm(
+    'Видалити рослину?',
+    'Всі поливи та нотатки також будуть видалені. Це незворотньо.',
+    async () => {
+      showLoadingOverlay()
+      try {
+        const { error } = await sb.from('plants').delete().eq('id', plantId)
+        if (error) throw error
+
+        state.plants = state.plants.filter(p => p.id !== plantId)
+        delete state.wateringLogs[plantId]
+        delete state.notes[plantId]
+
+        closeOverlay('overlay-detail')
+        renderPlantsTab()
+        renderCalendar()
+        await loadJournalData()
+        showToast('Рослину видалено')
+      } catch (err) {
+        showToast('Помилка видалення')
+      } finally {
+        hideLoadingOverlay()
+      }
+    }
+  )
+}
+
+/* ═══════════════════════════════════════
+   PHOTO UPLOAD
+═══════════════════════════════════════ */
+async function uploadPhoto(file, folder = 'plants') {
+  const ext = file.name.split('.').pop() || 'jpg'
+  const path = `${state.user.id}/${folder}/${Date.now()}.${ext}`
+
+  const { error } = await sb.storage
+    .from('plant-photos')
+    .upload(path, file, { cacheControl: '3600', upsert: true })
+
+  if (error) throw error
+
+  const { data: { publicUrl } } = sb.storage
+    .from('plant-photos')
+    .getPublicUrl(path)
+
+  return publicUrl
+}
+
+function setPhotoPreview(file, imgEl, placeholderEl) {
+  if (!file) return
+  const url = URL.createObjectURL(file)
+  imgEl.src = url
+  imgEl.classList.remove('hidden')
+  if (placeholderEl) placeholderEl.style.display = 'none'
+}
+
+/* ═══════════════════════════════════════
+   RENDER — CALENDAR
+═══════════════════════════════════════ */
+function renderCalendar() {
+  const container = document.getElementById('calendar-container')
+  const date = state.calendarDate
+  const year = date.getFullYear()
+  const month = date.getMonth()
+
+  // Build events map: 'YYYY-MM-DD' → [{type, plantName}]
+  const events = buildCalendarEvents(year, month)
+
+  const monthLabel = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' }).format(date)
+
+  container.innerHTML = `
+    <div class="calendar-nav">
+      <button class="calendar-nav-btn" id="cal-prev">‹</button>
+      <span class="calendar-month-label">${monthLabel}</span>
+      <button class="calendar-nav-btn" id="cal-next">›</button>
+    </div>
+    <div class="calendar-weekdays">
+      ${['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d => `<div class="calendar-weekday">${d}</div>`).join('')}
+    </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
+  `
+
+  document.getElementById('cal-prev').addEventListener('click', () => {
+    state.calendarDate = new Date(year, month - 1, 1)
+    renderCalendar()
+  })
+  document.getElementById('cal-next').addEventListener('click', () => {
+    state.calendarDate = new Date(year, month + 1, 1)
+    renderCalendar()
+  })
+
+  const grid = document.getElementById('calendar-grid')
+  const today = dayStart(new Date())
+
+  // First day of month (0=Sun, adjust for Mon-start)
+  const firstDay = new Date(year, month, 1)
+  let startDow = firstDay.getDay() - 1
+  if (startDow < 0) startDow = 6
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const daysInPrevMonth = new Date(year, month, 0).getDate()
+  const totalCells = Math.ceil((startDow + daysInMonth) / 7) * 7
+
+  for (let i = 0; i < totalCells; i++) {
+    let cellDate, otherMonth = false
+
+    if (i < startDow) {
+      cellDate = new Date(year, month - 1, daysInPrevMonth - startDow + i + 1)
+      otherMonth = true
+    } else if (i >= startDow + daysInMonth) {
+      cellDate = new Date(year, month + 1, i - startDow - daysInMonth + 1)
+      otherMonth = true
+    } else {
+      cellDate = new Date(year, month, i - startDow + 1)
+    }
+
+    const key = dateKey(cellDate)
+    const dayEvents = events[key] || []
+    const isToday = cellDate.getTime() === today.getTime()
+
+    const dayEl = createElement('div', `calendar-day${otherMonth ? ' other-month' : ''}${isToday ? ' today' : ''}${dayEvents.length ? ' has-events' : ''}`)
+
+    const numEl = createElement('div', 'calendar-day-num', String(cellDate.getDate()))
+    dayEl.appendChild(numEl)
+
+    if (dayEvents.length) {
+      const dotsEl = createElement('div', 'calendar-day-dots')
+      const types = [...new Set(dayEvents.map(e => e.type))].slice(0, 3)
+      types.forEach(t => {
+        dotsEl.appendChild(createElement('div', `dot dot-${t}`))
+      })
+      dayEl.appendChild(dotsEl)
+
+      const capturedDate = new Date(cellDate)
+      const capturedKey = key
+      dayEl.addEventListener('click', () => showDayEvents(capturedDate, dayEvents))
+    }
+
+    grid.appendChild(dayEl)
+  }
+}
+
+function buildCalendarEvents(year, month) {
+  const events = {}
+
+  for (const plant of state.plants) {
+    const logs = state.wateringLogs[plant.id] || []
+    const firstDay = new Date(year, month, 1)
+    const lastDay = new Date(year, month + 1, 0)
+
+    // Generate watering events for this month based on frequency
+    const lastLog = logs[0]
+    const baseDate = lastLog ? new Date(lastLog.watered_at) : new Date(plant.created_at)
+    const freq = plant.watering_frequency_days
+
+    // Go backwards/forwards from base to fill month
+    let cursor = dayStart(baseDate)
+
+    // Go forward from base
+    while (cursor <= lastDay) {
+      if (cursor >= firstDay) {
+        const key = dateKey(cursor)
+        if (!events[key]) events[key] = []
+        events[key].push({ type: 'water', plantName: plant.name, plantId: plant.id })
+      }
+      cursor = new Date(cursor)
+      cursor.setDate(cursor.getDate() + freq)
+    }
+
+    // Go backward from base
+    cursor = dayStart(baseDate)
+    cursor.setDate(cursor.getDate() - freq)
+    while (cursor >= firstDay) {
+      const key = dateKey(cursor)
+      if (!events[key]) events[key] = []
+      events[key].push({ type: 'water', plantName: plant.name, plantId: plant.id })
+      cursor = new Date(cursor)
+      cursor.setDate(cursor.getDate() - freq)
+    }
+
+    // Fertilizing events
+    if (plant.fertilizing_frequency_days) {
+      const lastFert = logs.find(l => l.with_fertilizer)
+      const baseFert = lastFert ? new Date(lastFert.watered_at) : new Date(plant.created_at)
+      const fertFreq = plant.fertilizing_frequency_days
+      let fc = dayStart(baseFert)
+
+      while (fc <= lastDay) {
+        if (fc >= firstDay) {
+          const key = dateKey(fc)
+          if (!events[key]) events[key] = []
+          events[key].push({ type: 'fertilizer', plantName: plant.name, plantId: plant.id })
+        }
+        fc = new Date(fc)
+        fc.setDate(fc.getDate() + fertFreq)
+      }
+
+      fc = dayStart(baseFert)
+      fc.setDate(fc.getDate() - fertFreq)
+      while (fc >= firstDay) {
+        const key = dateKey(fc)
+        if (!events[key]) events[key] = []
+        events[key].push({ type: 'fertilizer', plantName: plant.name, plantId: plant.id })
+        fc = new Date(fc)
+        fc.setDate(fc.getDate() - fertFreq)
+      }
+    }
+
+    // Repotting
+    if (plant.next_repotting_date) {
+      const rd = dayStart(new Date(plant.next_repotting_date))
+      if (rd >= firstDay && rd <= lastDay) {
+        const key = dateKey(rd)
+        if (!events[key]) events[key] = []
+        events[key].push({ type: 'repotting', plantName: plant.name, plantId: plant.id })
+      }
+    }
+  }
+
+  // Also mark actual logged waterings
+  for (const plant of state.plants) {
+    const logs = state.wateringLogs[plant.id] || []
+    for (const log of logs) {
+      const d = dayStart(new Date(log.watered_at))
+      const first = new Date(year, month, 1)
+      const last = new Date(year, month + 1, 0)
+      if (d >= first && d <= last) {
+        const key = dateKey(d)
+        // Mark as done (already shown via water dot)
+      }
+    }
+  }
+
+  return events
+}
+
+function isEventLogged(plantId, type, date) {
+  const key = dateKey(dayStart(date))
+  if (type === 'water') {
+    const logs = state.wateringLogs[plantId] || []
+    return logs.some(l => !l.with_fertilizer && dateKey(dayStart(new Date(l.watered_at))) === key)
+  }
+  if (type === 'fertilizer') {
+    const logs = state.wateringLogs[plantId] || []
+    return logs.some(l => l.with_fertilizer && dateKey(dayStart(new Date(l.watered_at))) === key)
+  }
+  if (type === 'repotting') {
+    const plant = state.plants.find(p => p.id === plantId)
+    return !!(plant && plant.next_repotting_date && dateKey(dayStart(new Date(plant.next_repotting_date))) === key)
+  }
+  return false
+}
+
+async function toggleCalendarEvent(plantId, type, date, isDone) {
+  const dateStr = dateKey(dayStart(date))
+
+  try {
+    if (type === 'water' || type === 'fertilizer') {
+      const withFertilizer = type === 'fertilizer'
+      if (!isDone) {
+        // Mark as done: create a watering log for this date
+        const logEntry = {
+          id: 'demo-' + Date.now(),
+          plant_id: plantId,
+          user_id: state.user.id,
+          watered_at: new Date(date).toISOString(),
+          with_fertilizer: withFertilizer
+        }
+        if (!sb) {
+          if (!state.wateringLogs[plantId]) state.wateringLogs[plantId] = []
+          state.wateringLogs[plantId].unshift(logEntry)
+        } else {
+          const { data, error } = await sb
+            .from('watering_logs')
+            .insert({ plant_id: plantId, user_id: state.user.id, with_fertilizer: withFertilizer, watered_at: new Date(date).toISOString() })
+            .select().single()
+          if (error) throw error
+          if (!state.wateringLogs[plantId]) state.wateringLogs[plantId] = []
+          state.wateringLogs[plantId].unshift(data)
+        }
+      } else {
+        // Mark as undone: remove the log for this date
+        const logs = state.wateringLogs[plantId] || []
+        const idx = logs.findIndex(l => l.with_fertilizer === withFertilizer && dateKey(dayStart(new Date(l.watered_at))) === dateStr)
+        if (idx !== -1) {
+          if (!sb) {
+            state.wateringLogs[plantId].splice(idx, 1)
+          } else {
+            const { error } = await sb.from('watering_logs').delete().eq('id', logs[idx].id)
+            if (error) throw error
+            state.wateringLogs[plantId].splice(idx, 1)
+          }
+        }
+      }
+    } else if (type === 'repotting') {
+      const idx = state.plants.findIndex(p => p.id === plantId)
+      if (!isDone) {
+        // Mark repotting as done: set next_repotting_date to this date
+        if (!sb) {
+          if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: dateStr }
+        } else {
+          const { data, error } = await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plantId).select().single()
+          if (error) throw error
+          if (idx !== -1) state.plants[idx] = data
+        }
+      } else {
+        // Unmark: clear the repotting date
+        if (!sb) {
+          if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: null }
+        } else {
+          const { data, error } = await sb.from('plants').update({ next_repotting_date: null }).eq('id', plantId).select().single()
+          if (error) throw error
+          if (idx !== -1) state.plants[idx] = data
+        }
+      }
+    }
+
+    // Sync back to detail page if it's the current plant
+    if (state.currentPlantId === plantId) {
+      const plant = state.plants.find(p => p.id === plantId)
+      if (plant) renderPlantDetail(plant)
+    }
+    renderCalendar()
+    renderPlantsTab()
+  } catch (err) {
+    console.error(err)
+    showToast('Помилка збереження')
+  }
+}
+
+const IC_CHECK = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+
+function showDayEvents(date, events) {
+  const panel = document.getElementById('calendar-day-events')
+  const title = document.getElementById('day-events-title')
+  const list = document.getElementById('day-events-list')
+
+  title.textContent = formatDate(date)
+  list.innerHTML = ''
+  panel.classList.remove('hidden')
+
+  if (!events.length) {
+    list.innerHTML = '<p style="font-size:14px;color:var(--text2)">Нічого заплановано</p>'
+    return
+  }
+
+  const typeLabels = { water: 'Полив', fertilizer: 'Добриво', repotting: 'Пересадка' }
+  const typeIcons = { water: IC_WATERDROP, fertilizer: IC_SOIL, repotting: IC_POT }
+
+  const renderList = () => {
+    list.innerHTML = ''
+    for (const ev of events) {
+      const done = ev.plantId ? isEventLogged(ev.plantId, ev.type, date) : false
+
+      const item = createElement('div', done ? 'day-event-item done' : 'day-event-item')
+
+      const checkBtn = document.createElement('button')
+      checkBtn.className = 'day-event-check' + (done ? (' done' + (ev.type === 'fertilizer' ? ' fertilizer-done' : '')) : '')
+      checkBtn.innerHTML = done ? IC_CHECK : ''
+
+      const iconEl = createElement('span', 'day-event-icon')
+      iconEl.innerHTML = typeIcons[ev.type] || ''
+
+      const info = createElement('div', 'day-event-info')
+      const plantEl = createElement('div', 'day-event-plant', ev.plantName)
+      const typeEl = createElement('div', 'day-event-type', typeLabels[ev.type] || ev.type)
+      info.append(plantEl, typeEl)
+
+      item.append(checkBtn, iconEl, info)
+
+      if (ev.plantId) {
+        checkBtn.addEventListener('click', async () => {
+          checkBtn.disabled = true
+          await toggleCalendarEvent(ev.plantId, ev.type, date, done)
+          renderList()
+        })
+      }
+
+      list.appendChild(item)
+    }
+  }
+
+  renderList()
+}
+
+/* ═══════════════════════════════════════
+   RENDER — JOURNAL
+═══════════════════════════════════════ */
+function renderJournal() {
+  const list = document.getElementById('journal-list')
+  const loading = document.getElementById('journal-loading')
+  loading.classList.add('hidden')
+  list.innerHTML = ''
+
+  // Build unified timeline
+  let items = []
+
+  for (const plant of state.plants) {
+    const logs = state.wateringLogs[plant.id] || []
+    const notes = state.notes[plant.id] || []
+
+    for (const log of logs) {
+      if (state.journalFilter !== 'all') {
+        if (state.journalFilter === 'water' && log.with_fertilizer) continue
+        if (state.journalFilter === 'fertilizer' && !log.with_fertilizer) continue
+        if (state.journalFilter === 'note') continue
+      }
+      items.push({
+        type: log.with_fertilizer ? 'fertilizer' : 'water',
+        date: new Date(log.watered_at),
+        plantName: plant.name,
+        plantId: plant.id,
+        data: log
+      })
+    }
+
+    for (const note of notes) {
+      if (state.journalFilter !== 'all' && state.journalFilter !== 'note') continue
+      items.push({
+        type: 'note',
+        date: new Date(note.created_at),
+        plantName: plant.name,
+        plantId: plant.id,
+        data: note
+      })
+    }
+  }
+
+  items.sort((a, b) => b.date - a.date)
+
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📖</div><h3>Журнал Порожній</h3><p>Почніть поливати рослини!</p></div>'
+    return
+  }
+
+  // Group by date
+  const groups = {}
+  for (const item of items) {
+    const key = dateKey(item.date)
+    if (!groups[key]) groups[key] = { date: item.date, items: [] }
+    groups[key].items.push(item)
+  }
+
+  for (const key of Object.keys(groups).sort().reverse()) {
+    const group = groups[key]
+    const groupEl = createElement('div', 'journal-date-group')
+    groupEl.appendChild(createElement('div', 'journal-date-label', formatDateRelative(group.date)))
+
+    const itemsEl = createElement('div', 'journal-items')
+    for (const item of group.items) {
+      itemsEl.appendChild(buildJournalItem(item))
+    }
+    groupEl.appendChild(itemsEl)
+    list.appendChild(groupEl)
+  }
+}
+
+function buildJournalItem(item) {
+  const el = createElement('div', 'journal-item')
+
+  const accent = createElement('div', `journal-item-accent ${item.type}`)
+  el.appendChild(accent)
+
+  const content = createElement('div', 'journal-item-content')
+  const top = createElement('div', 'journal-item-top')
+
+  const typeInfo = {
+    water: { icon: IC_WATERDROP, title: 'Полив' },
+    fertilizer: { icon: IC_SOIL, title: 'Добриво' },
+    note: { icon: IC_NOTE, title: 'Нотатка' },
+  }
+
+  const iconEl = createElement('span', 'journal-item-icon')
+  iconEl.innerHTML = typeInfo[item.type]?.icon || ''
+  top.appendChild(iconEl)
+  top.appendChild(createElement('span', 'journal-item-title', typeInfo[item.type]?.title || item.type))
+  content.appendChild(top)
+  content.appendChild(createElement('div', 'journal-item-plant', item.plantName))
+
+  if (item.type === 'note' && item.data.text) {
+    const textEl = createElement('div', 'journal-item-note-text',
+      item.data.text.length > 80 ? item.data.text.slice(0, 80) + '…' : item.data.text)
+    content.appendChild(textEl)
+  }
+
+  content.appendChild(createElement('div', 'journal-item-time', formatTime(item.date)))
+  el.appendChild(content)
+
+  if (item.type === 'note' && item.data.photo_url) {
+    const photoDiv = createElement('div', 'journal-item-photo')
+    const img = document.createElement('img')
+    img.src = item.data.photo_url
+    img.alt = ''
+    img.loading = 'lazy'
+    photoDiv.appendChild(img)
+    el.appendChild(photoDiv)
+  }
+
+  el.addEventListener('click', () => openPlantDetail(item.plantId))
+  return el
+}
+
+/* ═══════════════════════════════════════
+   UI HELPERS
+═══════════════════════════════════════ */
+function showApp() {
+  document.getElementById('view-auth').classList.remove('active')
+  document.getElementById('view-app').classList.add('active')
+  switchTab('plants')
+}
+
+function showAuth() {
+  document.getElementById('view-app').classList.remove('active')
+  document.getElementById('view-auth').classList.add('active')
+}
+
+function switchTab(tabName) {
+  state.activeTab = tabName
+
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'))
+  document.getElementById(`tab-${tabName}`).classList.remove('hidden')
+
+  document.querySelectorAll('.tab-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tabName)
+  })
+
+  if (tabName === 'calendar') renderCalendar()
+  if (tabName === 'journal') renderJournal()
+  if (tabName === 'profile') renderProfile()
+}
+
+function openOverlay(id) {
+  const el = document.getElementById(id)
+  el.style.display = 'flex'
+  // tiny delay so display:flex is painted before transform kicks in
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => el.classList.add('open'))
+  })
+}
+
+function closeOverlay(id) {
+  const el = document.getElementById(id)
+  el.classList.remove('open')
+  setTimeout(() => { if (!el.classList.contains('open')) el.style.display = 'none' }, 280)
+}
+
+function openSheet(id) {
+  document.getElementById(id).classList.add('open')
+}
+
+function closeSheet(id) {
+  document.getElementById(id).classList.remove('open')
+}
+
+function showToast(msg, duration = 2500) {
+  const toast = document.getElementById('toast')
+  toast.textContent = msg
+  toast.classList.remove('hidden')
+  toast.classList.add('show')
+  clearTimeout(toast._timer)
+  toast._timer = setTimeout(() => {
+    toast.classList.remove('show')
+    setTimeout(() => toast.classList.add('hidden'), 200)
+  }, duration)
+}
+
+let _confirmCallback = null
+function showConfirm(title, msg, onConfirm) {
+  _confirmCallback = onConfirm
+  document.getElementById('dialog-title').textContent = title
+  document.getElementById('dialog-message').textContent = msg
+  document.getElementById('dialog-confirm').classList.remove('hidden')
+}
+
+let _loadingEl = null
+function showLoadingOverlay() {
+  if (_loadingEl) return
+  _loadingEl = createElement('div', 'loading-overlay')
+  _loadingEl.innerHTML = '<div class="spinner"></div>'
+  document.body.appendChild(_loadingEl)
+}
+function hideLoadingOverlay() {
+  if (_loadingEl) { _loadingEl.remove(); _loadingEl = null }
+}
+
+/* ═══════════════════════════════════════
+   MORE MENU
+═══════════════════════════════════════ */
+function openMoreMenu() {
+  openSheet('sheet-more-actions')
+}
+
+/* ═══════════════════════════════════════
+   FULL HISTORY OVERLAY
+═══════════════════════════════════════ */
+function openFullHistory(plantId) {
+  const logs = state.wateringLogs[plantId] || []
+  const container = document.getElementById('full-history-list')
+  container.innerHTML = ''
+
+  if (!logs.length) {
+    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px">Ще немає поливів</p>'
+  } else {
+    logs.forEach(log => container.appendChild(buildHistoryItem(log)))
+  }
+
+  openOverlay('overlay-history')
+}
+
+/* ═══════════════════════════════════════
+   FULL NOTES OVERLAY
+═══════════════════════════════════════ */
+function openFullNotes(plantId) {
+  const notes = state.notes[plantId] || []
+  const container = document.getElementById('full-notes-list')
+  container.innerHTML = ''
+
+  if (!notes.length) {
+    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px">Нотаток ще немає</p>'
+  } else {
+    notes.forEach(note => container.appendChild(buildNoteItem(note)))
+  }
+
+  openOverlay('overlay-notes')
+}
+
+/* ═══════════════════════════════════════
+   RENDER — PROFILE
+═══════════════════════════════════════ */
+function renderProfile() {
+  const user = state.user
+
+  // Avatar: use Google photo if available
+  const avatarEl = document.getElementById('profile-avatar')
+  const photoUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture
+  if (photoUrl) {
+    avatarEl.innerHTML = `<img src="${photoUrl}" alt="">`
+  } else {
+    avatarEl.textContent = '🌿'
+  }
+
+  // Name + email
+  const name = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Користувач'
+  document.getElementById('profile-display-name').textContent = name
+  document.getElementById('profile-email-text').textContent = user?.email || 'demo@plantdiary.app'
+
+  // Pre-fill notification email
+  const notifEmail = document.getElementById('field-notif-email')
+  if (!notifEmail.value) notifEmail.value = user?.email || ''
+
+  // Stats
+  const totalWaterings = Object.values(state.wateringLogs).reduce((s, logs) => s + logs.length, 0)
+  const totalNotes = Object.values(state.notes).reduce((s, notes) => s + notes.length, 0)
+  document.getElementById('profile-plant-count').textContent = state.plants.length
+  document.getElementById('profile-watering-count').textContent = totalWaterings
+  document.getElementById('profile-notes-count').textContent = totalNotes
+}
+
+async function saveNotifEmail() {
+  const email = document.getElementById('field-notif-email').value.trim()
+  if (!email || !email.includes('@')) { showToast('Введіть коректну пошту'); return }
+  // In real app: save to user metadata via Supabase
+  // await sb.auth.updateUser({ data: { notification_email: email } })
+  showToast('Пошту збережено ✓')
+}
+
+async function deleteAccount() {
+  showConfirm(
+    'Видалити акаунт?',
+    'Всі ваші рослини, поливи та нотатки будуть видалені назавжди. Це незворотньо.',
+    async () => {
+      showLoadingOverlay()
+      try {
+        // In real app: call Supabase admin to delete user
+        // await sb.rpc('delete_user')
+        await signOut()
+        showToast('Акаунт видалено')
+      } catch (err) {
+        showToast('Помилка видалення акаунту')
+      } finally {
+        hideLoadingOverlay()
+      }
+    }
+  )
+}
+
+/* ═══════════════════════════════════════
+   DATE HELPERS
+═══════════════════════════════════════ */
+function dateKey(date) {
+  const d = new Date(date)
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`
+}
+
+function formatDate(date) {
+  return new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long' }).format(date)
+}
+
+function formatDateTime(date) {
+  return new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }).format(date)
+}
+
+function formatTime(date) {
+  return new Intl.DateTimeFormat('uk-UA', { hour: '2-digit', minute: '2-digit' }).format(date)
+}
+
+function formatDateRelative(date) {
+  const today = dayStart(new Date())
+  const d = dayStart(date)
+  const diff = Math.round((today - d) / 86400000)
+  if (diff === 0) return 'Сьогодні'
+  if (diff === 1) return 'Вчора'
+  if (diff === 2) return 'Позавчора'
+  return formatDate(date)
+}
+
+/* ═══════════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════════ */
+const LANG = {
+  uk: {
+    tab_plants: 'Рослини', tab_calendar: 'Календар', tab_journal: 'Журнал', tab_profile: 'Профіль',
+    title_plants: 'Мої Рослини', title_calendar: 'Календар', title_journal: 'Журнал Догляду', title_profile: 'Профіль',
+    filter_all: 'Всі', filter_water: 'Полив', filter_fertilizer: 'Добриво', filter_note: 'Нотатки',
+    stat_plants: 'Рослин', stat_waterings: 'Поливів', stat_notes: 'Нотаток',
+    section_notifications: 'Сповіщення', toggle_notifications: 'Увімкнути сповіщення', notif_email: 'Пошта для сповіщень',
+    section_account: 'Акаунт', signout: 'Вийти з акаунту', delete_account: 'Видалити акаунт',
+    section_settings: 'Налаштування', language: 'Мова', save: 'Зберегти',
+    status_ok: n => `Через ${n} дн.`, status_today: 'Полити сьогодні', status_soon: 'Завтра полив', status_overdue: n => `Прострочено ${n} дн.`,
+    cond_sun: 'Сонце', cond_partial: 'Напівтінь', cond_shade: 'Тінь',
+    empty_plants: 'Ще немає рослин', empty_plants_sub: 'Додайте першу рослину, натиснувши +',
+    empty_room: r => `Немає рослин у кімнаті "${r}"`, empty_room_sub: 'Оберіть іншу кімнату або додайте рослину',
+    empty_journal: 'Журнал порожній', empty_journal_sub: 'Почніть поливати рослини!',
+    notif_on: 'Сповіщення увімкнено', notif_off: 'Сповіщення вимкнено',
+  },
+  en: {
+    tab_plants: 'Plants', tab_calendar: 'Calendar', tab_journal: 'Journal', tab_profile: 'Profile',
+    title_plants: 'My Plants', title_calendar: 'Calendar', title_journal: 'Care Journal', title_profile: 'Profile',
+    filter_all: 'All', filter_water: 'Watering', filter_fertilizer: 'Fertilizer', filter_note: 'Notes',
+    stat_plants: 'Plants', stat_waterings: 'Waterings', stat_notes: 'Notes',
+    section_notifications: 'Notifications', toggle_notifications: 'Enable notifications', notif_email: 'Notification email',
+    section_account: 'Account', signout: 'Sign out', delete_account: 'Delete account',
+    section_settings: 'Settings', language: 'Language', save: 'Save',
+    status_ok: n => `In ${n} d.`, status_today: 'Water today', status_soon: 'Tomorrow', status_overdue: n => `Overdue ${n} d.`,
+    cond_sun: 'Sun', cond_partial: 'Part shade', cond_shade: 'Shade',
+    empty_plants: 'No plants yet', empty_plants_sub: 'Add your first plant by tapping +',
+    empty_room: r => `No plants in "${r}"`, empty_room_sub: 'Select another room or add a plant',
+    empty_journal: 'Journal is empty', empty_journal_sub: 'Start watering your plants!',
+    notif_on: 'Notifications enabled', notif_off: 'Notifications disabled',
+  }
+}
+function t(key, arg) {
+  const val = (LANG[state.lang] || LANG.uk)[key]
+  return typeof val === 'function' ? val(arg) : (val ?? key)
+}
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = (LANG[state.lang] || LANG.uk)[el.dataset.i18n]
+    if (v && typeof v === 'string') el.textContent = v
+  })
+  document.getElementById('btn-lang-uk').classList.toggle('active', state.lang !== 'en')
+  document.getElementById('btn-lang-en').classList.toggle('active', state.lang === 'en')
+  renderPlantsTab()
+  renderJournal()
+}
+
+const CONDITIONS = {
+  sun:     { key: 'cond_sun' },
+  partial: { key: 'cond_partial' },
+  shade:   { key: 'cond_shade' },
+}
+function conditionsLabel(val) {
+  const c = CONDITIONS[val]
+  return c ? t(c.key) : val
+}
+
+const POT_SIZES = {
+  large:  { label_uk: 'Великий', label_en: 'Large' },
+  medium: { label_uk: 'Середній', label_en: 'Medium' },
+  small:  { label_uk: 'Малий', label_en: 'Small' },
+}
+function potSizeLabel(val) {
+  const p = POT_SIZES[val]
+  if (!p) return ''
+  return state.lang === 'en' ? p.label_en : p.label_uk
+}
+
+/* ═══════════════════════════════════════
+   DOM HELPERS
+═══════════════════════════════════════ */
+function createElement(tag, className, text) {
+  const el = document.createElement(tag)
+  if (className) el.className = className
+  if (text !== undefined) el.textContent = text
+  return el
+}
+
+/* ═══════════════════════════════════════
+   GLOBAL HELPER (used inline in HTML)
+═══════════════════════════════════════ */
+function adjustNum(fieldId, delta) {
+  const input = document.getElementById(fieldId)
+  const val = parseInt(input.value) || 0
+  const min = parseInt(input.min) || 1
+  const max = parseInt(input.max) || 999
+  input.value = Math.max(min, Math.min(max, val + delta))
+}
+
+/* ═══════════════════════════════════════
+   EVENT BINDINGS
+═══════════════════════════════════════ */
+function bindEvents() {
+  // Auth
+  document.getElementById('btn-google').addEventListener('click', signInWithGoogle)
+  document.getElementById('btn-apple').addEventListener('click', signInWithApple)
+  document.getElementById('btn-auth-back').addEventListener('click', () => {
+    document.getElementById('btn-auth-back').classList.add('hidden')
+    showApp()
+  })
+
+  // Tab bar
+  document.querySelectorAll('.tab-item').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab))
+  })
+
+  // Add plant
+  document.getElementById('btn-add-plant').addEventListener('click', openAddPlantForm)
+
+  // Plant detail
+  document.getElementById('btn-detail-back').addEventListener('click', () => closeOverlay('overlay-detail'))
+  document.getElementById('btn-detail-more').addEventListener('click', openMoreMenu)
+  document.getElementById('btn-water').addEventListener('click', () => waterPlant())
+  document.getElementById('toggle-fertilizer').addEventListener('change', e => {
+    document.getElementById('btn-water').textContent = e.target.checked ? 'Полити з добривом' : 'Полити'
+  })
+  document.getElementById('btn-add-note').addEventListener('click', openAddNoteForm)
+  document.getElementById('btn-view-all-history').addEventListener('click', () => openFullHistory(state.currentPlantId))
+  document.getElementById('btn-view-all-notes').addEventListener('click', () => openFullNotes(state.currentPlantId))
+  document.getElementById('btn-log-repotting').addEventListener('click', () => logRepotting())
+
+  // More actions sheet
+  document.getElementById('more-btn-edit').addEventListener('click', () => {
+    closeSheet('sheet-more-actions')
+    setTimeout(openEditPlantForm, 100)
+  })
+  document.getElementById('more-btn-delete').addEventListener('click', () => {
+    closeSheet('sheet-more-actions')
+    setTimeout(deletePlant, 100)
+  })
+  document.getElementById('more-btn-cancel').addEventListener('click', () => closeSheet('sheet-more-actions'))
+
+  // Sub-page overlays
+  document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))
+  document.getElementById('btn-notes-back').addEventListener('click', () => closeOverlay('overlay-notes'))
+
+  // Change photo from detail
+  document.getElementById('input-change-photo').addEventListener('change', e => {
+    if (e.target.files[0]) changePlantPhoto(e.target.files[0])
+  })
+
+  // Plant form
+  document.getElementById('btn-close-plant-form').addEventListener('click', () => closeSheet('sheet-plant-form'))
+  document.getElementById('plant-form').addEventListener('submit', submitPlantForm)
+
+  // Plant form photo
+  document.getElementById('input-plant-photo-gallery').addEventListener('change', e => {
+    const file = e.target.files[0]
+    if (!file) return
+    state.pendingPhotoFile = file
+    setPhotoPreview(file,
+      document.getElementById('form-photo-img'),
+      document.getElementById('form-photo-preview').querySelector('.form-photo-placeholder')
+    )
+  })
+  document.getElementById('input-plant-photo-camera').addEventListener('change', e => {
+    const file = e.target.files[0]
+    if (!file) return
+    state.pendingPhotoFile = file
+    setPhotoPreview(file,
+      document.getElementById('form-photo-img'),
+      document.getElementById('form-photo-preview').querySelector('.form-photo-placeholder')
+    )
+  })
+
+  // Conditions picker
+  document.querySelectorAll('.condition-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      state.selectedCondition = btn.dataset.value
+      document.querySelectorAll('.condition-btn').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+    })
+  })
+
+  // Pot picker
+  document.querySelectorAll('.pot-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const newVal = btn.dataset.pot
+      if (state.selectedPotSize === newVal) {
+        state.selectedPotSize = null
+        btn.classList.remove('active')
+      } else {
+        state.selectedPotSize = newVal
+        document.querySelectorAll('.pot-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+      }
+    })
+  })
+
+  // Sheet backdrop tap to close
+  document.querySelectorAll('.sheet').forEach(sheet => {
+    sheet.addEventListener('click', e => {
+      if (e.target === sheet) closeSheet(sheet.id)
+    })
+  })
+
+  // Note form
+  document.getElementById('btn-close-note-form').addEventListener('click', () => closeSheet('sheet-note-form'))
+  document.getElementById('note-form').addEventListener('submit', submitNoteForm)
+
+  document.getElementById('input-note-photo-gallery').addEventListener('change', e => {
+    const file = e.target.files[0]
+    if (!file) return
+    state.pendingNotePhotoFile = file
+    const preview = document.getElementById('note-photo-preview')
+    preview.src = URL.createObjectURL(file)
+    preview.classList.remove('hidden')
+  })
+  document.getElementById('input-note-photo-camera').addEventListener('change', e => {
+    const file = e.target.files[0]
+    if (!file) return
+    state.pendingNotePhotoFile = file
+    const preview = document.getElementById('note-photo-preview')
+    preview.src = URL.createObjectURL(file)
+    preview.classList.remove('hidden')
+  })
+
+  // Calendar day events close
+  document.getElementById('btn-close-day-events').addEventListener('click', () => {
+    document.getElementById('calendar-day-events').classList.add('hidden')
+  })
+
+  // Journal filters
+  document.getElementById('journal-filters').addEventListener('click', e => {
+    const btn = e.target.closest('[data-filter]')
+    if (!btn) return
+    state.journalFilter = btn.dataset.filter
+    document.querySelectorAll('#journal-filters [data-filter]').forEach(b => b.classList.remove('active'))
+    btn.classList.add('active')
+    renderJournal()
+  })
+
+  // Language toggle
+  document.getElementById('btn-lang-uk').addEventListener('click', () => {
+    state.lang = 'uk'; localStorage.setItem('lang', 'uk'); applyLang()
+  })
+  document.getElementById('btn-lang-en').addEventListener('click', () => {
+    state.lang = 'en'; localStorage.setItem('lang', 'en'); applyLang()
+  })
+
+  // Profile tab
+  document.getElementById('btn-profile-signout').addEventListener('click', () => {
+    showConfirm('Вийти?', 'Ви впевнені що хочете вийти?', signOut)
+  })
+  document.getElementById('btn-delete-account').addEventListener('click', deleteAccount)
+  document.getElementById('btn-preview-login').addEventListener('click', () => {
+    document.getElementById('btn-auth-back').classList.remove('hidden')
+    showAuth()
+  })
+  document.getElementById('btn-save-notif-email').addEventListener('click', saveNotifEmail)
+  document.getElementById('toggle-notifications').addEventListener('change', e => {
+    const row = document.getElementById('notif-email-row')
+    row.style.opacity = e.target.checked ? '1' : '0.4'
+    row.style.pointerEvents = e.target.checked ? '' : 'none'
+    showToast(t(e.target.checked ? 'notif_on' : 'notif_off'))
+  })
+
+  // Remove old signout button (replaced by profile tab)
+  const oldSignout = document.getElementById('btn-signout')
+  if (oldSignout) oldSignout.style.display = 'none'
+
+  // Confirm dialog
+  document.getElementById('dialog-cancel').addEventListener('click', () => {
+    document.getElementById('dialog-confirm').classList.add('hidden')
+    _confirmCallback = null
+  })
+  document.getElementById('dialog-confirm-btn').addEventListener('click', () => {
+    document.getElementById('dialog-confirm').classList.add('hidden')
+    if (_confirmCallback) { _confirmCallback(); _confirmCallback = null }
+  })
+  document.getElementById('dialog-confirm').addEventListener('click', e => {
+    if (e.target === document.getElementById('dialog-confirm')) {
+      document.getElementById('dialog-confirm').classList.add('hidden')
+      _confirmCallback = null
+    }
+  })
+
+  // Swipe back gesture on detail overlay
+  setupSwipeBack()
+}
+
+/* ═══════════════════════════════════════
+   SWIPE BACK GESTURE
+═══════════════════════════════════════ */
+function setupSwipeBack() {
+  const overlay = document.getElementById('overlay-detail')
+  let startX = 0, startY = 0, tracking = false
+
+  overlay.addEventListener('touchstart', e => {
+    if (e.touches[0].clientX < 30) {
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+      tracking = true
+    }
+  }, { passive: true })
+
+  overlay.addEventListener('touchmove', e => {
+    if (!tracking) return
+    const dx = e.touches[0].clientX - startX
+    const dy = Math.abs(e.touches[0].clientY - startY)
+    if (dy > 30) { tracking = false; return }
+    if (dx > 0) {
+      overlay.style.transform = `translateX(${dx}px)`
+    }
+  }, { passive: true })
+
+  overlay.addEventListener('touchend', e => {
+    if (!tracking) return
+    tracking = false
+    const dx = e.changedTouches[0].clientX - startX
+    overlay.style.transform = ''
+    overlay.style.transition = ''
+    if (dx > 80) closeOverlay('overlay-detail')
+  }, { passive: true })
+}
+
+/* ═══════════════════════════════════════
+   START
+═══════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', init)
+
+</script>
+</body>
+</html>

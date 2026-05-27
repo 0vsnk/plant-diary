@@ -1,0 +1,12 @@
+{
+  "name": "plant-diary",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.7",
+    "resend": "^3.2.0"
+  }
+}

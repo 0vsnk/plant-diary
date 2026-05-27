@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0">
+  <meta name="theme-color" content="#0f0f0f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Plant Diary</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Critical: ensure views hide/show correctly regardless of external CSS loading */
+    body { margin: 0; background: #0f0f0f; overflow: hidden; height: 100vh; }
+    .view { display: none; flex-direction: column; position: fixed; inset: 0; }
+    .view.active { display: flex; }
+    .tab-content { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+    .tab-content.hidden { display: none; }
+    .overlay { display: none; flex-direction: column; position: fixed; inset: 0; z-index: 200;
+               transform: translateX(100%); transition: transform 250ms ease;
+               max-width: 430px; margin: 0 auto; }
+    .overlay.open { transform: translateX(0); }
+    .overlay-inner { flex: 1; background: #0f0f0f; overflow-y: auto; display: flex; flex-direction: column; }
+    .sheet { position: fixed; inset: 0; z-index: 300; display: flex; align-items: flex-end;
+             pointer-events: none; max-width: 430px; margin: 0 auto; }
+    .sheet.open { pointer-events: all; }
+    .sheet-inner { width: 100%; background: #181818; border-radius: 24px 24px 0 0;
+                   max-height: 90vh; overflow-y: auto; transform: translateY(100%);
+                   transition: transform 250ms ease; }
+    .sheet.open .sheet-inner { transform: translateY(0); }
+    .hidden { display: none !important; }
+    .dialog-backdrop.hidden { display: none !important; }
+    .dialog-backdrop { display: flex; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ AUTH VIEW ═══ -->
+<div id="view-auth" class="view view-auth active">
+  <div class="auth-bg">
+    <div class="auth-orb auth-orb-1"></div>
+    <div class="auth-orb auth-orb-2"></div>
+  </div>
+  <button class="btn-auth-back hidden" id="btn-auth-back">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M9.33325 11.1666L5.99994 7.8333L9.33325 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Повернутись
+  </button>
+  <div class="auth-content">
+    <div class="auth-logo">
+      <span class="auth-logo-icon">🌱</span>
+      <h1 class="auth-title">Plant Diary</h1>
+      <p class="auth-subtitle">Щоденник догляду за рослинами</p>
+    </div>
+    <div class="auth-buttons">
+      <button class="btn-oauth btn-google" id="btn-google">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Увійти через Google
+      </button>
+      <button class="btn-oauth btn-apple" id="btn-apple">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.7 9.05 7.42c1.39.07 2.35.74 3.15.8 1.18-.24 2.32-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.39-1.32 2.76-2.6 3.97zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+        </svg>
+        Увійти через Apple
+      </button>
+    </div>
+    <p class="auth-note">Ваші дані зберігаються захищено і доступні тільки вам</p>
+  </div>
+</div>
+
+<!-- ═══ APP SHELL ═══ -->
+<div id="view-app" class="view view-app">
+
+  <!-- TAB CONTENTS -->
+  <div class="tab-content" id="tab-plants">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_plants">Мої Рослини</h1>
+    </div>
+    <div class="room-filter-bar" id="room-filter-bar">
+      <button class="filter-chip active" data-room="all">Всі</button>
+    </div>
+    <div class="plants-list" id="plants-list">
+      <div class="loading-state" id="plants-loading">
+        <div class="spinner"></div>
+      </div>
+      <div class="empty-state hidden" id="plants-empty">
+        <div class="empty-icon">🪴</div>
+        <h3>Ще Немає Рослин</h3>
+        <p>Додайте першу рослину, натиснувши +</p>
+      </div>
+    </div>
+    <button class="fab" id="btn-add-plant">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M4 12H12M12 12H20M12 12V4M12 12V20" stroke="#0C0C0C" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="tab-content hidden" id="tab-calendar">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_calendar">Календар</h1>
+    </div>
+    <div class="calendar-container" id="calendar-container"></div>
+    <div class="calendar-day-events hidden" id="calendar-day-events">
+      <div class="day-events-header">
+        <span id="day-events-title"></span>
+        <button class="btn-icon" id="btn-close-day-events">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div id="day-events-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content hidden" id="tab-journal">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_journal">Журнал догляду</h1>
+    </div>
+    <div class="journal-filters" id="journal-filters">
+      <button class="filter-chip active" data-filter="all" data-i18n="filter_all">Всі</button>
+      <button class="filter-chip" data-filter="water" data-i18n="filter_water">Полив</button>
+      <button class="filter-chip" data-filter="fertilizer" data-i18n="filter_fertilizer">Добриво</button>
+      <button class="filter-chip" data-filter="note" data-i18n="filter_note">Нотатки</button>
+    </div>
+    <div class="journal-list" id="journal-list">
+      <div class="loading-state" id="journal-loading">
+        <div class="spinner"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: PROFILE -->
+  <div class="tab-content hidden" id="tab-profile">
+    <div class="page-header">
+      <h1 class="page-title" data-i18n="title_profile">Профіль</h1>
+    </div>
+    <div class="profile-scroll">
+
+      <!-- User card -->
+      <div class="profile-user-card">
+        <div class="profile-avatar" id="profile-avatar">🌿</div>
+        <div class="profile-user-info">
+          <div class="profile-display-name" id="profile-display-name">—</div>
+          <div class="profile-email-text" id="profile-email-text">—</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="profile-stat-item">
+          <span class="profile-stat-value" id="profile-plant-count">0</span>
+          <span class="profile-stat-label" data-i18n="stat_plants">Рослин</span>
+        </div>
+        <div class="profile-stat-divider"></div>
+        <div class="profile-stat-item">
+          <span class="profile-stat-value" id="profile-watering-count">0</span>
+          <span class="profile-stat-label" data-i18n="stat_waterings">Поливів</span>
+        </div>
+        <div class="profile-stat-divider"></div>
+        <div class="profile-stat-item">
+          <span class="profile-stat-value" id="profile-notes-count">0</span>
+          <span class="profile-stat-label" data-i18n="stat_notes">Нотаток</span>
+        </div>
+      </div>
+
+      <!-- Notifications section -->
+      <div class="profile-section-card">
+        <div class="profile-section-title" data-i18n="section_notifications">Сповіщення</div>
+
+        <div class="profile-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">🔔</span>
+            <span data-i18n="toggle_notifications">Увімкнути сповіщення</span>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-notifications" checked>
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+
+        <div class="profile-row profile-row-input" id="notif-email-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">✉️</span>
+            <span data-i18n="notif_email">Пошта для сповіщень</span>
+          </div>
+          <div class="profile-email-edit">
+            <input type="email" id="field-notif-email" class="form-input profile-input" placeholder="your@email.com">
+            <button class="btn-save-email" id="btn-save-notif-email">Зберегти</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Account section -->
+      <div class="profile-section-card">
+        <div class="profile-section-title" data-i18n="section_account">Акаунт</div>
+        <button class="profile-action-row" id="btn-profile-signout">
+          <span class="profile-row-icon">🚪</span>
+          <span data-i18n="signout">Вийти з акаунту</span>
+          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="profile-action-row profile-action-danger" id="btn-delete-account">
+          <span class="profile-row-icon">🗑</span>
+          <span data-i18n="delete_account">Видалити акаунт</span>
+          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        <button class="profile-action-row" id="btn-preview-login">
+          <span class="profile-row-icon">👁</span>
+          <span>Переглянути екран логіну</span>
+          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+
+      <!-- Settings section -->
+      <div class="profile-section-card">
+        <div class="profile-section-title" data-i18n="section_settings">Налаштування</div>
+        <div class="profile-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">🌐</span>
+            <span data-i18n="language">Мова</span>
+          </div>
+          <div class="lang-switcher">
+            <button class="lang-btn active" id="btn-lang-uk">УКР</button>
+            <button class="lang-btn" id="btn-lang-en">ENG</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-footer">Plant Diary v1.0</div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <nav class="tab-bar">
+    <button class="tab-item active" data-tab="plants">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M20.998 3V5C20.998 6.85652 20.2606 8.63699 18.9478 9.94975C17.635 11.2625 15.8546 12 13.998 12H12.998V13H17.998V20C17.998 20.5304 17.7873 21.0391 17.4123 21.4142C17.0372 21.7893 16.5285 22 15.998 22H7.99805C7.46761 22 6.95891 21.7893 6.58383 21.4142C6.20876 21.0391 5.99805 20.5304 5.99805 20V13H10.998V10C10.998 8.14349 11.7355 6.36301 13.0483 5.05025C14.3611 3.7375 16.1415 3 17.998 3H20.998Z" fill="currentColor"/>
+        <path d="M8.9464 2.83788C7.88067 2.28639 6.69802 1.99903 5.49805 2H1.99805V3.5C1.99805 5.48913 2.78822 7.39678 4.19475 8.8033C5.60127 10.2098 7.50892 11 9.49805 11H9.99805V10C9.99528 8.2552 10.5659 6.55783 11.622 5.169C10.9298 4.18885 10.0121 3.38937 8.9464 2.83788Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_plants">Рослини</span>
+    </button>
+    <button class="tab-item" data-tab="calendar">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M7.74998 2.5C7.74998 2.30109 7.67096 2.11032 7.53031 1.96967C7.38966 1.82902 7.19889 1.75 6.99998 1.75C6.80107 1.75 6.6103 1.82902 6.46965 1.96967C6.329 2.11032 6.24998 2.30109 6.24998 2.5V4.08C4.80998 4.195 3.86598 4.477 3.17198 5.172C2.47698 5.866 2.19498 6.811 2.07898 8.25H21.921C21.805 6.81 21.523 5.866 20.828 5.172C20.134 4.477 19.189 4.195 17.75 4.079V2.5C17.75 2.30109 17.671 2.11032 17.5303 1.96967C17.3897 1.82902 17.1989 1.75 17 1.75C16.8011 1.75 16.6103 1.82902 16.4696 1.96967C16.329 2.11032 16.25 2.30109 16.25 2.5V4.013C15.585 4 14.839 4 14 4H9.99998C9.16098 4 8.41498 4 7.74998 4.013V2.5Z" fill="currentColor"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 11.161 2 10.415 2.013 9.75H21.987C22 10.415 22 11.161 22 12V14C22 17.771 22 19.657 20.828 20.828C19.656 21.999 17.771 22 14 22H10C6.229 22 4.343 22 3.172 20.828C2.001 19.656 2 17.771 2 14V12ZM17 14C17.2652 14 17.5196 13.8946 17.7071 13.7071C17.8946 13.5196 18 13.2652 18 13C18 12.7348 17.8946 12.4804 17.7071 12.2929C17.5196 12.1054 17.2652 12 17 12C16.7348 12 16.4804 12.1054 16.2929 12.2929C16.1054 12.4804 16 12.7348 16 13C16 13.2652 16.1054 13.5196 16.2929 13.7071C16.4804 13.8946 16.7348 14 17 14ZM17 18C17.2652 18 17.5196 17.8946 17.7071 17.7071C17.8946 17.5196 18 17.2652 18 17C18 16.7348 17.8946 16.4804 17.7071 16.2929C17.5196 16.1054 17.2652 16 17 16C16.7348 16 16.4804 16.1054 16.2929 16.2929C16.1054 16.4804 16 16.7348 16 17C16 17.2652 16.1054 17.5196 16.2929 17.7071C16.4804 17.8946 16.7348 18 17 18ZM13 13C13 13.2652 12.8946 13.5196 12.7071 13.7071C12.5196 13.8946 12.2652 14 12 14C11.7348 14 11.4804 13.8946 11.2929 13.7071C11.1054 13.5196 11 13.2652 11 13C11 12.7348 11.1054 12.4804 11.2929 12.2929C11.4804 12.1054 11.7348 12 12 12C12.2652 12 12.5196 12.1054 12.7071 12.2929C12.8946 12.4804 13 12.7348 13 13ZM13 17C13 17.2652 12.8946 17.5196 12.7071 17.7071C12.5196 17.8946 12.2652 18 12 18C11.7348 18 11.4804 17.8946 11.2929 17.7071C11.1054 17.5196 11 17.2652 11 17C11 16.7348 11.1054 16.4804 11.2929 16.2929C11.4804 16.1054 11.7348 16 12 16C12.2652 16 12.5196 16.1054 12.7071 16.2929C12.8946 16.4804 13 16.7348 13 17ZM7 14C7.26522 14 7.51957 13.8946 7.70711 13.7071C7.89464 13.5196 8 13.2652 8 13C8 12.7348 7.89464 12.4804 7.70711 12.2929C7.51957 12.1054 7.26522 12 7 12C6.73478 12 6.48043 12.1054 6.29289 12.2929C6.10536 12.4804 6 12.7348 6 13C6 13.2652 6.10536 13.5196 6.29289 13.7071C6.48043 13.8946 6.73478 14 7 14ZM7 18C7.26522 18 7.51957 17.8946 7.70711 17.7071C7.89464 17.5196 8 17.2652 8 17C8 16.7348 7.89464 16.4804 7.70711 16.2929C7.51957 16.1054 7.26522 16 7 16C6.73478 16 6.48043 16.1054 6.29289 16.2929C6.10536 16.4804 6 16.7348 6 17C6 17.2652 6.10536 17.5196 6.29289 17.7071C6.48043 17.8946 6.73478 18 7 18Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_calendar">Календар</span>
+    </button>
+    <button class="tab-item" data-tab="journal">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M22 5.33333C22 4.67029 21.7366 4.03441 21.2678 3.56557C20.7989 3.09673 20.163 2.83333 19.5 2.83333H18.8583C18.7845 2.83271 18.7121 2.81324 18.6479 2.77678C18.5838 2.74032 18.53 2.68808 18.4917 2.625C18.3832 2.43551 18.2268 2.27796 18.038 2.16823C17.8493 2.0585 17.635 2.00048 17.4167 2H5.33333C5.00181 2 4.68387 2.1317 4.44945 2.36612C4.21503 2.60054 4.08333 2.91848 4.08333 3.25V3.875C4.08333 3.93025 4.10528 3.98324 4.14435 4.02231C4.18342 4.06138 4.23641 4.08333 4.29167 4.08333H5.33333C5.55435 4.08333 5.76631 4.17113 5.92259 4.32741C6.07887 4.48369 6.16667 4.69565 6.16667 4.91667C6.16667 5.13768 6.07887 5.34964 5.92259 5.50592C5.76631 5.6622 5.55435 5.75 5.33333 5.75H2.83333C2.61232 5.75 2.40036 5.8378 2.24408 5.99408C2.0878 6.15036 2 6.36232 2 6.58333C2 6.80435 2.0878 7.01631 2.24408 7.17259C2.40036 7.32887 2.61232 7.41667 2.83333 7.41667H3.90833C3.96359 7.41667 4.01658 7.43862 4.05565 7.47769C4.09472 7.51676 4.11667 7.56975 4.11667 7.625V10.125C4.11667 10.1803 4.13862 10.2332 4.17769 10.2723C4.21676 10.3114 4.26975 10.3333 4.325 10.3333H5.33333C5.55435 10.3333 5.76631 10.4211 5.92259 10.5774C6.07887 10.7337 6.16667 10.9457 6.16667 11.1667C6.16667 11.3877 6.07887 11.5996 5.92259 11.7559C5.76631 11.9122 5.55435 12 5.33333 12H2.83333C2.61232 12 2.40036 12.0878 2.24408 12.2441C2.0878 12.4004 2 12.6123 2 12.8333C2 13.0543 2.0878 13.2663 2.24408 13.4226C2.40036 13.5789 2.61232 13.6667 2.83333 13.6667H3.90833C3.96359 13.6667 4.01658 13.6886 4.05565 13.7277C4.09472 13.7668 4.11667 13.8197 4.11667 13.875V16.375C4.11667 16.4303 4.13862 16.4832 4.17769 16.5223C4.21676 16.5614 4.26975 16.5833 4.325 16.5833H5.33333C5.55435 16.5833 5.76631 16.6711 5.92259 16.8274C6.07887 16.9837 6.16667 17.1957 6.16667 17.4167C6.16667 17.6377 6.07887 17.8496 5.92259 18.0059C5.76631 18.1622 5.55435 18.25 5.33333 18.25H2.83333C2.61232 18.25 2.40036 18.3378 2.24408 18.4941C2.0878 18.6504 2 18.8623 2 19.0833C2 19.3043 2.0878 19.5163 2.24408 19.6726C2.40036 19.8289 2.61232 19.9167 2.83333 19.9167H3.90833C3.96359 19.9167 4.01658 19.9386 4.05565 19.9777C4.09472 20.0168 4.11667 20.0697 4.11667 20.125V20.75C4.11655 21.0758 4.24366 21.3888 4.47092 21.6223C4.69818 21.8558 5.00762 21.9913 5.33333 22H17.4167C17.635 21.9995 17.8493 21.9415 18.038 21.8318C18.2268 21.722 18.3832 21.5645 18.4917 21.375C18.53 21.3119 18.5838 21.2597 18.6479 21.2232C18.7121 21.1868 18.7845 21.1673 18.8583 21.1667H19.5C20.163 21.1667 20.7989 20.9033 21.2678 20.4344C21.7366 19.9656 22 19.3297 22 18.6667V5.33333ZM14.675 8.66667C14.675 8.99819 14.5433 9.31613 14.3089 9.55055C14.0745 9.78497 13.7565 9.91667 13.425 9.91667H9.91667C9.58515 9.91667 9.2672 9.78497 9.03278 9.55055C8.79836 9.31613 8.66667 8.99819 8.66667 8.66667V6.58333C8.66667 6.25181 8.79836 5.93387 9.03278 5.69945C9.2672 5.46503 9.58515 5.33333 9.91667 5.33333H13.425C13.7565 5.33333 14.0745 5.46503 14.3089 5.69945C14.5433 5.93387 14.675 6.25181 14.675 6.58333V8.66667ZM20.3333 10.9583C20.3333 11.0136 20.3114 11.0666 20.2723 11.1056C20.2332 11.1447 20.1803 11.1667 20.125 11.1667H18.875C18.8197 11.1667 18.7668 11.1447 18.7277 11.1056C18.6886 11.0666 18.6667 11.0136 18.6667 10.9583V8.875C18.6667 8.81975 18.6886 8.76676 18.7277 8.72769C18.7668 8.68862 18.8197 8.66667 18.875 8.66667H20.125C20.1803 8.66667 20.2332 8.68862 20.2723 8.72769C20.3114 8.76676 20.3333 8.81975 20.3333 8.875V10.9583ZM18.6667 13.0417C18.6667 12.9864 18.6886 12.9334 18.7277 12.8944C18.7668 12.8553 18.8197 12.8333 18.875 12.8333H20.125C20.1803 12.8333 20.2332 12.8553 20.2723 12.8944C20.3114 12.9334 20.3333 12.9864 20.3333 13.0417V15.125C20.3333 15.1803 20.3114 15.2332 20.2723 15.2723C20.2332 15.3114 20.1803 15.3333 20.125 15.3333H18.875C18.8197 15.3333 18.7668 15.3114 18.7277 15.2723C18.6886 15.2332 18.6667 15.1803 18.6667 15.125V13.0417ZM20.3333 5.33333V6.79167C20.3333 6.84692 20.3114 6.89991 20.2723 6.93898C20.2332 6.97805 20.1803 7 20.125 7H18.875C18.8197 7 18.7668 6.97805 18.7277 6.93898C18.6886 6.89991 18.6667 6.84692 18.6667 6.79167V4.70833C18.6667 4.65308 18.6886 4.60009 18.7277 4.56102C18.7668 4.52195 18.8197 4.5 18.875 4.5H19.5C19.721 4.5 19.933 4.5878 20.0893 4.74408C20.2455 4.90036 20.3333 5.11232 20.3333 5.33333ZM20.3333 18.6667C20.3333 18.8877 20.2455 19.0996 20.0893 19.2559C19.933 19.4122 19.721 19.5 19.5 19.5H18.875C18.8197 19.5 18.7668 19.4781 18.7277 19.439C18.6886 19.3999 18.6667 19.3469 18.6667 19.2917V17.2083C18.6667 17.1531 18.6886 17.1001 18.7277 17.061C18.7668 17.0219 18.8197 17 18.875 17H20.125C20.1803 17 20.2332 17.0219 20.2723 17.061C20.3114 17.1001 20.3333 17.1531 20.3333 17.2083V18.6667Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_journal">Журнал</span>
+    </button>
+    <button class="tab-item" data-tab="profile">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M12 13C14.396 13 16.575 13.694 18.178 14.671C18.978 15.161 19.662 15.736 20.156 16.361C20.642 16.977 21 17.713 21 18.5C21 19.345 20.589 20.011 19.997 20.486C19.437 20.936 18.698 21.234 17.913 21.442C16.335 21.859 14.229 22 12 22C9.771 22 7.665 21.86 6.087 21.442C5.302 21.234 4.563 20.936 4.003 20.486C3.41 20.01 3 19.345 3 18.5C3 17.713 3.358 16.977 3.844 16.361C4.338 15.736 5.021 15.161 5.822 14.671C7.425 13.694 9.605 13 12 13Z" fill="currentColor"/>
+        <path d="M12 2C15.849 2 18.255 6.167 16.33 9.5C15.8912 10.2601 15.26 10.8913 14.4999 11.3301C13.7398 11.7689 12.8777 12 12 12C8.15099 12 5.74499 7.833 7.66999 4.5C8.10882 3.73992 8.73999 3.10875 9.50006 2.6699C10.2601 2.23106 11.1223 2.00002 12 2Z" fill="currentColor"/>
+      </svg>
+      <span data-i18n="tab_profile">Профіль</span>
+    </button>
+  </nav>
+</div>
+
+<!-- ═══ PLANT DETAIL OVERLAY ═══ -->
+<div id="overlay-detail" class="overlay overlay-slide-right">
+  <div class="overlay-inner">
+    <div class="detail-header" id="detail-header">
+      <div class="detail-photo-wrap" id="detail-photo-wrap">
+        <div class="detail-photo-placeholder" id="detail-photo-placeholder">🪴</div>
+        <img id="detail-photo-img" class="detail-photo hidden" alt="">
+      </div>
+      <div class="detail-header-gradient"></div>
+      <button class="btn-back" id="btn-detail-back">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M9.33325 11.1666L5.99994 7.8333L9.33325 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="btn-detail-more" id="btn-detail-more">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/>
+        </svg>
+      </button>
+      <input type="file" id="input-change-photo" accept="image/*" class="hidden">
+    </div>
+
+    <div class="detail-content">
+      <div class="detail-title-row">
+        <h1 class="detail-name" id="detail-name"></h1>
+        <p class="detail-meta" id="detail-meta"></p>
+      </div>
+
+      <!-- Watering section -->
+      <div class="detail-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Полив</h2>
+          <span class="detail-watering-badge" id="detail-next-watering"></span>
+        </div>
+        <div class="fertilizer-toggle-row">
+          <span class="fertilizer-label">З добривом</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggle-fertilizer">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <button class="btn-water" id="btn-water">Полити</button>
+      </div>
+
+      <!-- Watering history section -->
+      <div class="detail-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Історія Поливу</h2>
+          <button class="btn-icon-only" id="btn-view-all-history"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+        <div class="watering-history" id="watering-history"></div>
+      </div>
+
+      <!-- Repotting section -->
+      <div class="detail-section" id="detail-repotting-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Пересадка</h2>
+          <div class="section-header-actions">
+            <button class="btn-add-compact" id="btn-log-repotting">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3.33331V12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.33325 8H12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Додати
+            </button>
+            <button class="btn-icon-only"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+        <div class="repotting-log" id="repotting-log"></div>
+      </div>
+
+      <!-- Notes section -->
+      <div class="detail-section">
+        <div class="section-header-row">
+          <h2 class="section-title">Нотатки</h2>
+          <div class="section-header-actions">
+            <button class="btn-add-compact" id="btn-add-note">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3.33331V12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.33325 8H12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Додати
+            </button>
+            <button class="btn-icon-only" id="btn-view-all-notes"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          </div>
+        </div>
+        <div class="notes-list" id="notes-list"></div>
+      </div>
+
+      <div class="detail-spacer"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FULL HISTORY OVERLAY ═══ -->
+<div id="overlay-history" class="overlay">
+  <div class="overlay-inner">
+    <div class="subpage-header">
+      <button class="btn-back" id="btn-history-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1 class="subpage-title">Історія Поливів</h1>
+    </div>
+    <div class="subpage-content" id="full-history-list"></div>
+  </div>
+</div>
+
+<!-- ═══ FULL NOTES OVERLAY ═══ -->
+<div id="overlay-notes" class="overlay">
+  <div class="overlay-inner">
+    <div class="subpage-header">
+      <button class="btn-back" id="btn-notes-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1 class="subpage-title">Всі Нотатки</h1>
+    </div>
+    <div class="subpage-content" id="full-notes-list"></div>
+  </div>
+</div>
+
+<!-- ═══ ADD / EDIT PLANT SHEET ═══ -->
+<div id="sheet-plant-form" class="sheet">
+  <div class="sheet-inner">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title" id="plant-form-title">Нова Рослина</h2>
+      <button class="btn-icon" id="btn-close-plant-form">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <form id="plant-form" class="form" autocomplete="off">
+      <!-- Photo -->
+      <div class="form-photo-section">
+        <div class="form-photo-preview" id="form-photo-preview">
+          <span class="form-photo-placeholder">🪴</span>
+          <img id="form-photo-img" class="hidden" alt="">
+        </div>
+        <div class="form-photo-buttons">
+          <label class="btn-outline btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18.512 10.077C18.512 10.816 17.887 11.415 17.116 11.415C16.345 11.415 15.721 10.815 15.721 10.077C15.721 9.33899 16.346 8.73999 17.116 8.73999C17.886 8.73999 18.512 9.33799 18.512 10.077Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18.036 5.532C16.976 5.396 15.622 5.396 13.913 5.396H10.087C8.377 5.396 7.023 5.396 5.964 5.532C4.874 5.673 3.99 5.969 3.294 6.636C2.598 7.304 2.289 8.15 2.142 9.196C2 10.21 2 11.508 2 13.147V13.247C2 14.886 2 16.184 2.142 17.2C2.289 18.245 2.598 19.091 3.294 19.758C3.99 20.426 4.874 20.722 5.964 20.862C7.024 21 8.378 21 10.087 21H13.913C15.623 21 16.977 21 18.036 20.863C19.126 20.723 20.01 20.427 20.706 19.759C21.402 19.092 21.711 18.246 21.858 17.201C22 16.185 22 14.887 22 13.248V13.148C22 11.508 22 10.211 21.858 9.195C21.711 8.15 21.402 7.304 20.706 6.636C20.01 5.969 19.126 5.673 18.036 5.532ZM6.15 6.858C5.214 6.978 4.675 7.205 4.28 7.582C3.887 7.96 3.651 8.476 3.525 9.373C3.425 10.093 3.402 10.993 3.397 12.169L3.867 11.774C4.992 10.831 6.686 10.885 7.742 11.897L11.732 15.722C11.9297 15.9085 12.1849 16.0223 12.4558 16.0448C12.7267 16.0673 12.9972 15.9972 13.223 15.846L13.501 15.659C14.1531 15.2229 14.9297 15.0114 15.7129 15.0565C16.4961 15.1016 17.2433 15.4009 17.841 15.909L20.248 17.987C20.346 17.723 20.421 17.407 20.475 17.022C20.603 16.106 20.605 14.898 20.605 13.198C20.605 11.498 20.603 10.29 20.475 9.373C20.349 8.476 20.113 7.96 19.719 7.583C19.326 7.205 18.786 6.979 17.85 6.858C16.894 6.735 15.634 6.733 13.86 6.733H10.14C8.366 6.733 7.106 6.735 6.15 6.858Z" fill="currentColor"/><path d="M17.086 2.61C16.226 2.5 15.132 2.5 13.767 2.5H10.677C9.31302 2.5 8.21802 2.5 7.35802 2.61C6.46802 2.725 5.72602 2.968 5.13702 3.53C4.81196 3.84202 4.56407 4.22549 4.41302 4.65C4.91702 4.42 5.48702 4.284 6.12702 4.2C7.21102 4.06 8.59702 4.06 10.347 4.06H14.261C16.011 4.06 17.396 4.06 18.481 4.2C19.039 4.273 19.545 4.386 20 4.566C19.847 4.17497 19.6109 3.82183 19.308 3.531C18.719 2.968 17.977 2.725 17.086 2.611" fill="currentColor"/></svg>
+            Галерея
+            <input type="file" id="input-plant-photo-gallery" accept="image/*" class="hidden">
+          </label>
+          <label class="btn-outline btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.574 4.336C7.84793 3.92507 8.21908 3.58812 8.6545 3.35506C9.08991 3.122 9.57613 3.00004 10.07 3H13.93C14.4239 3.00004 14.9101 3.122 15.3455 3.35506C15.7809 3.58812 16.1521 3.92507 16.426 4.336L17.238 5.555C17.3293 5.69192 17.4531 5.80417 17.5982 5.88179C17.7434 5.95942 17.9054 6.00002 18.07 6H19C19.7956 6 20.5587 6.31607 21.1213 6.87868C21.6839 7.44129 22 8.20435 22 9V18C22 18.7956 21.6839 19.5587 21.1213 20.1213C20.5587 20.6839 19.7956 21 19 21H5C4.20435 21 3.44129 20.6839 2.87868 20.1213C2.31607 19.5587 2 18.7956 2 18V9C2 8.20435 2.31607 7.44129 2.87868 6.87868C3.44129 6.31607 4.20435 6 5 6H5.93C6.09459 6.00002 6.25665 5.95942 6.40178 5.88179C6.54692 5.80417 6.67065 5.69192 6.762 5.555L7.574 4.336ZM10 13C10 12.4696 10.2107 11.9609 10.5858 11.5858C10.9609 11.2107 11.4696 11 12 11C12.5304 11 13.0391 11.2107 13.4142 11.5858C13.7893 11.9609 14 12.4696 14 13C14 13.5304 13.7893 14.0391 13.4142 14.4142C13.0391 14.7893 12.5304 15 12 15C11.4696 15 10.9609 14.7893 10.5858 14.4142C10.2107 14.0391 10 13.5304 10 13ZM12 9C10.9391 9 9.92172 9.42143 9.17157 10.1716C8.42143 10.9217 8 11.9391 8 13C8 14.0609 8.42143 15.0783 9.17157 15.8284C9.92172 16.5786 10.9391 17 12 17C13.0609 17 14.0783 16.5786 14.8284 15.8284C15.5786 15.0783 16 14.0609 16 13C16 11.9391 15.5786 10.9217 14.8284 10.1716C14.0783 9.42143 13.0609 9 12 9Z" fill="currentColor"/></svg>
+            Камера
+            <input type="file" id="input-plant-photo-camera" accept="image/*" capture="environment" class="hidden">
+          </label>
+        </div>
+      </div>
+
+      <!-- Name -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Назва Рослини</label>
+        </div>
+        <input type="text" id="field-name" class="form-input" placeholder="Наприклад: Монстера" required>
+      </div>
+
+      <!-- Room -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Кімната</label>
+        </div>
+        <div class="select-wrap">
+          <select id="field-room" class="form-input form-select">
+            <option>Вітальня</option>
+            <option>Спальня</option>
+            <option>Кухня</option>
+            <option>Кабінет</option>
+            <option>Балкон</option>
+            <option>Інша</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Conditions -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Умови Освітлення</label>
+        </div>
+        <div class="conditions-picker" id="conditions-picker">
+          <button type="button" class="condition-btn active" data-value="sun"><span class="picker-txt">Сонце</span></button>
+          <button type="button" class="condition-btn" data-value="partial"><span class="picker-txt">Напівтінь</span></button>
+          <button type="button" class="condition-btn" data-value="shade"><span class="picker-txt">Тінь</span></button>
+        </div>
+      </div>
+
+      <!-- Watering frequency -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Полив Кожні N Днів</label>
+        </div>
+        <div class="number-input-wrap">
+          <button type="button" class="num-btn" onclick="adjustNum('field-watering-freq', -1)">
+            <svg width="14" height="2" viewBox="0 0 14 2" fill="none"><path d="M1 1H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <input type="number" id="field-watering-freq" class="form-input num-input" value="7" min="1" max="90">
+          <button type="button" class="num-btn" onclick="adjustNum('field-watering-freq', 1)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Fertilizing frequency -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Підживлення Кожні N Днів</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <div class="number-input-wrap">
+          <button type="button" class="num-btn" onclick="adjustNum('field-fertilizing-freq', -1)">
+            <svg width="14" height="2" viewBox="0 0 14 2" fill="none"><path d="M1 1H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <input type="number" id="field-fertilizing-freq" class="form-input num-input" value="" min="1" max="365" placeholder="—">
+          <button type="button" class="num-btn" onclick="adjustNum('field-fertilizing-freq', 1)">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Pot size -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Горщик</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <div class="conditions-picker" id="pot-picker">
+          <button type="button" class="pot-btn" data-pot="large"><span class="picker-txt">Великий</span></button>
+          <button type="button" class="pot-btn" data-pot="medium"><span class="picker-txt">Середній</span></button>
+          <button type="button" class="pot-btn" data-pot="small"><span class="picker-txt">Малий</span></button>
+        </div>
+      </div>
+
+      <!-- Next repotting date -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Дата Пересаджування</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <div class="date-input-wrap">
+          <input type="date" id="field-repotting-date" class="form-input">
+          <span class="date-ic-cal" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M7.74998 2.5C7.74998 2.30109 7.67096 2.11032 7.53031 1.96967C7.38966 1.82902 7.19889 1.75 6.99998 1.75C6.80107 1.75 6.6103 1.82902 6.46965 1.96967C6.329 2.11032 6.24998 2.30109 6.24998 2.5V4.08C4.80998 4.195 3.86598 4.477 3.17198 5.172C2.47698 5.866 2.19498 6.811 2.07898 8.25H21.921C21.805 6.81 21.523 5.866 20.828 5.172C20.134 4.477 19.189 4.195 17.75 4.079V2.5C17.75 2.30109 17.671 2.11032 17.5303 1.96967C17.3897 1.82902 17.1989 1.75 17 1.75C16.8011 1.75 16.6103 1.82902 16.4696 1.96967C16.329 2.11032 16.25 2.30109 16.25 2.5V4.013C15.585 4 14.839 4 14 4H9.99998C9.16098 4 8.41498 4 7.74998 4.013V2.5Z" fill="currentColor"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M2 12C2 11.161 2 10.415 2.013 9.75H21.987C22 10.415 22 11.161 22 12V14C22 17.771 22 19.657 20.828 20.828C19.656 21.999 17.771 22 14 22H10C6.229 22 4.343 22 3.172 20.828C2.001 19.656 2 17.771 2 14V12ZM17 14C17.2652 14 17.5196 13.8946 17.7071 13.7071C17.8946 13.5196 18 13.2652 18 13C18 12.7348 17.8946 12.4804 17.7071 12.2929C17.5196 12.1054 17.2652 12 17 12C16.7348 12 16.4804 12.1054 16.2929 12.2929C16.1054 12.4804 16 12.7348 16 13C16 13.2652 16.1054 13.5196 16.2929 13.7071C16.4804 13.8946 16.7348 14 17 14ZM17 18C17.2652 18 17.5196 17.8946 17.7071 17.7071C17.8946 17.5196 18 17.2652 18 17C18 16.7348 17.8946 16.4804 17.7071 16.2929C17.5196 16.1054 17.2652 16 17 16C16.7348 16 16.4804 16.1054 16.2929 16.2929C16.1054 16.4804 16 16.7348 16 17C16 17.2652 16.1054 17.5196 16.2929 17.7071C16.4804 17.8946 16.7348 18 17 18ZM13 13C13 13.2652 12.8946 13.5196 12.7071 13.7071C12.5196 13.8946 12.2652 14 12 14C11.7348 14 11.4804 13.8946 11.2929 13.7071C11.1054 13.5196 11 13.2652 11 13C11 12.7348 11.1054 12.4804 11.2929 12.2929C11.4804 12.1054 11.7348 12 12 12C12.2652 12 12.5196 12.1054 12.7071 12.2929C12.8946 12.4804 13 12.7348 13 13ZM13 17C13 17.2652 12.8946 17.5196 12.7071 17.7071C12.5196 17.8946 12.2652 18 12 18C11.7348 18 11.4804 17.8946 11.2929 17.7071C11.1054 17.5196 11 17.2652 11 17C11 16.7348 11.1054 16.4804 11.2929 16.2929C11.4804 16.1054 11.7348 16 12 16C12.2652 16 12.5196 16.1054 12.7071 16.2929C12.8946 16.4804 13 16.7348 13 17ZM7 14C7.26522 14 7.51957 13.8946 7.70711 13.7071C7.89464 13.5196 8 13.2652 8 13C8 12.7348 7.89464 12.4804 7.70711 12.2929C7.51957 12.1054 7.26522 12 7 12C6.73478 12 6.48043 12.1054 6.29289 12.2929C6.10536 12.4804 6 12.7348 6 13C6 13.2652 6.10536 13.5196 6.29289 13.7071C6.48043 13.8946 6.73478 14 7 14ZM7 18C7.26522 18 7.51957 17.8946 7.70711 17.7071C7.89464 17.5196 8 17.2652 8 17C8 16.7348 7.89464 16.4804 7.70711 16.2929C7.51957 16.1054 7.26522 16 7 16C6.73478 16 6.48043 16.1054 6.29289 16.2929C6.10536 16.4804 6 16.7348 6 17C6 17.2652 6.10536 17.5196 6.29289 17.7071C6.48043 17.8946 6.73478 18 7 18Z" fill="currentColor"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-primary btn-full" id="btn-plant-form-submit">
+        Додати Рослину
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ ADD NOTE SHEET ═══ -->
+<div id="sheet-note-form" class="sheet">
+  <div class="sheet-inner">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h2 class="sheet-title">Нова Нотатка</h2>
+      <button class="btn-icon" id="btn-close-note-form">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <form id="note-form" class="form">
+      <div class="form-field">
+        <label class="form-label">Текст нотатки <span class="form-optional">(необов'язково)</span></label>
+        <textarea id="field-note-text" class="form-input form-textarea" rows="4" placeholder="Що спостерігаєте?"></textarea>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Фото <span class="form-optional">(необов'язково)</span></label>
+        <div class="note-photo-section">
+          <img id="note-photo-preview" class="note-photo-preview hidden" alt="">
+          <div class="form-photo-buttons">
+            <label class="btn-outline btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18.512 10.077C18.512 10.816 17.887 11.415 17.116 11.415C16.345 11.415 15.721 10.815 15.721 10.077C15.721 9.33899 16.346 8.73999 17.116 8.73999C17.886 8.73999 18.512 9.33799 18.512 10.077Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18.036 5.532C16.976 5.396 15.622 5.396 13.913 5.396H10.087C8.377 5.396 7.023 5.396 5.964 5.532C4.874 5.673 3.99 5.969 3.294 6.636C2.598 7.304 2.289 8.15 2.142 9.196C2 10.21 2 11.508 2 13.147V13.247C2 14.886 2 16.184 2.142 17.2C2.289 18.245 2.598 19.091 3.294 19.758C3.99 20.426 4.874 20.722 5.964 20.862C7.024 21 8.378 21 10.087 21H13.913C15.623 21 16.977 21 18.036 20.863C19.126 20.723 20.01 20.427 20.706 19.759C21.402 19.092 21.711 18.246 21.858 17.201C22 16.185 22 14.887 22 13.248V13.148C22 11.508 22 10.211 21.858 9.195C21.711 8.15 21.402 7.304 20.706 6.636C20.01 5.969 19.126 5.673 18.036 5.532ZM6.15 6.858C5.214 6.978 4.675 7.205 4.28 7.582C3.887 7.96 3.651 8.476 3.525 9.373C3.425 10.093 3.402 10.993 3.397 12.169L3.867 11.774C4.992 10.831 6.686 10.885 7.742 11.897L11.732 15.722C11.9297 15.9085 12.1849 16.0223 12.4558 16.0448C12.7267 16.0673 12.9972 15.9972 13.223 15.846L13.501 15.659C14.1531 15.2229 14.9297 15.0114 15.7129 15.0565C16.4961 15.1016 17.2433 15.4009 17.841 15.909L20.248 17.987C20.346 17.723 20.421 17.407 20.475 17.022C20.603 16.106 20.605 14.898 20.605 13.198C20.605 11.498 20.603 10.29 20.475 9.373C20.349 8.476 20.113 7.96 19.719 7.583C19.326 7.205 18.786 6.979 17.85 6.858C16.894 6.735 15.634 6.733 13.86 6.733H10.14C8.366 6.733 7.106 6.735 6.15 6.858Z" fill="currentColor"/><path d="M17.086 2.61C16.226 2.5 15.132 2.5 13.767 2.5H10.677C9.31302 2.5 8.21802 2.5 7.35802 2.61C6.46802 2.725 5.72602 2.968 5.13702 3.53C4.81196 3.84202 4.56407 4.22549 4.41302 4.65C4.91702 4.42 5.48702 4.284 6.12702 4.2C7.21102 4.06 8.59702 4.06 10.347 4.06H14.261C16.011 4.06 17.396 4.06 18.481 4.2C19.039 4.273 19.545 4.386 20 4.566C19.847 4.17497 19.6109 3.82183 19.308 3.531C18.719 2.968 17.977 2.725 17.086 2.611" fill="currentColor"/></svg>
+              Галерея
+              <input type="file" id="input-note-photo-gallery" accept="image/*" class="hidden">
+            </label>
+            <label class="btn-outline btn-sm">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M7.574 4.336C7.84793 3.92507 8.21908 3.58812 8.6545 3.35506C9.08991 3.122 9.57613 3.00004 10.07 3H13.93C14.4239 3.00004 14.9101 3.122 15.3455 3.35506C15.7809 3.58812 16.1521 3.92507 16.426 4.336L17.238 5.555C17.3293 5.69192 17.4531 5.80417 17.5982 5.88179C17.7434 5.95942 17.9054 6.00002 18.07 6H19C19.7956 6 20.5587 6.31607 21.1213 6.87868C21.6839 7.44129 22 8.20435 22 9V18C22 18.7956 21.6839 19.5587 21.1213 20.1213C20.5587 20.6839 19.7956 21 19 21H5C4.20435 21 3.44129 20.6839 2.87868 20.1213C2.31607 19.5587 2 18.7956 2 18V9C2 8.20435 2.31607 7.44129 2.87868 6.87868C3.44129 6.31607 4.20435 6 5 6H5.93C6.09459 6.00002 6.25665 5.95942 6.40178 5.88179C6.54692 5.80417 6.67065 5.69192 6.762 5.555L7.574 4.336ZM10 13C10 12.4696 10.2107 11.9609 10.5858 11.5858C10.9609 11.2107 11.4696 11 12 11C12.5304 11 13.0391 11.2107 13.4142 11.5858C13.7893 11.9609 14 12.4696 14 13C14 13.5304 13.7893 14.0391 13.4142 14.4142C13.0391 14.7893 12.5304 15 12 15C11.4696 15 10.9609 14.7893 10.5858 14.4142C10.2107 14.0391 10 13.5304 10 13ZM12 9C10.9391 9 9.92172 9.42143 9.17157 10.1716C8.42143 10.9217 8 11.9391 8 13C8 14.0609 8.42143 15.0783 9.17157 15.8284C9.92172 16.5786 10.9391 17 12 17C13.0609 17 14.0783 16.5786 14.8284 15.8284C15.5786 15.0783 16 14.0609 16 13C16 11.9391 15.5786 10.9217 14.8284 10.1716C14.0783 9.42143 13.0609 9 12 9Z" fill="currentColor"/></svg>
+              Камера
+              <input type="file" id="input-note-photo-camera" accept="image/*" capture="environment" class="hidden">
+            </label>
+          </div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary btn-full">Зберегти Нотатку</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══ MORE ACTIONS SHEET ═══ -->
+<div id="sheet-more-actions" class="sheet">
+  <div class="sheet-inner sheet-inner-compact">
+    <div class="sheet-handle"></div>
+    <div class="more-actions-list">
+      <button class="more-action-btn" id="more-btn-edit">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.529 1.76402C10.7724 1.52062 11.0614 1.32754 11.3794 1.19581C11.6974 1.06408 12.0383 0.996277 12.3825 0.996277C12.7267 0.996277 13.0676 1.06408 13.3856 1.19581C13.7037 1.32754 13.9926 1.52062 14.236 1.76402C14.4794 2.00743 14.6725 2.29639 14.8042 2.61441C14.936 2.93244 15.0038 3.27329 15.0038 3.61752C15.0038 3.96175 14.936 4.3026 14.8042 4.62063C14.6725 4.93865 14.4794 5.22762 14.236 5.47102L13.457 6.25002L9.75002 2.54302L10.529 1.76402ZM9.04302 3.25002L2.65702 9.63602C2.28335 10.0103 2.01677 10.4778 1.88502 10.99L1.01502 14.376C0.993445 14.4603 0.994218 14.5487 1.01726 14.6325C1.0403 14.7164 1.08482 14.7928 1.14642 14.8542C1.20801 14.9156 1.28456 14.9599 1.36849 14.9826C1.45242 15.0054 1.54084 15.0059 1.62502 14.984L5.01002 14.115C5.5224 13.9837 5.99006 13.7171 6.36402 13.343L12.75 6.95702L9.04302 3.25002Z" fill="currentColor"/></svg>
+        Редагувати Рослину
+      </button>
+      <button class="more-action-btn more-action-danger" id="more-btn-delete">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6ZM7 6.5C7 6.36739 6.94732 6.24021 6.85355 6.14645C6.75979 6.05268 6.63261 6 6.5 6C6.36739 6 6.24021 6.05268 6.14645 6.14645C6.05268 6.24021 6 6.36739 6 6.5V11.5C6 11.6326 6.05268 11.7598 6.14645 11.8536C6.24021 11.9473 6.36739 12 6.5 12C6.63261 12 6.75979 11.9473 6.85355 11.8536C6.94732 11.7598 7 11.6326 7 11.5V6.5ZM9.5 6C9.36739 6 9.24021 6.05268 9.14645 6.14645C9.05268 6.24021 9 6.36739 9 6.5V11.5C9 11.6326 9.05268 11.7598 9.14645 11.8536C9.24021 11.9473 9.36739 12 9.5 12C9.63261 12 9.75979 11.9473 9.85355 11.8536C9.94732 11.7598 10 11.6326 10 11.5V6.5C10 6.36739 9.94732 6.24021 9.85355 6.14645C9.75979 6.05268 9.63261 6 9.5 6Z" fill="currentColor"/></svg>
+        Видалити Рослину
+      </button>
+    </div>
+    <div class="more-actions-cancel">
+      <button class="more-cancel-btn" id="more-btn-cancel">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ CONFIRM DIALOG ═══ -->
+<div id="dialog-confirm" class="dialog-backdrop hidden">
+  <div class="dialog">
+    <h3 class="dialog-title" id="dialog-title">Підтвердження</h3>
+    <p class="dialog-message" id="dialog-message"></p>
+    <div class="dialog-buttons">
+      <button class="btn-outline" id="dialog-cancel">Скасувати</button>
+      <button class="btn-danger" id="dialog-confirm-btn">Видалити</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
