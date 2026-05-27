@@ -39,19 +39,8 @@ const IC_NOTE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" str
 async function init() {
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (session) {
-      state.user = session.user
-      showApp()
-      await loadAllData()
-    } else if (event === 'SIGNED_OUT') {
-      state.user = null
-      showAuth()
-    }
-  })
-
-  // DEMO MODE: bypass auth to preview UI
-  const DEMO_MODE = true
+  // DEMO MODE: set to true to preview UI without Supabase
+  const DEMO_MODE = false
   if (DEMO_MODE) {
     state.user = { id: 'demo-user', email: 'demo@plantdiary.app' }
     loadDemoData()
@@ -60,16 +49,36 @@ async function init() {
     return
   }
 
-  const { data: { session } } = await sb.auth.getSession()
-  if (session) {
-    state.user = session.user
-    showApp()
+  // Bind events once (covers both auth screen and app)
+  bindEvents()
+
+  let appStarted = false
+
+  async function startApp(user) {
+    if (appStarted) return
+    appStarted = true
+    state.user = user
     await loadAllData()
-  } else {
-    showAuth()
+    showApp()
   }
 
-  bindEvents()
+  // Handle all auth transitions
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+      if (session) {
+        await startApp(session.user)
+      } else {
+        showAuth()
+      }
+    } else if (event === 'SIGNED_OUT') {
+      appStarted = false
+      state.user = null
+      state.plants = []
+      state.wateringLogs = {}
+      state.notes = {}
+      showAuth()
+    }
+  })
 }
 
 /* ═══════════════════════════════════════
