@@ -37,7 +37,16 @@ const IC_NOTE = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" str
    INIT
 ═══════════════════════════════════════ */
 async function init() {
-  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  // Explicitly configure session persistence so it works reliably
+  // across OAuth redirects and page reloads
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storage: window.localStorage,
+    }
+  })
 
   // DEMO MODE: set to true to preview UI without Supabase
   const DEMO_MODE = false
@@ -62,14 +71,21 @@ async function init() {
     showApp()
   }
 
-  // Handle all auth transitions
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
-      if (session) {
-        await startApp(session.user)
-      } else {
-        showAuth()
-      }
+    if (event === 'INITIAL_SESSION') {
+      // Auth screen is shown by default — only transition if session exists.
+      // Do NOT call showAuth() here: PKCE code exchange is async and
+      // INITIAL_SESSION can fire with null before SIGNED_IN arrives.
+      if (session) await startApp(session.user)
+
+    } else if (event === 'SIGNED_IN') {
+      // Fires after OAuth redirect + code exchange, or on explicit sign-in
+      if (session) await startApp(session.user)
+
+    } else if (event === 'TOKEN_REFRESHED') {
+      // Access token was silently refreshed — keep state in sync
+      if (session) state.user = session.user
+
     } else if (event === 'SIGNED_OUT') {
       appStarted = false
       state.user = null
