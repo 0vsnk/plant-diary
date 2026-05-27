@@ -539,10 +539,10 @@ function renderNotes(plantId) {
     return
   }
 
-  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note)))
+  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId)))
 }
 
-function buildNoteItem(note) {
+function buildNoteItem(note, plantId) {
   const item = createElement('div', 'note-item')
 
   const content = createElement('div', 'note-item-content')
@@ -560,8 +560,45 @@ function buildNoteItem(note) {
   }
 
   item.appendChild(content)
-  item.appendChild(createElement('p', 'note-item-date', formatDateTime(new Date(note.created_at))))
+
+  // Footer: date + delete button
+  const footer = createElement('div', 'note-item-footer')
+  footer.appendChild(createElement('p', 'note-item-date', formatDateTime(new Date(note.created_at))))
+
+  const delBtn = document.createElement('button')
+  delBtn.className = 'note-delete-btn'
+  delBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6Z" fill="currentColor"/></svg>`
+  delBtn.setAttribute('aria-label', 'Видалити нотатку')
+  delBtn.addEventListener('click', e => {
+    e.stopPropagation()
+    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', () => deleteNote(note.id, plantId))
+  })
+  footer.appendChild(delBtn)
+
+  item.appendChild(footer)
   return item
+}
+
+async function deleteNote(noteId, plantId) {
+  // Remove from state
+  if (state.notes[plantId]) {
+    state.notes[plantId] = state.notes[plantId].filter(n => n.id !== noteId)
+  }
+
+  // Delete from Supabase
+  if (sb && !noteId.toString().startsWith('demo-')) {
+    const { error } = await sb.from('notes').delete().eq('id', noteId)
+    if (error) { showToast('Помилка видалення'); return }
+  }
+
+  showToast('Нотатку видалено')
+  renderNotes(plantId)
+
+  // Refresh full-notes overlay if open
+  const overlay = document.getElementById('overlay-notes')
+  if (overlay && overlay.classList.contains('open')) {
+    openFullNotes(plantId)
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -1526,7 +1563,7 @@ function openFullNotes(plantId) {
   if (!notes.length) {
     container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px">Нотаток ще немає</p>'
   } else {
-    notes.forEach(note => container.appendChild(buildNoteItem(note)))
+    notes.forEach(note => container.appendChild(buildNoteItem(note, plantId)))
   }
 
   openOverlay('overlay-notes')
