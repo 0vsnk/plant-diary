@@ -200,13 +200,10 @@ img { display: block; max-width: 100%; }
 }
 .btn-oauth:active { transform: scale(0.97); opacity: 0.85; }
 
-.btn-google {
+.btn-google,
+.btn-apple {
   background: #fff;
   color: #1a1a1a;
-}
-.btn-apple {
-  background: var(--text);
-  color: #000;
 }
 
 .auth-note {
