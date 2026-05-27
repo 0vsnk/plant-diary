@@ -2,11 +2,18 @@
   "name": "plant-diary",
   "version": "1.0.0",
   "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "start": "node server.js"
+  },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.7",
     "resend": "^3.2.0"
+  },
+  "devDependencies": {
+    "vercel": "^54.5.0"
   }
 }

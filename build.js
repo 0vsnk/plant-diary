@@ -25,6 +25,13 @@ html = html.replace(
   `<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>\n<script>\n${js}\n</script>`
 )
 
+// Write standalone.html (local dev convenience)
 fs.writeFileSync(path.join(BASE, 'standalone.html'), html, 'utf8')
+
+// Write public/index.html (Vercel deployment target)
+const publicDir = path.join(BASE, 'public')
+if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir)
+fs.writeFileSync(path.join(publicDir, 'index.html'), html, 'utf8')
+
 const size = fs.statSync(path.join(BASE, 'standalone.html')).size
-console.log(`✅ standalone.html rebuilt — ${(size/1024).toFixed(1)} KB`)
+console.log(`✅ standalone.html + public/index.html rebuilt — ${(size/1024).toFixed(1)} KB`)
