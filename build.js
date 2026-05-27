@@ -12,17 +12,11 @@ const js      = fs.readFileSync(path.join(BASE, 'js/app.js'), 'utf8')
 const htmlSrc = fs.readFileSync(path.join(BASE, 'index.html'), 'utf8')
 const bgImg   = fs.readFileSync(path.join(BASE, 'img/bg_image.png'))
 const bgB64   = bgImg.toString('base64')
-const logoImg = fs.readFileSync(path.join(BASE, 'img/logo.png'))
-const logoB64 = logoImg.toString('base64')
-
 // Replace external CSS link with inline style block
 let html = htmlSrc.replace(
   '<link rel="stylesheet" href="css/style.css">',
   `<style>\n${css.replace(/url\('\.\.\/img\/bg_image\.png'\)/g, `url('data:image/png;base64,${bgB64}')`)}\n</style>`
 )
-
-// Inline logo image
-html = html.replace('src="img/logo.png"', `src="data:image/png;base64,${logoB64}"`)
 
 // Replace external JS with inline script
 html = html.replace(
