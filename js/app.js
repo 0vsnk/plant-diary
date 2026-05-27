@@ -1248,8 +1248,9 @@ function showDayEvents(date, events) {
 ═══════════════════════════════════════ */
 function renderJournal() {
   const list = document.getElementById('journal-list')
-  const loading = document.getElementById('journal-loading')
-  loading.classList.add('hidden')
+  // #journal-loading lives inside #journal-list — after the first render
+  // list.innerHTML='' removes it from the DOM, so guard against null
+  document.getElementById('journal-loading')?.classList.add('hidden')
   list.innerHTML = ''
 
   // Build unified timeline
