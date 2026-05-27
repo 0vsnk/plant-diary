@@ -162,11 +162,10 @@ img { display: block; max-width: 100%; }
 
 .auth-logo { text-align: center; }
 .auth-logo-img {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   display: block;
-  margin: 0 auto 20px;
-  filter: drop-shadow(0 6px 24px rgba(93,186,106,0.4));
+  margin: 0 auto 16px;
 }
 .auth-title {
   font-size: 34px;
