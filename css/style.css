@@ -501,9 +501,10 @@ img { display: block; max-width: 100%; }
 }
 .detail-header-gradient {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 220px;
-  background: linear-gradient(to top, var(--bg) 0%, rgba(17,18,17,0.85) 35%, rgba(17,18,17,0.4) 65%, transparent 100%);
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.15) 25%, transparent 50%),
+    linear-gradient(to top, var(--bg) 0%, rgba(17,18,17,0.92) 22%, rgba(17,18,17,0.55) 50%, rgba(17,18,17,0.15) 75%, transparent 100%);
   pointer-events: none;
 }
 
@@ -512,35 +513,35 @@ img { display: block; max-width: 100%; }
   top: calc(var(--safe-top) + 14px);
   left: 14px;
   width: 38px; height: 38px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  color: #fff;
   z-index: 2;
   border: none;
   transition: transform var(--trans-fast), background var(--trans-fast);
 }
-.btn-back:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+.btn-back:active { transform: scale(0.9); background: rgba(0,0,0,0.5); }
 
 .btn-photo-action {
   width: 38px; height: 38px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--text);
+  color: #fff;
   border: none;
   transition: transform var(--trans-fast), background var(--trans-fast);
 }
-.btn-photo-action:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+.btn-photo-action:active { transform: scale(0.9); background: rgba(0,0,0,0.5); }
 
 /* Detail content */
 .detail-content {
@@ -1714,19 +1715,19 @@ img { display: block; max-width: 100%; }
   top: calc(var(--safe-top) + 14px);
   right: 14px;
   width: 38px; height: 38px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  color: #fff;
   z-index: 2;
   border: none;
   transition: transform var(--trans-fast), background var(--trans-fast);
 }
-.btn-detail-more:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+.btn-detail-more:active { transform: scale(0.9); background: rgba(0,0,0,0.5); }
 
 /* ═══════════════════════════════════════
    MORE ACTIONS SHEET
