@@ -89,7 +89,12 @@
         <div class="spinner"></div>
       </div>
       <div class="empty-state hidden" id="plants-empty">
-        <div class="empty-icon">🪴</div>
+        <div class="empty-icon">
+          <svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 25C35.9999 24.9952 41.9131 26.4319 47.2418 29.1894C52.5705 31.9468 57.1587 35.9442 60.62 40.845C55.3391 47.7891 52.4862 56.276 52.5 65V70H50C40.0544 70 30.5161 66.0491 23.4835 59.0165C16.4509 51.9839 12.5 42.4456 12.5 32.5V25H30Z" fill="#ADDC58" fill-opacity="0.2"/>
+            <path d="M107.499 40V30H92.4994C83.2168 30 74.3145 33.6875 67.7507 40.2513C61.1869 46.815 57.4994 55.7174 57.4994 65V95H67.4994V80C67.4994 77.2386 69.738 75 72.4994 75C81.782 75 90.6844 71.3125 97.2482 64.7487C103.812 58.185 107.499 49.2826 107.499 40Z" fill="#ADDC58" fill-opacity="0.2"/>
+          </svg>
+        </div>
         <h3>Ще Немає Рослин</h3>
         <p>Додайте першу рослину, натиснувши +</p>
       </div>
@@ -121,7 +126,7 @@
 
   <div class="tab-content hidden" id="tab-journal">
     <div class="page-header">
-      <h1 class="page-title" data-i18n="title_journal">Журнал догляду</h1>
+      <h1 class="page-title" data-i18n="title_journal">Журнал Догляду</h1>
     </div>
     <div class="journal-filters" id="journal-filters">
       <button class="filter-chip active" data-filter="all" data-i18n="filter_all">Всі</button>
@@ -170,9 +175,9 @@
         </div>
       </div>
 
-      <!-- Notifications section -->
+      <!-- General section -->
       <div class="profile-section-card">
-        <div class="profile-section-title" data-i18n="section_notifications">Сповіщення</div>
+        <div class="profile-section-title">Загальне</div>
 
         <div class="profile-row">
           <div class="profile-row-label">
@@ -195,6 +200,17 @@
             <button class="btn-save-email" id="btn-save-notif-email">Зберегти</button>
           </div>
         </div>
+
+        <div class="profile-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">🌐</span>
+            <span data-i18n="language">Мова</span>
+          </div>
+          <div class="lang-switcher">
+            <button class="lang-btn active" id="btn-lang-uk">УКР</button>
+            <button class="lang-btn" id="btn-lang-en">ENG</button>
+          </div>
+        </div>
       </div>
 
       <!-- Account section -->
@@ -206,30 +222,10 @@
           <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="profile-action-row profile-action-danger" id="btn-delete-account">
-          <span class="profile-row-icon">🗑</span>
+          <span class="profile-row-icon">🗑️</span>
           <span data-i18n="delete_account">Видалити акаунт</span>
           <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button class="profile-action-row" id="btn-preview-login">
-          <span class="profile-row-icon">👁</span>
-          <span>Переглянути екран логіну</span>
-          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
-
-      <!-- Settings section -->
-      <div class="profile-section-card">
-        <div class="profile-section-title" data-i18n="section_settings">Налаштування</div>
-        <div class="profile-row">
-          <div class="profile-row-label">
-            <span class="profile-row-icon">🌐</span>
-            <span data-i18n="language">Мова</span>
-          </div>
-          <div class="lang-switcher">
-            <button class="lang-btn active" id="btn-lang-uk">УКР</button>
-            <button class="lang-btn" id="btn-lang-en">ENG</button>
-          </div>
-        </div>
       </div>
 
       <div class="profile-footer">Plant Diary v1.0</div>

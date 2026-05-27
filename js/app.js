@@ -1306,7 +1306,7 @@ function renderJournal() {
   items.sort((a, b) => b.date - a.date)
 
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📖</div><h3>Журнал Порожній</h3><p>Почніть поливати рослини!</p></div>'
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="18" y="10" width="56" height="78" rx="7" fill="#ADDC58" fill-opacity="0.2"/><rect x="14" y="10" width="10" height="78" rx="5" fill="#ADDC58" fill-opacity="0.2"/><rect x="28" y="28" width="36" height="5" rx="2.5" fill="#ADDC58" fill-opacity="0.2"/><rect x="28" y="40" width="30" height="5" rx="2.5" fill="#ADDC58" fill-opacity="0.2"/><rect x="28" y="52" width="34" height="5" rx="2.5" fill="#ADDC58" fill-opacity="0.2"/><rect x="28" y="64" width="22" height="5" rx="2.5" fill="#ADDC58" fill-opacity="0.2"/></svg></div><h3>Журнал Порожній</h3><p>Почніть поливати рослини!</p></div>'
     return
   }
 
@@ -1542,23 +1542,17 @@ async function saveNotifEmail() {
 }
 
 async function deleteAccount() {
-  showConfirm(
-    'Видалити акаунт?',
-    'Всі ваші рослини, поливи та нотатки будуть видалені назавжди. Це незворотньо.',
-    async () => {
-      showLoadingOverlay()
-      try {
-        // In real app: call Supabase admin to delete user
-        // await sb.rpc('delete_user')
-        await signOut()
-        showToast('Акаунт видалено')
-      } catch (err) {
-        showToast('Помилка видалення акаунту')
-      } finally {
-        hideLoadingOverlay()
-      }
-    }
-  )
+  showLoadingOverlay()
+  try {
+    // In real app: call Supabase admin to delete user
+    // await sb.rpc('delete_user')
+    await signOut()
+    showToast('Акаунт видалено')
+  } catch (err) {
+    showToast('Помилка видалення акаунту')
+  } finally {
+    hideLoadingOverlay()
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -1838,10 +1832,12 @@ function bindEvents() {
   document.getElementById('btn-profile-signout').addEventListener('click', () => {
     showConfirm('Вийти?', 'Ви впевнені що хочете вийти?', signOut)
   })
-  document.getElementById('btn-delete-account').addEventListener('click', deleteAccount)
-  document.getElementById('btn-preview-login').addEventListener('click', () => {
-    document.getElementById('btn-auth-back').classList.remove('hidden')
-    showAuth()
+  document.getElementById('btn-delete-account').addEventListener('click', () => {
+    showConfirm(
+      'Видалити акаунт?',
+      'Всі ваші рослини, поливи та нотатки будуть видалені назавжди. Це незворотньо.',
+      deleteAccount
+    )
   })
   document.getElementById('btn-save-notif-email').addEventListener('click', saveNotifEmail)
   document.getElementById('toggle-notifications').addEventListener('change', e => {

@@ -27,7 +27,7 @@
   --r-lg: 18px;
   --r-xl: 22px;
   --r-pill: 100px;
-  --tab-h: 98px;
+  --tab-h: 66px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
   --hdr-h: 60px;
@@ -261,7 +261,7 @@ img { display: block; max-width: 100%; }
   transform: translateX(-50%);
   width: 100%;
   max-width: var(--max-w);
-  padding: 14px 8px calc(var(--safe-bottom) + 40px);
+  padding: 12px 8px calc(var(--safe-bottom) + 10px);
   background: #0c0c0c;
   border-top: 1px solid rgba(255,255,255,0.05);
   border-radius: 24px 24px 0 0;
@@ -442,10 +442,13 @@ img { display: block; max-width: 100%; }
 .empty-icon {
   font-size: 60px;
   opacity: 1;
-  filter: drop-shadow(0 4px 12px rgba(93,186,106,0.2));
+  filter: drop-shadow(0 4px 12px rgba(173,220,88,0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text2); }
-.empty-state p { font-size: 14px; color: var(--text3); }
+.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text); }
+.empty-state p { font-size: 14px; color: var(--text2); }
 
 .hidden { display: none !important; }
 
@@ -1836,6 +1839,10 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   justify-content: center;
+}
+input[type="date"].form-input {
+  text-align: left;
+  min-height: 48px;
 }
 input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
