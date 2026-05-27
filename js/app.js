@@ -439,6 +439,16 @@ function renderPlantDetail(plant) {
   if (plant.pot_size) metaParts.push(potSizeLabel(plant.pot_size))
   document.getElementById('detail-meta').textContent = metaParts.join(' · ')
 
+  // Description (optional)
+  const descEl = document.getElementById('detail-description')
+  if (plant.description) {
+    descEl.textContent = plant.description
+    descEl.classList.remove('hidden')
+  } else {
+    descEl.textContent = ''
+    descEl.classList.add('hidden')
+  }
+
   // Next watering badge
   const nw = getNextWatering(plant)
   const today = dayStart(new Date())
@@ -575,6 +585,8 @@ function openAddPlantForm() {
   _dateFieldReset.placeholder = 'дд.мм.рррр'
   document.getElementById('field-repotting-notes').value = ''
 
+  document.getElementById('field-description').value = ''
+
   // Reset conditions
   state.selectedConditions = ['sun']
   document.querySelectorAll('.condition-btn').forEach(btn => {
@@ -598,6 +610,7 @@ function openEditPlantForm() {
   document.getElementById('btn-plant-form-submit').textContent = 'Зберегти Зміни'
 
   document.getElementById('field-name').value = plant.name
+  document.getElementById('field-description').value = plant.description || ''
   document.getElementById('field-room').value = plant.room
   document.getElementById('field-watering-freq').value = plant.watering_frequency_days
   document.getElementById('field-fertilizing-freq').value = plant.fertilizing_frequency_days || ''
@@ -660,6 +673,7 @@ async function submitPlantForm(e) {
     const payload = {
       user_id: state.user.id,
       name: document.getElementById('field-name').value.trim(),
+      description: document.getElementById('field-description').value.trim() || null,
       room: document.getElementById('field-room').value,
       conditions: state.selectedConditions.join(',') || 'sun',
       watering_frequency_days: parseInt(document.getElementById('field-watering-freq').value) || 7,

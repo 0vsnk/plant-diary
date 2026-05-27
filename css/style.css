@@ -577,6 +577,12 @@ img { display: block; max-width: 100%; }
   color: var(--text2);
   margin-top: 5px;
 }
+.detail-description {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 10px;
+}
 
 .btn-edit {
   width: 36px; height: 36px;
