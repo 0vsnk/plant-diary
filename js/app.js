@@ -482,6 +482,10 @@ function renderPlantDetail(plant) {
   } else {
     repLog.appendChild(createElement('p', 'repotting-empty', 'Пересадку не заплановано'))
   }
+  if (plant.repotting_notes) {
+    const notesEl = createElement('p', 'repotting-notes-text', plant.repotting_notes)
+    repLog.appendChild(notesEl)
+  }
 
   // Notes
   renderNotes(plant.id)
@@ -570,6 +574,7 @@ function openAddPlantForm() {
   _dateFieldReset.type = 'text'
   _dateFieldReset.value = ''
   _dateFieldReset.placeholder = 'дд.мм.рррр'
+  document.getElementById('field-repotting-notes').value = ''
 
   // Reset conditions
   state.selectedCondition = 'sun'
@@ -606,6 +611,7 @@ function openEditPlantForm() {
     _dateFieldEdit.value = ''
     _dateFieldEdit.placeholder = 'дд.мм.рррр'
   }
+  document.getElementById('field-repotting-notes').value = plant.repotting_notes || ''
 
   // Photo preview
   const formImg = document.getElementById('form-photo-img')
@@ -660,6 +666,7 @@ async function submitPlantForm(e) {
       watering_frequency_days: parseInt(document.getElementById('field-watering-freq').value) || 7,
       fertilizing_frequency_days: parseInt(document.getElementById('field-fertilizing-freq').value) || null,
       next_repotting_date: document.getElementById('field-repotting-date').value || null,
+      repotting_notes: document.getElementById('field-repotting-notes').value.trim() || null,
       photo_url: photoUrl,
       pot_size: state.selectedPotSize || null,
     }

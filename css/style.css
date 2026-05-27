@@ -817,6 +817,15 @@ img { display: block; max-width: 100%; }
   font-size: 13px;
   color: var(--text2);
 }
+.repotting-notes-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.55;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+}
 
 .detail-spacer { height: calc(var(--tab-h) + var(--safe-bottom) + 20px); }
 
