@@ -826,23 +826,75 @@ img { display: block; max-width: 100%; }
 .note-item-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
 }
 .note-item-date { font-size: 12px; color: var(--text2); }
-.note-delete-btn {
+
+/* Swipe-to-delete */
+.swipe-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+.swipe-content {
+  position: relative;
+  z-index: 1;
+  will-change: transform;
+  transition: transform 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-radius: 20px;
+}
+.swipe-content.no-transition { transition: none; }
+.swipe-delete-action {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: 84px;
+  background: var(--danger);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: none;
-  border: none;
-  color: var(--text3);
-  flex-shrink: 0;
-  transition: background var(--trans-fast), color var(--trans-fast);
+  flex-direction: column;
+  gap: 4px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  border-radius: 0 20px 20px 0;
+  cursor: pointer;
 }
-.note-delete-btn:active { background: var(--danger-dim); color: var(--danger); }
+.swipe-delete-action svg { flex-shrink: 0; }
+
+/* Note edit mode */
+.note-detail-edit-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.note-detail-edit-actions {
+  display: flex;
+  gap: 10px;
+}
+.btn-note-save {
+  flex: 1;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0c0c0c;
+  padding: 13px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  transition: opacity var(--trans-fast);
+}
+.btn-note-save:active { opacity: 0.8; }
+.btn-note-cancel {
+  padding: 13px 20px;
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.06);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text2);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: background var(--trans-fast);
+}
+.btn-note-cancel:active { background: rgba(255,255,255,0.1); }
 
 /* Repotting log list */
 .repotting-log {
