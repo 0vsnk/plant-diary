@@ -539,11 +539,17 @@ function renderNotes(plantId) {
     return
   }
 
+  // Reset filter/sort for fresh open
+  state.notesFilter = 'all'
+  state.notesSort = 'desc'
   notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId)))
 }
 
+const IC_TRASH = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6Z" fill="currentColor"/></svg>`
+
 function buildNoteItem(note, plantId) {
   const item = createElement('div', 'note-item')
+  item.style.cursor = 'pointer'
 
   const content = createElement('div', 'note-item-content')
   if (note.text) content.appendChild(createElement('p', 'note-item-text', note.text))
@@ -555,6 +561,8 @@ function buildNoteItem(note, plantId) {
     img.className = 'note-item-thumb'
     img.alt = ''
     img.loading = 'lazy'
+    // tap photo → lightbox
+    img.addEventListener('click', e => { e.stopPropagation(); openLightbox(note.photo_url) })
     thumbs.appendChild(img)
     content.appendChild(thumbs)
   }
@@ -567,7 +575,7 @@ function buildNoteItem(note, plantId) {
 
   const delBtn = document.createElement('button')
   delBtn.className = 'note-delete-btn'
-  delBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6Z" fill="currentColor"/></svg>`
+  delBtn.innerHTML = IC_TRASH
   delBtn.setAttribute('aria-label', 'Видалити нотатку')
   delBtn.addEventListener('click', e => {
     e.stopPropagation()
@@ -576,7 +584,55 @@ function buildNoteItem(note, plantId) {
   footer.appendChild(delBtn)
 
   item.appendChild(footer)
+
+  // Tap anywhere on item → open note detail
+  item.addEventListener('click', () => openNoteDetail(note, plantId))
+
   return item
+}
+
+// ─── Lightbox ───────────────────────────────────────────
+function openLightbox(src) {
+  const lb = document.getElementById('lightbox')
+  document.getElementById('lightbox-img').src = src
+  lb.style.display = 'flex'
+  document.body.style.overflow = 'hidden'
+}
+function closeLightbox() {
+  const lb = document.getElementById('lightbox')
+  lb.style.display = 'none'
+  document.getElementById('lightbox-img').src = ''
+  document.body.style.overflow = ''
+}
+
+// ─── Note Detail overlay ─────────────────────────────────
+function openNoteDetail(note, plantId) {
+  document.getElementById('note-detail-title').textContent = formatDateTime(new Date(note.created_at))
+  const body = document.getElementById('note-detail-body')
+  body.innerHTML = ''
+
+  if (note.photo_url) {
+    const img = document.createElement('img')
+    img.src = note.photo_url
+    img.className = 'note-detail-photo'
+    img.alt = ''
+    img.addEventListener('click', () => openLightbox(note.photo_url))
+    body.appendChild(img)
+  }
+
+  if (note.text) {
+    const p = createElement('p', 'note-detail-text', note.text)
+    body.appendChild(p)
+  }
+
+  // Wire delete button
+  const delBtn = document.getElementById('btn-note-detail-delete')
+  delBtn.onclick = () => showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
+    await deleteNote(note.id, plantId)
+    closeOverlay('overlay-note-detail')
+  })
+
+  openOverlay('overlay-note-detail')
 }
 
 async function deleteNote(noteId, plantId) {
@@ -597,7 +653,7 @@ async function deleteNote(noteId, plantId) {
   // Refresh full-notes overlay if open
   const overlay = document.getElementById('overlay-notes')
   if (overlay && overlay.classList.contains('open')) {
-    openFullNotes(plantId)
+    renderFullNotes()
   }
 }
 
@@ -1556,17 +1612,47 @@ function openFullHistory(plantId) {
    FULL NOTES OVERLAY
 ═══════════════════════════════════════ */
 function openFullNotes(plantId) {
-  const notes = state.notes[plantId] || []
+  state.currentNotesPlantId = plantId
+  state.notesFilter = state.notesFilter || 'all'
+  state.notesSort = state.notesSort || 'desc'
+  renderFullNotes()
+  openOverlay('overlay-notes')
+}
+
+function renderFullNotes() {
+  const plantId = state.currentNotesPlantId
+  let notes = [...(state.notes[plantId] || [])]
+
+  // Filter
+  if (state.notesFilter === 'photo') notes = notes.filter(n => n.photo_url)
+
+  // Sort
+  notes.sort((a, b) => {
+    const diff = new Date(b.created_at) - new Date(a.created_at)
+    return state.notesSort === 'desc' ? diff : -diff
+  })
+
   const container = document.getElementById('full-notes-list')
   container.innerHTML = ''
 
+  // Update filter chip active states
+  document.querySelectorAll('[data-notes-filter]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.notesFilter === state.notesFilter)
+  })
+
+  // Update sort button label
+  const sortBtn = document.getElementById('btn-notes-sort')
+  const sortLabel = document.getElementById('notes-sort-label')
+  if (sortBtn && sortLabel) {
+    sortLabel.textContent = state.notesSort === 'desc' ? 'Нові' : 'Старі'
+    sortBtn.classList.toggle('sort-asc', state.notesSort === 'asc')
+  }
+
   if (!notes.length) {
-    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px">Нотаток ще немає</p>'
+    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px 0">Нотаток не знайдено</p>'
   } else {
     notes.forEach(note => container.appendChild(buildNoteItem(note, plantId)))
   }
-
-  openOverlay('overlay-notes')
 }
 
 /* ═══════════════════════════════════════
@@ -1796,6 +1882,23 @@ function bindEvents() {
   // Sub-page overlays
   document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))
   document.getElementById('btn-notes-back').addEventListener('click', () => closeOverlay('overlay-notes'))
+  document.getElementById('btn-note-detail-back').addEventListener('click', () => closeOverlay('overlay-note-detail'))
+
+  // Notes filter chips + sort
+  document.getElementById('notes-filter-bar').addEventListener('click', e => {
+    const chip = e.target.closest('[data-notes-filter]')
+    if (chip) { state.notesFilter = chip.dataset.notesFilter; renderFullNotes(); return }
+    if (e.target.closest('#btn-notes-sort')) {
+      state.notesSort = state.notesSort === 'desc' ? 'asc' : 'desc'
+      renderFullNotes()
+    }
+  })
+
+  // Lightbox
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox)
+  document.getElementById('lightbox').addEventListener('click', e => {
+    if (e.target === document.getElementById('lightbox')) closeLightbox()
+  })
 
   // Change photo from detail
   document.getElementById('input-change-photo').addEventListener('change', e => {
