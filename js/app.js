@@ -705,14 +705,52 @@ function renderNoteDetailEdit(note, plantId) {
 
   const area = createElement('div', 'note-detail-edit-area')
 
-  if (note.photo_url) {
-    const img = document.createElement('img')
-    img.src = note.photo_url
-    img.className = 'note-detail-photo'
-    img.alt = ''
-    area.appendChild(img)
+  // Photo state for this edit session
+  let currentPhotoUrl = note.photo_url || null
+  let pendingPhotoFile = null
+
+  // ── Photo section ─────────────────────────────────────
+  const photoSection = createElement('div', 'note-edit-photo-section')
+
+  function renderPhotoSection() {
+    photoSection.innerHTML = ''
+    if (currentPhotoUrl) {
+      const imgWrap = createElement('div', 'note-edit-photo-wrap')
+      const img = document.createElement('img')
+      img.src = currentPhotoUrl
+      img.className = 'note-detail-photo'
+      img.alt = ''
+      imgWrap.appendChild(img)
+
+      const removeBtn = createElement('button', 'note-edit-photo-remove', '✕ Видалити фото')
+      removeBtn.addEventListener('click', () => {
+        currentPhotoUrl = null
+        pendingPhotoFile = null
+        renderPhotoSection()
+      })
+      imgWrap.appendChild(removeBtn)
+      photoSection.appendChild(imgWrap)
+    } else {
+      const addBtn = createElement('button', 'btn-outline btn-sm', '+ Додати фото')
+      addBtn.addEventListener('click', () => document.getElementById('input-note-edit-photo').click())
+      photoSection.appendChild(addBtn)
+    }
+  }
+  renderPhotoSection()
+  area.appendChild(photoSection)
+
+  // File input handler
+  const fileInput = document.getElementById('input-note-edit-photo')
+  fileInput.value = ''
+  fileInput.onchange = e => {
+    const file = e.target.files[0]
+    if (!file) return
+    pendingPhotoFile = file
+    currentPhotoUrl = URL.createObjectURL(file)
+    renderPhotoSection()
   }
 
+  // ── Textarea ─────────────────────────────────────────
   const textarea = document.createElement('textarea')
   textarea.className = 'form-input form-textarea'
   textarea.rows = 5
@@ -720,6 +758,7 @@ function renderNoteDetailEdit(note, plantId) {
   textarea.placeholder = 'Текст нотатки…'
   area.appendChild(textarea)
 
+  // ── Actions ──────────────────────────────────────────
   const actions = createElement('div', 'note-detail-edit-actions')
 
   const cancelBtn = createElement('button', 'btn-note-cancel', 'Скасувати')
@@ -728,7 +767,18 @@ function renderNoteDetailEdit(note, plantId) {
   const saveBtn = createElement('button', 'btn-note-save', 'Зберегти')
   saveBtn.addEventListener('click', async () => {
     const newText = textarea.value.trim()
-    await updateNote(note, plantId, newText)
+    let finalPhotoUrl = currentPhotoUrl
+
+    // Upload new photo if selected
+    if (pendingPhotoFile) {
+      if (sb && state.user) {
+        finalPhotoUrl = await uploadPhoto(pendingPhotoFile)
+      } else {
+        finalPhotoUrl = URL.createObjectURL(pendingPhotoFile)
+      }
+    }
+
+    await updateNote(note, plantId, newText, finalPhotoUrl)
   })
 
   actions.appendChild(cancelBtn)
@@ -738,16 +788,19 @@ function renderNoteDetailEdit(note, plantId) {
   textarea.focus()
 }
 
-async function updateNote(note, plantId, newText) {
+async function updateNote(note, plantId, newText, newPhotoUrl) {
+  const updated = { text: newText, photo_url: newPhotoUrl ?? note.photo_url }
+
   // Update state
   const notes = state.notes[plantId] || []
   const idx = notes.findIndex(n => n.id === note.id)
-  if (idx !== -1) notes[idx] = { ...notes[idx], text: newText }
-  note.text = newText
+  if (idx !== -1) notes[idx] = { ...notes[idx], ...updated }
+  note.text = updated.text
+  note.photo_url = updated.photo_url
 
   // Update Supabase
   if (sb && !note.id.toString().startsWith('demo-')) {
-    const { error } = await sb.from('notes').update({ text: newText }).eq('id', note.id)
+    const { error } = await sb.from('notes').update(updated).eq('id', note.id)
     if (error) { showToast('Помилка збереження'); return }
   }
 

@@ -812,7 +812,7 @@ img { display: block; max-width: 100%; }
   flex-direction: column;
   gap: 8px;
 }
-.note-item-text { font-size: 12px; line-height: 1.5; color: var(--text); }
+.note-item-text { font-size: 12px; line-height: 1.5; color: var(--text); white-space: pre-wrap; }
 .note-item-thumbs {
   display: flex;
   gap: 8px;
@@ -840,8 +840,11 @@ img { display: block; max-width: 100%; }
   z-index: 1;
   will-change: transform;
   transition: transform 220ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border-radius: 20px;
+  border-radius: 0;         /* outer wrap clips corners */
+  width: 100%;
 }
+/* note-item inside swipe must not have its own border-radius */
+.swipe-content.note-item { border-radius: 0; }
 .swipe-content.no-transition { transition: none; }
 .swipe-delete-action {
   position: absolute;
@@ -895,6 +898,21 @@ img { display: block; max-width: 100%; }
   transition: background var(--trans-fast);
 }
 .btn-note-cancel:active { background: rgba(255,255,255,0.1); }
+
+.note-edit-photo-section { display: flex; flex-direction: column; gap: 8px; }
+.note-edit-photo-wrap { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.note-edit-photo-remove {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--danger);
+  background: var(--danger-dim);
+  border: 1px solid rgba(208,95,114,0.2);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  transition: opacity var(--trans-fast);
+}
+.note-edit-photo-remove:active { opacity: 0.7; }
 
 /* Repotting log list */
 .repotting-log {
