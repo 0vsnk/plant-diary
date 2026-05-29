@@ -545,23 +545,9 @@ function renderNotes(plantId) {
   notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId)))
 }
 
-let _openSwipeWrap = null // track currently swiped-open item
-
 function buildNoteItem(note, plantId) {
-  // Outer wrapper for swipe
-  const wrap = createElement('div', 'swipe-wrap')
-
-  // Delete action revealed on swipe
-  const deleteAction = createElement('div', 'swipe-delete-action')
-  deleteAction.innerHTML = `<svg width="18" height="18" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6Z" fill="currentColor"/></svg><span>Видалити</span>`
-  deleteAction.addEventListener('click', () =>
-    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', () => deleteNote(note.id, plantId))
-  )
-  wrap.appendChild(deleteAction)
-
-  // Swipeable content
-  const inner = createElement('div', 'swipe-content note-item')
-  inner.style.cursor = 'pointer'
+  const item = createElement('div', 'note-item')
+  item.style.cursor = 'pointer'
 
   const content = createElement('div', 'note-item-content')
   if (note.text) content.appendChild(createElement('p', 'note-item-text', note.text))
@@ -576,80 +562,14 @@ function buildNoteItem(note, plantId) {
     thumbs.appendChild(img)
     content.appendChild(thumbs)
   }
-  inner.appendChild(content)
+  item.appendChild(content)
 
   const footer = createElement('div', 'note-item-footer')
   footer.appendChild(createElement('p', 'note-item-date', formatDateTime(new Date(note.created_at))))
-  inner.appendChild(footer)
+  item.appendChild(footer)
 
-  // Tap → open detail (only if not mid-swipe)
-  inner.addEventListener('click', () => {
-    if (inner._swipeMoved) return
-    // close any open swipe first
-    if (_openSwipeWrap && _openSwipeWrap !== wrap) snapClose(_openSwipeWrap._swipeInner)
-    if (inner._swipeOpen) { snapClose(inner); return }
-    openNoteDetail(note, plantId)
-  })
-
-  // ── Swipe-to-delete touch logic ─────────────────────────
-  const THRESHOLD = 84 // px to lock open = delete button width
-  let startX = 0, startY = 0, currentX = 0, tracking = false, dirLocked = false, isHoriz = false
-
-  function snapClose(el) {
-    el.classList.remove('no-transition')
-    el.style.transform = 'translateX(0)'
-    el._swipeOpen = false
-    if (_openSwipeWrap && _openSwipeWrap._swipeInner === el) _openSwipeWrap = null
-  }
-  function snapOpen(el) {
-    el.classList.remove('no-transition')
-    el.style.transform = `translateX(-${THRESHOLD}px)`
-    el._swipeOpen = true
-    _openSwipeWrap = wrap
-    wrap._swipeInner = el
-  }
-
-  inner.addEventListener('touchstart', e => {
-    // close other open item
-    if (_openSwipeWrap && _openSwipeWrap !== wrap) {
-      snapClose(_openSwipeWrap._swipeInner)
-    }
-    startX = e.touches[0].clientX
-    startY = e.touches[0].clientY
-    tracking = true; dirLocked = false; isHoriz = false
-    inner._swipeMoved = false
-    inner.classList.add('no-transition')
-  }, { passive: true })
-
-  inner.addEventListener('touchmove', e => {
-    if (!tracking) return
-    const dx = e.touches[0].clientX - startX
-    const dy = e.touches[0].clientY - startY
-    if (!dirLocked) {
-      if (Math.abs(dx) < 5 && Math.abs(dy) < 5) return
-      isHoriz = Math.abs(dx) > Math.abs(dy)
-      dirLocked = true
-    }
-    if (!isHoriz) return
-    e.preventDefault()
-    currentX = dx
-    const base = inner._swipeOpen ? -THRESHOLD : 0
-    const translate = Math.max(-THRESHOLD, Math.min(0, base + dx))
-    inner.style.transform = `translateX(${translate}px)`
-    if (Math.abs(dx) > 6) inner._swipeMoved = true
-  }, { passive: false })
-
-  inner.addEventListener('touchend', () => {
-    if (!tracking || !isHoriz) { tracking = false; return }
-    tracking = false
-    const base = inner._swipeOpen ? -THRESHOLD : 0
-    const total = base + currentX
-    if (total < -THRESHOLD / 2) snapOpen(inner)
-    else snapClose(inner)
-  })
-
-  wrap.appendChild(inner)
-  return wrap
+  item.addEventListener('click', () => openNoteDetail(note, plantId))
+  return item
 }
 
 // ─── Lightbox ───────────────────────────────────────────

@@ -37,7 +37,7 @@
   --r-lg: 18px;
   --r-xl: 22px;
   --r-pill: 100px;
-  --tab-h: 98px;
+  --tab-h: 66px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-top: env(safe-area-inset-top, 0px);
   --hdr-h: 60px;
@@ -171,16 +171,16 @@ img { display: block; max-width: 100%; }
 }
 
 .auth-logo { text-align: center; }
-.auth-logo-icon {
-  font-size: 72px;
+.auth-logo-img {
+  width: 60px;
+  height: 60px;
   display: block;
-  margin-bottom: 20px;
-  filter: drop-shadow(0 6px 24px rgba(93,186,106,0.5));
+  margin: 0 auto 16px;
 }
 .auth-title {
   font-size: 34px;
-  font-weight: 800;
-  letter-spacing: -0.8px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
   color: var(--text);
 }
 .auth-subtitle {
@@ -210,13 +210,10 @@ img { display: block; max-width: 100%; }
 }
 .btn-oauth:active { transform: scale(0.97); opacity: 0.85; }
 
-.btn-google {
+.btn-google,
+.btn-apple {
   background: #fff;
   color: #1a1a1a;
-}
-.btn-apple {
-  background: var(--text);
-  color: #000;
 }
 
 .auth-note {
@@ -271,7 +268,7 @@ img { display: block; max-width: 100%; }
   transform: translateX(-50%);
   width: 100%;
   max-width: var(--max-w);
-  padding: 14px 8px calc(var(--safe-bottom) + 40px);
+  padding: 12px 8px calc(var(--safe-bottom) + 10px);
   background: #0c0c0c;
   border-top: 1px solid rgba(255,255,255,0.05);
   border-radius: 24px 24px 0 0;
@@ -452,10 +449,13 @@ img { display: block; max-width: 100%; }
 .empty-icon {
   font-size: 60px;
   opacity: 1;
-  filter: drop-shadow(0 4px 12px rgba(93,186,106,0.2));
+  filter: drop-shadow(0 4px 12px rgba(173,220,88,0.15));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text2); }
-.empty-state p { font-size: 14px; color: var(--text3); }
+.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text); }
+.empty-state p { font-size: 14px; color: var(--text2); }
 
 .hidden { display: none !important; }
 
@@ -511,9 +511,21 @@ img { display: block; max-width: 100%; }
 }
 .detail-header-gradient {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 220px;
-  background: linear-gradient(to top, var(--bg) 0%, rgba(17,18,17,0.85) 35%, rgba(17,18,17,0.4) 65%, transparent 100%);
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.12) 28%, transparent 55%),
+    linear-gradient(to top,
+      #111211 0%,
+      rgba(17,18,17,0.98) 8%,
+      rgba(17,18,17,0.93) 18%,
+      rgba(17,18,17,0.82) 28%,
+      rgba(17,18,17,0.65) 40%,
+      rgba(17,18,17,0.44) 53%,
+      rgba(17,18,17,0.25) 66%,
+      rgba(17,18,17,0.10) 80%,
+      rgba(17,18,17,0.02) 92%,
+      transparent 100%
+    );
   pointer-events: none;
 }
 
@@ -522,35 +534,35 @@ img { display: block; max-width: 100%; }
   top: calc(var(--safe-top) + 14px);
   left: 14px;
   width: 38px; height: 38px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  color: #fff;
   z-index: 2;
   border: none;
   transition: transform var(--trans-fast), background var(--trans-fast);
 }
-.btn-back:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+.btn-back:active { transform: scale(0.9); background: rgba(0,0,0,0.5); }
 
 .btn-photo-action {
   width: 38px; height: 38px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--text);
+  color: #fff;
   border: none;
   transition: transform var(--trans-fast), background var(--trans-fast);
 }
-.btn-photo-action:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+.btn-photo-action:active { transform: scale(0.9); background: rgba(0,0,0,0.5); }
 
 /* Detail content */
 .detail-content {
@@ -574,6 +586,12 @@ img { display: block; max-width: 100%; }
   font-size: 13px;
   color: var(--text2);
   margin-top: 5px;
+}
+.detail-description {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 10px;
 }
 
 .btn-edit {
@@ -804,7 +822,7 @@ img { display: block; max-width: 100%; }
   flex-direction: column;
   gap: 8px;
 }
-.note-item-text { font-size: 12px; line-height: 1.5; color: var(--text); }
+.note-item-text { font-size: 12px; line-height: 1.5; color: var(--text); white-space: pre-wrap; }
 .note-item-thumbs {
   display: flex;
   gap: 8px;
@@ -815,7 +833,61 @@ img { display: block; max-width: 100%; }
   object-fit: cover;
   display: block;
 }
+.note-item-footer {
+  display: flex;
+  align-items: center;
+}
 .note-item-date { font-size: 12px; color: var(--text2); }
+
+
+/* Note edit mode */
+.note-detail-edit-area {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.note-detail-edit-actions {
+  display: flex;
+  gap: 10px;
+}
+.btn-note-save {
+  flex: 1;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #0c0c0c;
+  padding: 13px;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  transition: opacity var(--trans-fast);
+}
+.btn-note-save:active { opacity: 0.8; }
+.btn-note-cancel {
+  padding: 13px 20px;
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.06);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text2);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: background var(--trans-fast);
+}
+.btn-note-cancel:active { background: rgba(255,255,255,0.1); }
+
+.note-edit-photo-section { display: flex; flex-direction: column; gap: 8px; }
+.note-edit-photo-wrap { position: relative; display: flex; flex-direction: column; gap: 8px; }
+.note-edit-photo-remove {
+  align-self: flex-start;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--danger);
+  background: var(--danger-dim);
+  border: 1px solid rgba(208,95,114,0.2);
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  transition: opacity var(--trans-fast);
+}
+.note-edit-photo-remove:active { opacity: 0.7; }
 
 /* Repotting log list */
 .repotting-log {
@@ -826,6 +898,15 @@ img { display: block; max-width: 100%; }
 .repotting-empty {
   font-size: 13px;
   color: var(--text2);
+}
+.repotting-notes-text {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.55;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
 }
 
 .detail-spacer { height: calc(var(--tab-h) + var(--safe-bottom) + 20px); }
@@ -1715,19 +1796,19 @@ img { display: block; max-width: 100%; }
   top: calc(var(--safe-top) + 14px);
   right: 14px;
   width: 38px; height: 38px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0,0,0,0.32);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text);
+  color: #fff;
   z-index: 2;
   border: none;
   transition: transform var(--trans-fast), background var(--trans-fast);
 }
-.btn-detail-more:active { transform: scale(0.9); background: rgba(255,255,255,0.10); }
+.btn-detail-more:active { transform: scale(0.9); background: rgba(0,0,0,0.5); }
 
 /* ═══════════════════════════════════════
    MORE ACTIONS SHEET
@@ -1806,6 +1887,87 @@ img { display: block; max-width: 100%; }
 }
 .subpage-content::-webkit-scrollbar { display: none; }
 
+/* Notes filter bar */
+.notes-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 4px;
+  flex-shrink: 0;
+}
+.notes-sort-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-pill);
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.06);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  flex-shrink: 0;
+  transition: background var(--trans-fast), color var(--trans-fast);
+}
+.notes-sort-btn:active { background: rgba(255,255,255,0.09); }
+.notes-sort-btn.sort-asc { color: var(--accent); border-color: var(--accent); background: var(--accent-dim); }
+
+/* Note detail full photo */
+.note-detail-photo {
+  width: 100%;
+  border-radius: var(--r-md);
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+}
+.note-detail-text {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.note-detail-date {
+  font-size: 13px;
+  color: var(--text2);
+}
+
+/* Lightbox */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  background: rgba(0,0,0,0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.lightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 4px;
+  user-select: none;
+}
+.lightbox-close {
+  position: absolute;
+  top: calc(var(--safe-top) + 14px);
+  right: 16px;
+  width: 40px; height: 40px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  border: none;
+  z-index: 1;
+  transition: background var(--trans-fast);
+}
+.lightbox-close:active { background: rgba(255,255,255,0.2); }
+
 /* ═══════════════════════════════════════
    VIEW ALL BUTTON
 ═══════════════════════════════════════ */
@@ -1846,6 +2008,10 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   justify-content: center;
+}
+input[type="date"].form-input {
+  text-align: left;
+  min-height: 48px;
 }
 input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
@@ -1905,7 +2071,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   </button>
   <div class="auth-content">
     <div class="auth-logo">
-      <span class="auth-logo-icon">🌱</span>
+      <svg class="auth-logo-img" width="60" height="60" viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.5">
+        <path d="M515.973 325.669L524.387 324.014L533.948 322.648L542.222 321.51L567 320.766L564.741 332.936L563.103 341.779L561.475 348.67L559.724 355.762L558.227 361.847L550.137 386.047L547.37 392.998L531.356 425.096L527.136 432.109L514.187 451.406L509.967 456.957L503.006 465.66L471.154 497.582L462.022 504.928L456.007 509.472L434.434 523.866C424.058 530.783 412.685 536.229 400.953 540.72L381.962 547.987L365.169 553.135L359.058 554.668L352.071 556.252L340.82 558.143L331.005 559.798C331.005 559.798 319.406 561.49 311.919 561.952C303.059 562.499 298.053 562.466 289.189 561.987C281.022 561.546 268.36 559.789 268.36 559.789L258.502 558.117L249.037 556.331L242.094 554.685L235.02 552.943L228.9 551.384L204.253 543.014L193.186 538.277L168.75 525.959L162.787 522.343L148.157 512.65L142.588 508.491L135.173 502.774L126.96 496.146C116.664 487.846 107.654 478.198 99.2315 468.216L91.0977 458.577L86.5886 452.675L72.1334 431.19L65.4443 419.492L56.9515 402.708C47.1454 383.332 40.6226 362.967 36.7527 341.77L35.3168 333.89C34.5551 329.697 34.0297 326.326 33.8896 320.88C33.8896 320.88 47.7668 320.105 56.5925 320.95C62.0229 321.47 70.3998 323.069 70.3998 323.069L79.3041 324.864L88.0771 326.632L95.0902 328.243L101.911 329.968L128.869 338.942L139.743 343.644C146.327 346.489 152.902 349.501 159.092 353.179L167.296 358.055L176.638 363.659L182.233 367.424L189.307 372.738L196.723 378.359L204.971 384.943C215.845 393.629 224.767 403.943 234.24 414.125L238.399 419.571L245.211 427.775L249.948 434.35L261.444 451.765C268.929 463.103 274.034 475.685 279.874 488.153L283.113 496.286L286.344 504.49L292.849 526.256L294.811 534.066L296.544 542.077C298.689 552.023 300 559.5 300 559.5C300 559.5 301.213 552.648 302.042 548.267C302.699 544.8 303.776 539.398 303.776 539.398L305.405 532.499L307.182 525.512L309.397 517.746L314.545 502.039L322.425 482.549L334.052 459.128L337.957 452.588L350.767 433.098L357.587 424.229L363.961 416.551L369.03 410.29L390.858 388.411L396.68 383.805L404.858 377.046L411.38 372.169L418.437 367.047L427.937 360.883L434.915 356.628L467.012 340.58L473.973 337.857L493.664 331.369L506.92 327.622L515.973 325.678V325.669Z" fill="#ADDC58"/>
+        <path d="M300 41C312.687 127.99 381.01 196.313 468 209C381.01 221.687 312.687 290.01 300 377C287.313 290.01 218.99 221.687 132 209C218.99 196.313 287.313 127.99 300 41Z" fill="#ADDC58"/>
+      </svg>
       <h1 class="auth-title">Plant Diary</h1>
       <p class="auth-subtitle">Щоденник догляду за рослинами</p>
     </div>
@@ -1946,7 +2115,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div class="spinner"></div>
       </div>
       <div class="empty-state hidden" id="plants-empty">
-        <div class="empty-icon">🪴</div>
+        <div class="empty-icon">
+          <svg width="80" height="80" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 25C35.9999 24.9952 41.9131 26.4319 47.2418 29.1894C52.5705 31.9468 57.1587 35.9442 60.62 40.845C55.3391 47.7891 52.4862 56.276 52.5 65V70H50C40.0544 70 30.5161 66.0491 23.4835 59.0165C16.4509 51.9839 12.5 42.4456 12.5 32.5V25H30Z" fill="#ADDC58" fill-opacity="0.2"/>
+            <path d="M107.499 40V30H92.4994C83.2168 30 74.3145 33.6875 67.7507 40.2513C61.1869 46.815 57.4994 55.7174 57.4994 65V95H67.4994V80C67.4994 77.2386 69.738 75 72.4994 75C81.782 75 90.6844 71.3125 97.2482 64.7487C103.812 58.185 107.499 49.2826 107.499 40Z" fill="#ADDC58" fill-opacity="0.2"/>
+          </svg>
+        </div>
         <h3>Ще Немає Рослин</h3>
         <p>Додайте першу рослину, натиснувши +</p>
       </div>
@@ -1978,7 +2152,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   <div class="tab-content hidden" id="tab-journal">
     <div class="page-header">
-      <h1 class="page-title" data-i18n="title_journal">Журнал догляду</h1>
+      <h1 class="page-title" data-i18n="title_journal">Журнал Догляду</h1>
     </div>
     <div class="journal-filters" id="journal-filters">
       <button class="filter-chip active" data-filter="all" data-i18n="filter_all">Всі</button>
@@ -2027,9 +2201,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         </div>
       </div>
 
-      <!-- Notifications section -->
+      <!-- General section -->
       <div class="profile-section-card">
-        <div class="profile-section-title" data-i18n="section_notifications">Сповіщення</div>
+        <div class="profile-section-title">Загальне</div>
 
         <div class="profile-row">
           <div class="profile-row-label">
@@ -2052,6 +2226,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             <button class="btn-save-email" id="btn-save-notif-email">Зберегти</button>
           </div>
         </div>
+
+        <div class="profile-row">
+          <div class="profile-row-label">
+            <span class="profile-row-icon">🌐</span>
+            <span data-i18n="language">Мова</span>
+          </div>
+          <div class="lang-switcher">
+            <button class="lang-btn active" id="btn-lang-uk">УКР</button>
+            <button class="lang-btn" id="btn-lang-en">ENG</button>
+          </div>
+        </div>
       </div>
 
       <!-- Account section -->
@@ -2063,30 +2248,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
         <button class="profile-action-row profile-action-danger" id="btn-delete-account">
-          <span class="profile-row-icon">🗑</span>
+          <span class="profile-row-icon">🗑️</span>
           <span data-i18n="delete_account">Видалити акаунт</span>
           <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
         </button>
-        <button class="profile-action-row" id="btn-preview-login">
-          <span class="profile-row-icon">👁</span>
-          <span>Переглянути екран логіну</span>
-          <svg class="profile-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </button>
-      </div>
-
-      <!-- Settings section -->
-      <div class="profile-section-card">
-        <div class="profile-section-title" data-i18n="section_settings">Налаштування</div>
-        <div class="profile-row">
-          <div class="profile-row-label">
-            <span class="profile-row-icon">🌐</span>
-            <span data-i18n="language">Мова</span>
-          </div>
-          <div class="lang-switcher">
-            <button class="lang-btn active" id="btn-lang-uk">УКР</button>
-            <button class="lang-btn" id="btn-lang-en">ENG</button>
-          </div>
-        </div>
       </div>
 
       <div class="profile-footer">Plant Diary v1.0</div>
@@ -2151,6 +2316,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div class="detail-title-row">
         <h1 class="detail-name" id="detail-name"></h1>
         <p class="detail-meta" id="detail-meta"></p>
+        <p class="detail-description hidden" id="detail-description"></p>
       </div>
 
       <!-- Watering section -->
@@ -2239,8 +2405,51 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       </button>
       <h1 class="subpage-title">Всі Нотатки</h1>
     </div>
+    <!-- Notes filters -->
+    <div class="notes-filter-bar" id="notes-filter-bar">
+      <button class="filter-chip active" data-notes-filter="all">Всі</button>
+      <button class="filter-chip" data-notes-filter="photo">З фото</button>
+      <button class="notes-sort-btn" id="btn-notes-sort" title="Сортування">
+        <svg id="notes-sort-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M7 12h10M11 18h2"/>
+        </svg>
+        <span id="notes-sort-label">Нові</span>
+      </button>
+    </div>
     <div class="subpage-content" id="full-notes-list"></div>
   </div>
+</div>
+
+<!-- Note detail overlay -->
+<div id="overlay-note-detail" class="overlay">
+  <div class="overlay-inner">
+    <div class="subpage-header">
+      <button class="btn-back" id="btn-note-detail-back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <h1 class="subpage-title" id="note-detail-title">Нотатка</h1>
+      <div style="display:flex;gap:8px;margin-left:auto">
+        <button class="btn-icon" id="btn-note-detail-edit">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn-icon" id="btn-note-detail-delete">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6Z" fill="currentColor"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="subpage-content" id="note-detail-body"></div>
+  </div>
+</div>
+<input type="file" id="input-note-edit-photo" accept="image/*" style="display:none">
+
+<!-- Photo lightbox -->
+<div id="lightbox" class="lightbox" style="display:none">
+  <button id="lightbox-close" class="lightbox-close" aria-label="Закрити">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <img id="lightbox-img" class="lightbox-img" src="" alt="">
 </div>
 
 <!-- ═══ ADD / EDIT PLANT SHEET ═══ -->
@@ -2282,6 +2491,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <label class="form-label">Назва Рослини</label>
         </div>
         <input type="text" id="field-name" class="form-input" placeholder="Наприклад: Монстера" required>
+      </div>
+
+      <!-- Description -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Опис</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <textarea id="field-description" class="form-input form-textarea" rows="3" placeholder="Особливості, походження, нотатки…"></textarea>
       </div>
 
       <!-- Room -->
@@ -2366,7 +2584,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
           <span class="form-optional">(опціонально)</span>
         </div>
         <div class="date-input-wrap">
-          <input type="date" id="field-repotting-date" class="form-input">
+          <input type="text" id="field-repotting-date" class="form-input" placeholder="дд.мм.рррр"
+            onfocus="this.type='date'"
+            onblur="if(!this.value){this.type='text';this.placeholder='дд.мм.рррр'}">
           <span class="date-ic-cal" aria-hidden="true">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path d="M7.74998 2.5C7.74998 2.30109 7.67096 2.11032 7.53031 1.96967C7.38966 1.82902 7.19889 1.75 6.99998 1.75C6.80107 1.75 6.6103 1.82902 6.46965 1.96967C6.329 2.11032 6.24998 2.30109 6.24998 2.5V4.08C4.80998 4.195 3.86598 4.477 3.17198 5.172C2.47698 5.866 2.19498 6.811 2.07898 8.25H21.921C21.805 6.81 21.523 5.866 20.828 5.172C20.134 4.477 19.189 4.195 17.75 4.079V2.5C17.75 2.30109 17.671 2.11032 17.5303 1.96967C17.3897 1.82902 17.1989 1.75 17 1.75C16.8011 1.75 16.6103 1.82902 16.4696 1.96967C16.329 2.11032 16.25 2.30109 16.25 2.5V4.013C15.585 4 14.839 4 14 4H9.99998C9.16098 4 8.41498 4 7.74998 4.013V2.5Z" fill="currentColor"/>
@@ -2374,6 +2594,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
             </svg>
           </span>
         </div>
+      </div>
+
+      <!-- Repotting notes -->
+      <div class="form-field">
+        <div class="form-field-header">
+          <label class="form-label">Поради щодо Пересаджування</label>
+          <span class="form-optional">(опціонально)</span>
+        </div>
+        <textarea id="field-repotting-notes" class="form-input form-textarea" rows="3" placeholder="Наприклад: використовувати дренаж, горщик +2 см від поточного…"></textarea>
       </div>
 
       <button type="submit" class="btn-primary btn-full" id="btn-plant-form-submit">
@@ -2481,9 +2710,9 @@ let state = {
   formMode: 'add',    // 'add' | 'edit'
   pendingPhotoFile: null,
   pendingNotePhotoFile: null,
-  selectedCondition: 'sun',
+  selectedConditions: ['sun'],
   roomFilter: 'all',  // room filter for plants tab
-  selectedPotSize: null,
+  selectedPotSizes: [],
   lang: localStorage.getItem('lang') || 'uk',
 }
 
@@ -2834,8 +3063,7 @@ function buildPlantCard(plant) {
   const textBlock = createElement('div', 'plant-card-text')
   const nameEl = createElement('div', 'plant-card-name', plant.name)
   const roomEl = createElement('div', 'plant-card-room')
-  const c = CONDITIONS[plant.conditions]
-  const condText = c ? t(c.key) : plant.conditions
+  const condText = conditionsLabel(plant.conditions)
   roomEl.innerHTML = `<span>${condText}</span><span>·</span><span>${plant.room}</span>`
   textBlock.append(nameEl, roomEl)
 
@@ -2900,8 +3128,18 @@ function renderPlantDetail(plant) {
   // Name + meta (conditions · room · pot size)
   document.getElementById('detail-name').textContent = plant.name
   const metaParts = [conditionsLabel(plant.conditions), plant.room]
-  if (plant.pot_size && POT_SIZES[plant.pot_size]) metaParts.push(potSizeLabel(plant.pot_size))
+  if (plant.pot_size) metaParts.push(potSizeLabel(plant.pot_size))
   document.getElementById('detail-meta').textContent = metaParts.join(' · ')
+
+  // Description (optional)
+  const descEl = document.getElementById('detail-description')
+  if (plant.description) {
+    descEl.textContent = plant.description
+    descEl.classList.remove('hidden')
+  } else {
+    descEl.textContent = ''
+    descEl.classList.add('hidden')
+  }
 
   // Next watering badge
   const nw = getNextWatering(plant)
@@ -2944,6 +3182,10 @@ function renderPlantDetail(plant) {
     repLog.appendChild(entry)
   } else {
     repLog.appendChild(createElement('p', 'repotting-empty', 'Пересадку не заплановано'))
+  }
+  if (plant.repotting_notes) {
+    const notesEl = createElement('p', 'repotting-notes-text', plant.repotting_notes)
+    repLog.appendChild(notesEl)
   }
 
   // Notes
@@ -2989,15 +3231,18 @@ function renderNotes(plantId) {
     return
   }
 
-  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note)))
+  // Reset filter/sort for fresh open
+  state.notesFilter = 'all'
+  state.notesSort = 'desc'
+  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId)))
 }
 
-function buildNoteItem(note) {
+function buildNoteItem(note, plantId) {
   const item = createElement('div', 'note-item')
+  item.style.cursor = 'pointer'
 
   const content = createElement('div', 'note-item-content')
   if (note.text) content.appendChild(createElement('p', 'note-item-text', note.text))
-
   if (note.photo_url) {
     const thumbs = createElement('div', 'note-item-thumbs')
     const img = document.createElement('img')
@@ -3005,13 +3250,199 @@ function buildNoteItem(note) {
     img.className = 'note-item-thumb'
     img.alt = ''
     img.loading = 'lazy'
+    img.addEventListener('click', e => { e.stopPropagation(); openLightbox(note.photo_url) })
     thumbs.appendChild(img)
     content.appendChild(thumbs)
   }
-
   item.appendChild(content)
-  item.appendChild(createElement('p', 'note-item-date', formatDateTime(new Date(note.created_at))))
+
+  const footer = createElement('div', 'note-item-footer')
+  footer.appendChild(createElement('p', 'note-item-date', formatDateTime(new Date(note.created_at))))
+  item.appendChild(footer)
+
+  item.addEventListener('click', () => openNoteDetail(note, plantId))
   return item
+}
+
+// ─── Lightbox ───────────────────────────────────────────
+function openLightbox(src) {
+  const lb = document.getElementById('lightbox')
+  document.getElementById('lightbox-img').src = src
+  lb.style.display = 'flex'
+  document.body.style.overflow = 'hidden'
+}
+function closeLightbox() {
+  const lb = document.getElementById('lightbox')
+  lb.style.display = 'none'
+  document.getElementById('lightbox-img').src = ''
+  document.body.style.overflow = ''
+}
+
+// ─── Note Detail overlay ─────────────────────────────────
+function openNoteDetail(note, plantId) {
+  document.getElementById('note-detail-title').textContent = formatDateTime(new Date(note.created_at))
+  renderNoteDetailView(note, plantId)
+
+  // Wire delete button
+  document.getElementById('btn-note-detail-delete').onclick = () =>
+    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
+      await deleteNote(note.id, plantId)
+      closeOverlay('overlay-note-detail')
+    })
+
+  // Wire edit button
+  document.getElementById('btn-note-detail-edit').onclick = () =>
+    renderNoteDetailEdit(note, plantId)
+
+  openOverlay('overlay-note-detail')
+}
+
+function renderNoteDetailView(note, plantId) {
+  const body = document.getElementById('note-detail-body')
+  body.innerHTML = ''
+  if (note.photo_url) {
+    const img = document.createElement('img')
+    img.src = note.photo_url
+    img.className = 'note-detail-photo'
+    img.alt = ''
+    img.addEventListener('click', () => openLightbox(note.photo_url))
+    body.appendChild(img)
+  }
+  if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
+}
+
+function renderNoteDetailEdit(note, plantId) {
+  const body = document.getElementById('note-detail-body')
+  body.innerHTML = ''
+
+  const area = createElement('div', 'note-detail-edit-area')
+
+  // Photo state for this edit session
+  let currentPhotoUrl = note.photo_url || null
+  let pendingPhotoFile = null
+
+  // ── Photo section ─────────────────────────────────────
+  const photoSection = createElement('div', 'note-edit-photo-section')
+
+  function renderPhotoSection() {
+    photoSection.innerHTML = ''
+    if (currentPhotoUrl) {
+      const imgWrap = createElement('div', 'note-edit-photo-wrap')
+      const img = document.createElement('img')
+      img.src = currentPhotoUrl
+      img.className = 'note-detail-photo'
+      img.alt = ''
+      imgWrap.appendChild(img)
+
+      const removeBtn = createElement('button', 'note-edit-photo-remove', '✕ Видалити фото')
+      removeBtn.addEventListener('click', () => {
+        currentPhotoUrl = null
+        pendingPhotoFile = null
+        renderPhotoSection()
+      })
+      imgWrap.appendChild(removeBtn)
+      photoSection.appendChild(imgWrap)
+    } else {
+      const addBtn = createElement('button', 'btn-outline btn-sm', '+ Додати фото')
+      addBtn.addEventListener('click', () => document.getElementById('input-note-edit-photo').click())
+      photoSection.appendChild(addBtn)
+    }
+  }
+  renderPhotoSection()
+  area.appendChild(photoSection)
+
+  // File input handler
+  const fileInput = document.getElementById('input-note-edit-photo')
+  fileInput.value = ''
+  fileInput.onchange = e => {
+    const file = e.target.files[0]
+    if (!file) return
+    pendingPhotoFile = file
+    currentPhotoUrl = URL.createObjectURL(file)
+    renderPhotoSection()
+  }
+
+  // ── Textarea ─────────────────────────────────────────
+  const textarea = document.createElement('textarea')
+  textarea.className = 'form-input form-textarea'
+  textarea.rows = 5
+  textarea.value = note.text || ''
+  textarea.placeholder = 'Текст нотатки…'
+  area.appendChild(textarea)
+
+  // ── Actions ──────────────────────────────────────────
+  const actions = createElement('div', 'note-detail-edit-actions')
+
+  const cancelBtn = createElement('button', 'btn-note-cancel', 'Скасувати')
+  cancelBtn.addEventListener('click', () => renderNoteDetailView(note, plantId))
+
+  const saveBtn = createElement('button', 'btn-note-save', 'Зберегти')
+  saveBtn.addEventListener('click', async () => {
+    const newText = textarea.value.trim()
+    let finalPhotoUrl = currentPhotoUrl
+
+    // Upload new photo if selected
+    if (pendingPhotoFile) {
+      if (sb && state.user) {
+        finalPhotoUrl = await uploadPhoto(pendingPhotoFile)
+      } else {
+        finalPhotoUrl = URL.createObjectURL(pendingPhotoFile)
+      }
+    }
+
+    await updateNote(note, plantId, newText, finalPhotoUrl)
+  })
+
+  actions.appendChild(cancelBtn)
+  actions.appendChild(saveBtn)
+  area.appendChild(actions)
+  body.appendChild(area)
+  textarea.focus()
+}
+
+async function updateNote(note, plantId, newText, newPhotoUrl) {
+  const updated = { text: newText, photo_url: newPhotoUrl ?? note.photo_url }
+
+  // Update state
+  const notes = state.notes[plantId] || []
+  const idx = notes.findIndex(n => n.id === note.id)
+  if (idx !== -1) notes[idx] = { ...notes[idx], ...updated }
+  note.text = updated.text
+  note.photo_url = updated.photo_url
+
+  // Update Supabase
+  if (sb && !note.id.toString().startsWith('demo-')) {
+    const { error } = await sb.from('notes').update(updated).eq('id', note.id)
+    if (error) { showToast('Помилка збереження'); return }
+  }
+
+  showToast('Нотатку збережено ✓')
+  renderNoteDetailView(note, plantId)
+  renderNotes(plantId)
+  const overlay = document.getElementById('overlay-notes')
+  if (overlay?.classList.contains('open')) renderFullNotes()
+}
+
+async function deleteNote(noteId, plantId) {
+  // Remove from state
+  if (state.notes[plantId]) {
+    state.notes[plantId] = state.notes[plantId].filter(n => n.id !== noteId)
+  }
+
+  // Delete from Supabase
+  if (sb && !noteId.toString().startsWith('demo-')) {
+    const { error } = await sb.from('notes').delete().eq('id', noteId)
+    if (error) { showToast('Помилка видалення'); return }
+  }
+
+  showToast('Нотатку видалено')
+  renderNotes(plantId)
+
+  // Refresh full-notes overlay if open
+  const overlay = document.getElementById('overlay-notes')
+  if (overlay && overlay.classList.contains('open')) {
+    renderFullNotes()
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -3029,16 +3460,22 @@ function openAddPlantForm() {
   document.getElementById('form-photo-preview').querySelector('.form-photo-placeholder').style.display = ''
   document.getElementById('field-watering-freq').value = 7
   document.getElementById('field-fertilizing-freq').value = ''
-  document.getElementById('field-repotting-date').value = ''
+  const _dateFieldReset = document.getElementById('field-repotting-date')
+  _dateFieldReset.type = 'text'
+  _dateFieldReset.value = ''
+  _dateFieldReset.placeholder = 'дд.мм.рррр'
+  document.getElementById('field-repotting-notes').value = ''
+
+  document.getElementById('field-description').value = ''
 
   // Reset conditions
-  state.selectedCondition = 'sun'
+  state.selectedConditions = ['sun']
   document.querySelectorAll('.condition-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.value === 'sun')
   })
 
   // Reset pot size
-  state.selectedPotSize = null
+  state.selectedPotSizes = []
   document.querySelectorAll('.pot-btn').forEach(btn => btn.classList.remove('active'))
 
   openSheet('sheet-plant-form')
@@ -3054,10 +3491,20 @@ function openEditPlantForm() {
   document.getElementById('btn-plant-form-submit').textContent = 'Зберегти Зміни'
 
   document.getElementById('field-name').value = plant.name
+  document.getElementById('field-description').value = plant.description || ''
   document.getElementById('field-room').value = plant.room
   document.getElementById('field-watering-freq').value = plant.watering_frequency_days
   document.getElementById('field-fertilizing-freq').value = plant.fertilizing_frequency_days || ''
-  document.getElementById('field-repotting-date').value = plant.next_repotting_date || ''
+  const _dateFieldEdit = document.getElementById('field-repotting-date')
+  if (plant.next_repotting_date) {
+    _dateFieldEdit.type = 'date'
+    _dateFieldEdit.value = plant.next_repotting_date
+  } else {
+    _dateFieldEdit.type = 'text'
+    _dateFieldEdit.value = ''
+    _dateFieldEdit.placeholder = 'дд.мм.рррр'
+  }
+  document.getElementById('field-repotting-notes').value = plant.repotting_notes || ''
 
   // Photo preview
   const formImg = document.getElementById('form-photo-img')
@@ -3071,16 +3518,16 @@ function openEditPlantForm() {
     placeholder.style.display = ''
   }
 
-  // Conditions
-  state.selectedCondition = plant.conditions
+  // Conditions (comma-separated for multi-select)
+  state.selectedConditions = plant.conditions ? plant.conditions.split(',') : ['sun']
   document.querySelectorAll('.condition-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.value === plant.conditions)
+    btn.classList.toggle('active', state.selectedConditions.includes(btn.dataset.value))
   })
 
-  // Pot size
-  state.selectedPotSize = plant.pot_size || null
+  // Pot size (comma-separated for multi-select)
+  state.selectedPotSizes = plant.pot_size ? plant.pot_size.split(',') : []
   document.querySelectorAll('.pot-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.pot === plant.pot_size)
+    btn.classList.toggle('active', state.selectedPotSizes.includes(btn.dataset.pot))
   })
 
   openSheet('sheet-plant-form')
@@ -3107,13 +3554,15 @@ async function submitPlantForm(e) {
     const payload = {
       user_id: state.user.id,
       name: document.getElementById('field-name').value.trim(),
+      description: document.getElementById('field-description').value.trim() || null,
       room: document.getElementById('field-room').value,
-      conditions: state.selectedCondition,
+      conditions: state.selectedConditions.join(',') || 'sun',
       watering_frequency_days: parseInt(document.getElementById('field-watering-freq').value) || 7,
       fertilizing_frequency_days: parseInt(document.getElementById('field-fertilizing-freq').value) || null,
       next_repotting_date: document.getElementById('field-repotting-date').value || null,
+      repotting_notes: document.getElementById('field-repotting-notes').value.trim() || null,
       photo_url: photoUrl,
-      pot_size: state.selectedPotSize || null,
+      pot_size: state.selectedPotSizes.length ? state.selectedPotSizes.join(',') : null,
     }
 
     if (state.formMode === 'add') {
@@ -3769,7 +4218,7 @@ function renderJournal() {
   items.sort((a, b) => b.date - a.date)
 
   if (!items.length) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📖</div><h3>Журнал Порожній</h3><p>Почніть поливати рослини!</p></div>'
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 5.33333C22 4.67029 21.7366 4.03441 21.2678 3.56557C20.7989 3.09673 20.163 2.83333 19.5 2.83333H18.8583C18.7845 2.83271 18.7121 2.81324 18.6479 2.77678C18.5838 2.74032 18.53 2.68808 18.4917 2.625C18.3832 2.43551 18.2268 2.27796 18.038 2.16823C17.8493 2.0585 17.635 2.00048 17.4167 2H5.33333C5.00181 2 4.68387 2.1317 4.44945 2.36612C4.21503 2.60054 4.08333 2.91848 4.08333 3.25V3.875C4.08333 3.93025 4.10528 3.98324 4.14435 4.02231C4.18342 4.06138 4.23641 4.08333 4.29167 4.08333H5.33333C5.55435 4.08333 5.76631 4.17113 5.92259 4.32741C6.07887 4.48369 6.16667 4.69565 6.16667 4.91667C6.16667 5.13768 6.07887 5.34964 5.92259 5.50592C5.76631 5.6622 5.55435 5.75 5.33333 5.75H2.83333C2.61232 5.75 2.40036 5.8378 2.24408 5.99408C2.0878 6.15036 2 6.36232 2 6.58333C2 6.80435 2.0878 7.01631 2.24408 7.17259C2.40036 7.32887 2.61232 7.41667 2.83333 7.41667H3.90833C3.96359 7.41667 4.01658 7.43862 4.05565 7.47769C4.09472 7.51676 4.11667 7.56975 4.11667 7.625V10.125C4.11667 10.1803 4.13862 10.2332 4.17769 10.2723C4.21676 10.3114 4.26975 10.3333 4.325 10.3333H5.33333C5.55435 10.3333 5.76631 10.4211 5.92259 10.5774C6.07887 10.7337 6.16667 10.9457 6.16667 11.1667C6.16667 11.3877 6.07887 11.5996 5.92259 11.7559C5.76631 11.9122 5.55435 12 5.33333 12H2.83333C2.61232 12 2.40036 12.0878 2.24408 12.2441C2.0878 12.4004 2 12.6123 2 12.8333C2 13.0543 2.0878 13.2663 2.24408 13.4226C2.40036 13.5789 2.61232 13.6667 2.83333 13.6667H3.90833C3.96359 13.6667 4.01658 13.6886 4.05565 13.7277C4.09472 13.7668 4.11667 13.8197 4.11667 13.875V16.375C4.11667 16.4303 4.13862 16.4832 4.17769 16.5223C4.21676 16.5614 4.26975 16.5833 4.325 16.5833H5.33333C5.55435 16.5833 5.76631 16.6711 5.92259 16.8274C6.07887 16.9837 6.16667 17.1957 6.16667 17.4167C6.16667 17.6377 6.07887 17.8496 5.92259 18.0059C5.76631 18.1622 5.55435 18.25 5.33333 18.25H2.83333C2.61232 18.25 2.40036 18.3378 2.24408 18.4941C2.0878 18.6504 2 18.8623 2 19.0833C2 19.3043 2.0878 19.5163 2.24408 19.6726C2.40036 19.8289 2.61232 19.9167 2.83333 19.9167H3.90833C3.96359 19.9167 4.01658 19.9386 4.05565 19.9777C4.09472 20.0168 4.11667 20.0697 4.11667 20.125V20.75C4.11655 21.0758 4.24366 21.3888 4.47092 21.6223C4.69818 21.8558 5.00762 21.9913 5.33333 22H17.4167C17.635 21.9995 17.8493 21.9415 18.038 21.8318C18.2268 21.722 18.3832 21.5645 18.4917 21.375C18.53 21.3119 18.5838 21.2597 18.6479 21.2232C18.7121 21.1868 18.7845 21.1673 18.8583 21.1667H19.5C20.163 21.1667 20.7989 20.9033 21.2678 20.4344C21.7366 19.9656 22 19.3297 22 18.6667V5.33333ZM14.675 8.66667C14.675 8.99819 14.5433 9.31613 14.3089 9.55055C14.0745 9.78497 13.7565 9.91667 13.425 9.91667H9.91667C9.58515 9.91667 9.2672 9.78497 9.03278 9.55055C8.79836 9.31613 8.66667 8.99819 8.66667 8.66667V6.58333C8.66667 6.25181 8.79836 5.93387 9.03278 5.69945C9.2672 5.46503 9.58515 5.33333 9.91667 5.33333H13.425C13.7565 5.33333 14.0745 5.46503 14.3089 5.69945C14.5433 5.93387 14.675 6.25181 14.675 6.58333V8.66667ZM20.3333 10.9583C20.3333 11.0136 20.3114 11.0666 20.2723 11.1056C20.2332 11.1447 20.1803 11.1667 20.125 11.1667H18.875C18.8197 11.1667 18.7668 11.1447 18.7277 11.1056C18.6886 11.0666 18.6667 11.0136 18.6667 10.9583V8.875C18.6667 8.81975 18.6886 8.76676 18.7277 8.72769C18.7668 8.68862 18.8197 8.66667 18.875 8.66667H20.125C20.1803 8.66667 20.2332 8.68862 20.2723 8.72769C20.3114 8.76676 20.3333 8.81975 20.3333 8.875V10.9583ZM18.6667 13.0417C18.6667 12.9864 18.6886 12.9334 18.7277 12.8944C18.7668 12.8553 18.8197 12.8333 18.875 12.8333H20.125C20.1803 12.8333 20.2332 12.8553 20.2723 12.8944C20.3114 12.9334 20.3333 12.9864 20.3333 13.0417V15.125C20.3333 15.1803 20.3114 15.2332 20.2723 15.2723C20.2332 15.3114 20.1803 15.3333 20.125 15.3333H18.875C18.8197 15.3333 18.7668 15.3114 18.7277 15.2723C18.6886 15.2332 18.6667 15.1803 18.6667 15.125V13.0417ZM20.3333 5.33333V6.79167C20.3333 6.84692 20.3114 6.89991 20.2723 6.93898C20.2332 6.97805 20.1803 7 20.125 7H18.875C18.8197 7 18.7668 6.97805 18.7277 6.93898C18.6886 6.89991 18.6667 6.84692 18.6667 6.79167V4.70833C18.6667 4.65308 18.6886 4.60009 18.7277 4.56102C18.7668 4.52195 18.8197 4.5 18.875 4.5H19.5C19.721 4.5 19.933 4.5878 20.0893 4.74408C20.2455 4.90036 20.3333 5.11232 20.3333 5.33333ZM20.3333 18.6667C20.3333 18.8877 20.2455 19.0996 20.0893 19.2559C19.933 19.4122 19.721 19.5 19.5 19.5H18.875C18.8197 19.5 18.7668 19.4781 18.7277 19.439C18.6886 19.3999 18.6667 19.3469 18.6667 19.2917V17.2083C18.6667 17.1531 18.6886 17.1001 18.7277 17.061C18.7668 17.0219 18.8197 17 18.875 17H20.125C20.1803 17 20.2332 17.0219 20.2723 17.061C20.3114 17.1001 20.3333 17.1531 20.3333 17.2083V18.6667Z" fill="#ADDC58" fill-opacity="0.2"/></svg></div><h3>Журнал Порожній</h3><p>Тут буде відображатись ваш догляд за рослинами</p></div>'
     return
   }
 
@@ -3951,17 +4400,47 @@ function openFullHistory(plantId) {
    FULL NOTES OVERLAY
 ═══════════════════════════════════════ */
 function openFullNotes(plantId) {
-  const notes = state.notes[plantId] || []
+  state.currentNotesPlantId = plantId
+  state.notesFilter = state.notesFilter || 'all'
+  state.notesSort = state.notesSort || 'desc'
+  renderFullNotes()
+  openOverlay('overlay-notes')
+}
+
+function renderFullNotes() {
+  const plantId = state.currentNotesPlantId
+  let notes = [...(state.notes[plantId] || [])]
+
+  // Filter
+  if (state.notesFilter === 'photo') notes = notes.filter(n => n.photo_url)
+
+  // Sort
+  notes.sort((a, b) => {
+    const diff = new Date(b.created_at) - new Date(a.created_at)
+    return state.notesSort === 'desc' ? diff : -diff
+  })
+
   const container = document.getElementById('full-notes-list')
   container.innerHTML = ''
 
-  if (!notes.length) {
-    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px">Нотаток ще немає</p>'
-  } else {
-    notes.forEach(note => container.appendChild(buildNoteItem(note)))
+  // Update filter chip active states
+  document.querySelectorAll('[data-notes-filter]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.notesFilter === state.notesFilter)
+  })
+
+  // Update sort button label
+  const sortBtn = document.getElementById('btn-notes-sort')
+  const sortLabel = document.getElementById('notes-sort-label')
+  if (sortBtn && sortLabel) {
+    sortLabel.textContent = state.notesSort === 'desc' ? 'Нові' : 'Старі'
+    sortBtn.classList.toggle('sort-asc', state.notesSort === 'asc')
   }
 
-  openOverlay('overlay-notes')
+  if (!notes.length) {
+    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px 0">Нотаток не знайдено</p>'
+  } else {
+    notes.forEach(note => container.appendChild(buildNoteItem(note, plantId)))
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -4005,23 +4484,17 @@ async function saveNotifEmail() {
 }
 
 async function deleteAccount() {
-  showConfirm(
-    'Видалити акаунт?',
-    'Всі ваші рослини, поливи та нотатки будуть видалені назавжди. Це незворотньо.',
-    async () => {
-      showLoadingOverlay()
-      try {
-        // In real app: call Supabase admin to delete user
-        // await sb.rpc('delete_user')
-        await signOut()
-        showToast('Акаунт видалено')
-      } catch (err) {
-        showToast('Помилка видалення акаунту')
-      } finally {
-        hideLoadingOverlay()
-      }
-    }
-  )
+  showLoadingOverlay()
+  try {
+    // In real app: call Supabase admin to delete user
+    // await sb.rpc('delete_user')
+    await signOut()
+    showToast('Акаунт видалено')
+  } catch (err) {
+    showToast('Помилка видалення акаунту')
+  } finally {
+    hideLoadingOverlay()
+  }
 }
 
 /* ═══════════════════════════════════════
@@ -4110,8 +4583,11 @@ const CONDITIONS = {
   shade:   { key: 'cond_shade' },
 }
 function conditionsLabel(val) {
-  const c = CONDITIONS[val]
-  return c ? t(c.key) : val
+  if (!val) return ''
+  return val.split(',').map(v => {
+    const c = CONDITIONS[v.trim()]
+    return c ? t(c.key) : v.trim()
+  }).join(', ')
 }
 
 const POT_SIZES = {
@@ -4120,9 +4596,11 @@ const POT_SIZES = {
   small:  { label_uk: 'Малий', label_en: 'Small' },
 }
 function potSizeLabel(val) {
-  const p = POT_SIZES[val]
-  if (!p) return ''
-  return state.lang === 'en' ? p.label_en : p.label_uk
+  if (!val) return ''
+  return val.split(',').map(v => {
+    const p = POT_SIZES[v.trim()]
+    return p ? (state.lang === 'en' ? p.label_en : p.label_uk) : v.trim()
+  }).join(', ')
 }
 
 /* ═══════════════════════════════════════
@@ -4192,6 +4670,23 @@ function bindEvents() {
   // Sub-page overlays
   document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))
   document.getElementById('btn-notes-back').addEventListener('click', () => closeOverlay('overlay-notes'))
+  document.getElementById('btn-note-detail-back').addEventListener('click', () => closeOverlay('overlay-note-detail'))
+
+  // Notes filter chips + sort
+  document.getElementById('notes-filter-bar').addEventListener('click', e => {
+    const chip = e.target.closest('[data-notes-filter]')
+    if (chip) { state.notesFilter = chip.dataset.notesFilter; renderFullNotes(); return }
+    if (e.target.closest('#btn-notes-sort')) {
+      state.notesSort = state.notesSort === 'desc' ? 'asc' : 'desc'
+      renderFullNotes()
+    }
+  })
+
+  // Lightbox
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox)
+  document.getElementById('lightbox').addEventListener('click', e => {
+    if (e.target === document.getElementById('lightbox')) closeLightbox()
+  })
 
   // Change photo from detail
   document.getElementById('input-change-photo').addEventListener('change', e => {
@@ -4222,25 +4717,34 @@ function bindEvents() {
     )
   })
 
-  // Conditions picker
+  // Conditions picker — multi-select toggle, must keep at least one
   document.querySelectorAll('.condition-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      state.selectedCondition = btn.dataset.value
-      document.querySelectorAll('.condition-btn').forEach(b => b.classList.remove('active'))
-      btn.classList.add('active')
+      const val = btn.dataset.value
+      const idx = state.selectedConditions.indexOf(val)
+      if (idx !== -1) {
+        if (state.selectedConditions.length > 1) {
+          state.selectedConditions.splice(idx, 1)
+          btn.classList.remove('active')
+        }
+        // if last one — do nothing (keep at least one selected)
+      } else {
+        state.selectedConditions.push(val)
+        btn.classList.add('active')
+      }
     })
   })
 
-  // Pot picker
+  // Pot picker — multi-select toggle
   document.querySelectorAll('.pot-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const newVal = btn.dataset.pot
-      if (state.selectedPotSize === newVal) {
-        state.selectedPotSize = null
+      const idx = state.selectedPotSizes.indexOf(newVal)
+      if (idx !== -1) {
+        state.selectedPotSizes.splice(idx, 1)
         btn.classList.remove('active')
       } else {
-        state.selectedPotSize = newVal
-        document.querySelectorAll('.pot-btn').forEach(b => b.classList.remove('active'))
+        state.selectedPotSizes.push(newVal)
         btn.classList.add('active')
       }
     })
@@ -4301,10 +4805,12 @@ function bindEvents() {
   document.getElementById('btn-profile-signout').addEventListener('click', () => {
     showConfirm('Вийти?', 'Ви впевнені що хочете вийти?', signOut)
   })
-  document.getElementById('btn-delete-account').addEventListener('click', deleteAccount)
-  document.getElementById('btn-preview-login').addEventListener('click', () => {
-    document.getElementById('btn-auth-back').classList.remove('hidden')
-    showAuth()
+  document.getElementById('btn-delete-account').addEventListener('click', () => {
+    showConfirm(
+      'Видалити акаунт?',
+      'Всі ваші рослини, поливи та нотатки будуть видалені назавжди. Це незворотньо.',
+      deleteAccount
+    )
   })
   document.getElementById('btn-save-notif-email').addEventListener('click', saveNotifEmail)
   document.getElementById('toggle-notifications').addEventListener('change', e => {
