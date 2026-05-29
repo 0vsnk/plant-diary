@@ -437,7 +437,7 @@ function renderPlantDetail(plant) {
   document.getElementById('detail-name').textContent = plant.name
   const metaParts = [conditionsLabel(plant.conditions), plant.room]
   if (plant.pot_size) metaParts.push(potSizeLabel(plant.pot_size))
-  document.getElementById('detail-meta').textContent = metaParts.join(' · ')
+  document.getElementById('detail-meta').innerHTML = metaParts.map(p => `<span class="meta-chip">${p}</span>`).join('')
 
   // Description (optional)
   const descEl = document.getElementById('detail-description')

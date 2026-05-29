@@ -583,9 +583,20 @@ img { display: block; max-width: 100%; }
   letter-spacing: -0.5px;
 }
 .detail-meta {
-  font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 10px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--r-pill);
+  font-size: 12px;
   color: var(--text2);
-  margin-top: 5px;
 }
 .detail-description {
   font-size: 14px;
@@ -3132,7 +3143,7 @@ function renderPlantDetail(plant) {
   document.getElementById('detail-name').textContent = plant.name
   const metaParts = [conditionsLabel(plant.conditions), plant.room]
   if (plant.pot_size) metaParts.push(potSizeLabel(plant.pot_size))
-  document.getElementById('detail-meta').textContent = metaParts.join(' · ')
+  document.getElementById('detail-meta').innerHTML = metaParts.map(p => `<span class="meta-chip">${p}</span>`).join('')
 
   // Description (optional)
   const descEl = document.getElementById('detail-description')
