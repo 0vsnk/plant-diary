@@ -506,7 +506,7 @@ function renderWateringHistory(plantId) {
   container.innerHTML = ''
 
   if (!logs.length) {
-    container.innerHTML = '<p style="font-size:13px;color:var(--text3)">Ще не поливали</p>'
+    container.innerHTML = '<p class="repotting-empty">Ще не поливали</p>'
     return
   }
 
@@ -535,7 +535,7 @@ function renderNotes(plantId) {
   container.innerHTML = ''
 
   if (!notes.length) {
-    container.innerHTML = '<p style="font-size:13px;color:var(--text3)">Нотаток ще немає</p>'
+    container.innerHTML = '<p class="repotting-empty">Нотаток ще немає</p>'
     return
   }
 
@@ -1696,7 +1696,7 @@ function openFullHistory(plantId) {
   container.innerHTML = ''
 
   if (!logs.length) {
-    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px">Ще немає поливів</p>'
+    container.innerHTML = '<p class="repotting-empty">Ще немає поливів</p>'
   } else {
     logs.forEach(log => container.appendChild(buildHistoryItem(log)))
   }
