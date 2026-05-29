@@ -581,6 +581,7 @@ img { display: block; max-width: 100%; }
 .meta-chip {
   display: inline-flex;
   align-items: center;
+  gap: 5px;
   height: 24px;
   padding: 0 10px;
   background: rgba(255,255,255,0.05);
@@ -588,6 +589,7 @@ img { display: block; max-width: 100%; }
   font-size: 12px;
   color: var(--text2);
 }
+.meta-chip svg { flex-shrink: 0; opacity: 0.6; }
 .detail-description {
   font-size: 14px;
   color: var(--text2);
