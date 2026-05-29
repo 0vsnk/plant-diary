@@ -769,13 +769,16 @@ img { display: block; max-width: 100%; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
   color: var(--text2);
-  background: none;
+  background: rgba(255,255,255,0.05);
   border: none;
+  border-radius: var(--r-pill);
   padding: 0;
-  transition: opacity var(--trans-fast);
+  transition: background var(--trans-fast), opacity var(--trans-fast);
 }
-.btn-icon-only:active { opacity: 0.6; }
+.btn-icon-only:active { background: rgba(255,255,255,0.09); opacity: 0.6; }
 
 /* Notes */
 .btn-add-note {
