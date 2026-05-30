@@ -2583,8 +2583,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       </button>
       <h1 class="subpage-title" id="note-detail-title">Нотатка</h1>
       <div class="subpage-header-action">
-        <button class="btn-subpage-back" id="btn-note-detail-edit">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10.529 1.76402C10.7724 1.52062 11.0614 1.32754 11.3794 1.19581C11.6974 1.06408 12.0383 0.996277 12.3825 0.996277C12.7267 0.996277 13.0676 1.06408 13.3856 1.19581C13.7037 1.32754 13.9926 1.52062 14.236 1.76402C14.4794 2.00743 14.6725 2.29639 14.8042 2.61441C14.936 2.93244 15.0038 3.27329 15.0038 3.61752C15.0038 3.96175 14.936 4.3026 14.8042 4.62063C14.6725 4.93865 14.4794 5.22762 14.236 5.47102L13.457 6.25002L9.75002 2.54302L10.529 1.76402ZM9.04302 3.25002L2.65702 9.63602C2.28335 10.0103 2.01677 10.4778 1.88502 10.99L1.01502 14.376C0.993445 14.4603 0.994218 14.5487 1.01726 14.6325C1.0403 14.7164 1.08482 14.7928 1.14642 14.8542C1.20801 14.9156 1.28456 14.9599 1.36849 14.9826C1.45242 15.0054 1.54084 15.0059 1.62502 14.984L5.01002 14.115C5.5224 13.9837 5.99006 13.7171 6.36402 13.343L12.75 6.95702L9.04302 3.25002Z" fill="currentColor"/></svg>
+        <button class="btn-subpage-back" id="btn-note-detail-more">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
         </button>
       </div>
     </div>
@@ -2817,6 +2817,26 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     </div>
     <div class="more-actions-cancel">
       <button class="more-cancel-btn" id="more-btn-cancel">Скасувати</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ NOTE MORE ACTIONS SHEET ═══ -->
+<div id="sheet-note-actions" class="sheet">
+  <div class="sheet-inner sheet-inner-compact">
+    <div class="sheet-handle"></div>
+    <div class="more-actions-list">
+      <button class="more-action-btn" id="note-action-edit">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.529 1.76402C10.7724 1.52062 11.0614 1.32754 11.3794 1.19581C11.6974 1.06408 12.0383 0.996277 12.3825 0.996277C12.7267 0.996277 13.0676 1.06408 13.3856 1.19581C13.7037 1.32754 13.9926 1.52062 14.236 1.76402C14.4794 2.00743 14.6725 2.29639 14.8042 2.61441C14.936 2.93244 15.0038 3.27329 15.0038 3.61752C15.0038 3.96175 14.936 4.3026 14.8042 4.62063C14.6725 4.93865 14.4794 5.22762 14.236 5.47102L13.457 6.25002L9.75002 2.54302L10.529 1.76402ZM9.04302 3.25002L2.65702 9.63602C2.28335 10.0103 2.01677 10.4778 1.88502 10.99L1.01502 14.376C0.993445 14.4603 0.994218 14.5487 1.01726 14.6325C1.0403 14.7164 1.08482 14.7928 1.14642 14.8542C1.20801 14.9156 1.28456 14.9599 1.36849 14.9826C1.45242 15.0054 1.54084 15.0059 1.62502 14.984L5.01002 14.115C5.5224 13.9837 5.99006 13.7171 6.36402 13.343L12.75 6.95702L9.04302 3.25002Z" fill="currentColor"/></svg>
+        Редагувати нотатку
+      </button>
+      <button class="more-action-btn more-action-danger" id="note-action-delete">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M7 3H9C9 2.73478 8.89464 2.48043 8.70711 2.29289C8.51957 2.10536 8.26522 2 8 2C7.73478 2 7.48043 2.10536 7.29289 2.29289C7.10536 2.48043 7 2.73478 7 3ZM6 3C6 2.46957 6.21071 1.96086 6.58579 1.58579C6.96086 1.21071 7.46957 1 8 1C8.53043 1 9.03914 1.21071 9.41421 1.58579C9.78929 1.96086 10 2.46957 10 3H14C14.1326 3 14.2598 3.05268 14.3536 3.14645C14.4473 3.24021 14.5 3.36739 14.5 3.5C14.5 3.63261 14.4473 3.75979 14.3536 3.85355C14.2598 3.94732 14.1326 4 14 4H13.436L12.231 12.838C12.1493 13.4369 11.8533 13.986 11.3979 14.3835C10.9425 14.781 10.3585 15 9.754 15H6.246C5.64152 15 5.05751 14.781 4.6021 14.3835C4.14669 13.986 3.85073 13.4369 3.769 12.838L2.564 4H2C1.86739 4 1.74021 3.94732 1.64645 3.85355C1.55268 3.75979 1.5 3.63261 1.5 3.5C1.5 3.36739 1.55268 3.24021 1.64645 3.14645C1.74021 3.05268 1.86739 3 2 3H6Z" fill="currentColor"/></svg>
+        Видалити нотатку
+      </button>
+    </div>
+    <div class="more-actions-cancel">
+      <button class="more-cancel-btn" id="note-action-cancel">Скасувати</button>
     </div>
   </div>
 </div>
@@ -3464,12 +3484,13 @@ function closeLightbox() {
 
 // ─── Note Detail overlay ─────────────────────────────────
 function openNoteDetail(note, plantId) {
+  state._currentNoteDetail = note
+  state._currentNoteDetailPlantId = plantId
   document.getElementById('note-detail-title').textContent = formatDateTime(new Date(note.created_at))
   renderNoteDetailView(note, plantId)
 
-  // Wire edit button
-  document.getElementById('btn-note-detail-edit').onclick = () =>
-    renderNoteDetailEdit(note, plantId)
+  // Wire more button → sheet
+  document.getElementById('btn-note-detail-more').onclick = () => openSheet('sheet-note-actions')
 
   openOverlay('overlay-note-detail')
 }
@@ -3486,15 +3507,6 @@ function renderNoteDetailView(note, plantId) {
     body.appendChild(img)
   }
   if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
-
-  const deleteBtn = createElement('button', 'btn-note-delete', 'Видалити нотатку')
-  deleteBtn.addEventListener('click', () =>
-    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
-      await deleteNote(note.id, plantId)
-      closeOverlay('overlay-note-detail')
-    })
-  )
-  body.appendChild(deleteBtn)
 }
 
 function renderNoteDetailEdit(note, plantId) {
@@ -4915,6 +4927,25 @@ function bindEvents() {
     setTimeout(deletePlant, 100)
   })
   document.getElementById('more-btn-cancel').addEventListener('click', () => closeSheet('sheet-more-actions'))
+
+  // Note more actions sheet
+  document.getElementById('note-action-edit').addEventListener('click', () => {
+    closeSheet('sheet-note-actions')
+    const note = state._currentNoteDetail
+    const plantId = state._currentNoteDetailPlantId
+    if (note && plantId) setTimeout(() => renderNoteDetailEdit(note, plantId), 100)
+  })
+  document.getElementById('note-action-delete').addEventListener('click', () => {
+    closeSheet('sheet-note-actions')
+    const note = state._currentNoteDetail
+    const plantId = state._currentNoteDetailPlantId
+    if (!note) return
+    setTimeout(() => showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
+      await deleteNote(note.id, plantId)
+      closeOverlay('overlay-note-detail')
+    }), 100)
+  })
+  document.getElementById('note-action-cancel').addEventListener('click', () => closeSheet('sheet-note-actions'))
 
   // Sub-page overlays
   document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))

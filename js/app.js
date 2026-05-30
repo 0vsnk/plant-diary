@@ -623,12 +623,13 @@ function closeLightbox() {
 
 // ─── Note Detail overlay ─────────────────────────────────
 function openNoteDetail(note, plantId) {
+  state._currentNoteDetail = note
+  state._currentNoteDetailPlantId = plantId
   document.getElementById('note-detail-title').textContent = formatDateTime(new Date(note.created_at))
   renderNoteDetailView(note, plantId)
 
-  // Wire edit button
-  document.getElementById('btn-note-detail-edit').onclick = () =>
-    renderNoteDetailEdit(note, plantId)
+  // Wire more button → sheet
+  document.getElementById('btn-note-detail-more').onclick = () => openSheet('sheet-note-actions')
 
   openOverlay('overlay-note-detail')
 }
@@ -645,15 +646,6 @@ function renderNoteDetailView(note, plantId) {
     body.appendChild(img)
   }
   if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
-
-  const deleteBtn = createElement('button', 'btn-note-delete', 'Видалити нотатку')
-  deleteBtn.addEventListener('click', () =>
-    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
-      await deleteNote(note.id, plantId)
-      closeOverlay('overlay-note-detail')
-    })
-  )
-  body.appendChild(deleteBtn)
 }
 
 function renderNoteDetailEdit(note, plantId) {
@@ -2074,6 +2066,25 @@ function bindEvents() {
     setTimeout(deletePlant, 100)
   })
   document.getElementById('more-btn-cancel').addEventListener('click', () => closeSheet('sheet-more-actions'))
+
+  // Note more actions sheet
+  document.getElementById('note-action-edit').addEventListener('click', () => {
+    closeSheet('sheet-note-actions')
+    const note = state._currentNoteDetail
+    const plantId = state._currentNoteDetailPlantId
+    if (note && plantId) setTimeout(() => renderNoteDetailEdit(note, plantId), 100)
+  })
+  document.getElementById('note-action-delete').addEventListener('click', () => {
+    closeSheet('sheet-note-actions')
+    const note = state._currentNoteDetail
+    const plantId = state._currentNoteDetailPlantId
+    if (!note) return
+    setTimeout(() => showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
+      await deleteNote(note.id, plantId)
+      closeOverlay('overlay-note-detail')
+    }), 100)
+  })
+  document.getElementById('note-action-cancel').addEventListener('click', () => closeSheet('sheet-note-actions'))
 
   // Sub-page overlays
   document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))
