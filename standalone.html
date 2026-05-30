@@ -1156,6 +1156,82 @@ img { display: block; max-width: 100%; }
 .note-photo-preview { width: 100%; max-height: 160px; object-fit: cover; border-radius: var(--r-md); }
 .note-photo-section .form-photo-buttons { flex-direction: row; }
 
+/* Multiple photos preview row */
+.note-photos-preview {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.note-photos-preview:empty { display: none; }
+.note-photo-thumb-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.note-photo-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.note-photo-thumb-remove {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  line-height: 1;
+}
+
+/* Edit note multi-photo */
+.note-edit-photos-row {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.note-edit-photo-thumb-wrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.note-edit-photo-thumb-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.note-edit-photo-thumb-remove {
+  position: absolute;
+  top: 3px; right: 3px;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  line-height: 1;
+}
+
 /* ═══════════════════════════════════════
    BUTTONS
 ═══════════════════════════════════════ */
@@ -1642,7 +1718,9 @@ img { display: block; max-width: 100%; }
   content: '';
   position: absolute;
   width: 20px; height: 20px;
-  left: 3px; top: 2px;
+  left: 3px;
+  top: 50%;
+  transform: translateY(-50%);
   background: rgba(247,255,231,0.5);
   border-radius: 50%;
   transition: transform var(--trans-fast), background var(--trans-fast);
@@ -1652,7 +1730,7 @@ img { display: block; max-width: 100%; }
   border-color: var(--accent);
 }
 .toggle-switch input:checked + .toggle-track::before {
-  transform: translateX(22px);
+  transform: translateY(-50%) translateX(22px);
   background: var(--accent);
   box-shadow: 0 0 6px var(--accent-glow);
 }
@@ -1978,6 +2056,11 @@ img { display: block; max-width: 100%; }
 .notes-sort-btn.sort-asc { color: var(--accent); background: var(--accent-dim); }
 
 /* Note detail full photo */
+.note-detail-photos-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .note-detail-photo {
   width: 100%;
   border-radius: var(--r-md);
@@ -2791,7 +2874,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div class="form-field">
         <label class="form-label">Фото <span class="form-optional">(необов'язково)</span></label>
         <div class="note-photo-section">
-          <img id="note-photo-preview" class="note-photo-preview hidden" alt="">
+          <div id="note-photos-preview" class="note-photos-preview"></div>
           <div class="form-photo-buttons">
             <label class="btn-outline btn-sm">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18.512 10.077C18.512 10.816 17.887 11.415 17.116 11.415C16.345 11.415 15.721 10.815 15.721 10.077C15.721 9.33899 16.346 8.73999 17.116 8.73999C17.886 8.73999 18.512 9.33799 18.512 10.077Z" fill="currentColor"/><path fill-rule="evenodd" clip-rule="evenodd" d="M18.036 5.532C16.976 5.396 15.622 5.396 13.913 5.396H10.087C8.377 5.396 7.023 5.396 5.964 5.532C4.874 5.673 3.99 5.969 3.294 6.636C2.598 7.304 2.289 8.15 2.142 9.196C2 10.21 2 11.508 2 13.147V13.247C2 14.886 2 16.184 2.142 17.2C2.289 18.245 2.598 19.091 3.294 19.758C3.99 20.426 4.874 20.722 5.964 20.862C7.024 21 8.378 21 10.087 21H13.913C15.623 21 16.977 21 18.036 20.863C19.126 20.723 20.01 20.427 20.706 19.759C21.402 19.092 21.711 18.246 21.858 17.201C22 16.185 22 14.887 22 13.248V13.148C22 11.508 22 10.211 21.858 9.195C21.711 8.15 21.402 7.304 20.706 6.636C20.01 5.969 19.126 5.673 18.036 5.532ZM6.15 6.858C5.214 6.978 4.675 7.205 4.28 7.582C3.887 7.96 3.651 8.476 3.525 9.373C3.425 10.093 3.402 10.993 3.397 12.169L3.867 11.774C4.992 10.831 6.686 10.885 7.742 11.897L11.732 15.722C11.9297 15.9085 12.1849 16.0223 12.4558 16.0448C12.7267 16.0673 12.9972 15.9972 13.223 15.846L13.501 15.659C14.1531 15.2229 14.9297 15.0114 15.7129 15.0565C16.4961 15.1016 17.2433 15.4009 17.841 15.909L20.248 17.987C20.346 17.723 20.421 17.407 20.475 17.022C20.603 16.106 20.605 14.898 20.605 13.198C20.605 11.498 20.603 10.29 20.475 9.373C20.349 8.476 20.113 7.96 19.719 7.583C19.326 7.205 18.786 6.979 17.85 6.858C16.894 6.735 15.634 6.733 13.86 6.733H10.14C8.366 6.733 7.106 6.735 6.15 6.858Z" fill="currentColor"/><path d="M17.086 2.61C16.226 2.5 15.132 2.5 13.767 2.5H10.677C9.31302 2.5 8.21802 2.5 7.35802 2.61C6.46802 2.725 5.72602 2.968 5.13702 3.53C4.81196 3.84202 4.56407 4.22549 4.41302 4.65C4.91702 4.42 5.48702 4.284 6.12702 4.2C7.21102 4.06 8.59702 4.06 10.347 4.06H14.261C16.011 4.06 17.396 4.06 18.481 4.2C19.039 4.273 19.545 4.386 20 4.566C19.847 4.17497 19.6109 3.82183 19.308 3.531C18.719 2.968 17.977 2.725 17.086 2.611" fill="currentColor"/></svg>
@@ -2888,7 +2971,8 @@ let state = {
   journalFilter: 'all',
   formMode: 'add',    // 'add' | 'edit'
   pendingPhotoFile: null,
-  pendingNotePhotoFile: null,
+  pendingNotePhotoFile: null,   // kept for compatibility
+  pendingNotePhotoFiles: [],    // multi-photo array
   selectedConditions: ['sun'],
   roomFilter: 'all',  // room filter for plants tab
   selectedPotSizes: [],
@@ -3462,15 +3546,18 @@ function buildNoteItem(note, plantId, isPreview = false) {
     if (isPreview) textEl.classList.add('note-item-text--preview')
     content.appendChild(textEl)
   }
-  if (note.photo_url) {
+  const photos = getNotePhotos(note)
+  if (photos.length) {
     const thumbs = createElement('div', 'note-item-thumbs')
-    const img = document.createElement('img')
-    img.src = note.photo_url
-    img.className = 'note-item-thumb'
-    img.alt = ''
-    img.loading = 'lazy'
-    if (!state.notesSelectMode) img.addEventListener('click', e => { e.stopPropagation(); openLightbox(note.photo_url) })
-    thumbs.appendChild(img)
+    photos.forEach(url => {
+      const img = document.createElement('img')
+      img.src = url
+      img.className = 'note-item-thumb'
+      img.alt = ''
+      img.loading = 'lazy'
+      if (!state.notesSelectMode) img.addEventListener('click', e => { e.stopPropagation(); openLightbox(url) })
+      thumbs.appendChild(img)
+    })
     content.appendChild(thumbs)
   }
   item.appendChild(content)
@@ -3512,13 +3599,18 @@ function openNoteDetail(note, plantId) {
 function renderNoteDetailView(note, plantId) {
   const body = document.getElementById('note-detail-body')
   body.innerHTML = ''
-  if (note.photo_url) {
-    const img = document.createElement('img')
-    img.src = note.photo_url
-    img.className = 'note-detail-photo'
-    img.alt = ''
-    img.addEventListener('click', () => openLightbox(note.photo_url))
-    body.appendChild(img)
+  const photos = getNotePhotos(note)
+  if (photos.length) {
+    const row = createElement('div', 'note-detail-photos-row')
+    photos.forEach(url => {
+      const img = document.createElement('img')
+      img.src = url
+      img.className = 'note-detail-photo'
+      img.alt = ''
+      img.addEventListener('click', () => openLightbox(url))
+      row.appendChild(img)
+    })
+    body.appendChild(row)
   }
   if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
 }
@@ -3530,32 +3622,39 @@ function renderNoteDetailEdit(note, plantId) {
   const area = createElement('div', 'note-detail-edit-area')
 
   // Photo state for this edit session
-  let currentPhotoUrl = note.photo_url || null
-  let pendingPhotoFile = null
+  let currentPhotos = getNotePhotos(note)     // array of existing URLs
+  let pendingPhotoFiles = []                  // new files to upload
 
   // ── Photo section ─────────────────────────────────────
   const photoSection = createElement('div', 'note-edit-photo-section')
 
   function renderPhotoSection() {
     photoSection.innerHTML = ''
-    if (currentPhotoUrl) {
-      const imgWrap = createElement('div', 'note-edit-photo-wrap')
-      const img = document.createElement('img')
-      img.src = currentPhotoUrl
-      img.className = 'note-detail-photo'
-      img.alt = ''
-      imgWrap.appendChild(img)
-
-      const removeBtn = createElement('button', 'note-edit-photo-remove', '✕ Видалити фото')
-      removeBtn.addEventListener('click', () => {
-        currentPhotoUrl = null
-        pendingPhotoFile = null
-        renderPhotoSection()
+    if (currentPhotos.length) {
+      const row = createElement('div', 'note-edit-photos-row')
+      currentPhotos.forEach((url, idx) => {
+        const wrap = createElement('div', 'note-edit-photo-thumb-wrap')
+        const img = document.createElement('img')
+        img.src = url
+        img.alt = ''
+        const removeBtn = createElement('button', 'note-edit-photo-thumb-remove', '✕')
+        removeBtn.type = 'button'
+        removeBtn.addEventListener('click', () => {
+          // If it's a pending blob, also remove the file
+          const blobIdx = currentPhotos.slice(0, idx + 1).filter(u => u.startsWith('blob:')).length - 1
+          if (url.startsWith('blob:') && blobIdx >= 0) pendingPhotoFiles.splice(blobIdx, 1)
+          currentPhotos.splice(idx, 1)
+          renderPhotoSection()
+        })
+        wrap.appendChild(img)
+        wrap.appendChild(removeBtn)
+        row.appendChild(wrap)
       })
-      imgWrap.appendChild(removeBtn)
-      photoSection.appendChild(imgWrap)
-    } else {
+      photoSection.appendChild(row)
+    }
+    if (currentPhotos.length < 5) {
       const addBtn = createElement('button', 'btn-outline btn-sm', '+ Додати фото')
+      addBtn.type = 'button'
       addBtn.addEventListener('click', () => document.getElementById('input-note-edit-photo').click())
       photoSection.appendChild(addBtn)
     }
@@ -3569,8 +3668,10 @@ function renderNoteDetailEdit(note, plantId) {
   fileInput.onchange = e => {
     const file = e.target.files[0]
     if (!file) return
-    pendingPhotoFile = file
-    currentPhotoUrl = URL.createObjectURL(file)
+    if (currentPhotos.length >= 5) return
+    pendingPhotoFiles.push(file)
+    currentPhotos.push(URL.createObjectURL(file))
+    fileInput.value = ''
     renderPhotoSection()
   }
 
@@ -3591,18 +3692,30 @@ function renderNoteDetailEdit(note, plantId) {
   const saveBtn = createElement('button', 'btn-note-save', 'Зберегти')
   saveBtn.addEventListener('click', async () => {
     const newText = textarea.value.trim()
-    let finalPhotoUrl = currentPhotoUrl
+    saveBtn.disabled = true
+    saveBtn.textContent = 'Збереження...'
 
-    // Upload new photo if selected
-    if (pendingPhotoFile) {
-      if (sb && state.user) {
-        finalPhotoUrl = await uploadPhoto(pendingPhotoFile)
+    // Build final photos array: replace blob URLs with uploaded URLs
+    const finalPhotos = []
+    let pendingIdx = 0
+    for (const url of currentPhotos) {
+      if (url.startsWith('blob:')) {
+        const file = pendingPhotoFiles[pendingIdx++]
+        if (file) {
+          if (sb && state.user) {
+            finalPhotos.push(await uploadPhoto(file, 'notes'))
+          } else {
+            finalPhotos.push(url)
+          }
+        }
       } else {
-        finalPhotoUrl = URL.createObjectURL(pendingPhotoFile)
+        finalPhotos.push(url)
       }
     }
 
-    await updateNote(note, plantId, newText, finalPhotoUrl)
+    await updateNote(note, plantId, newText, photosToField(finalPhotos))
+    saveBtn.disabled = false
+    saveBtn.textContent = 'Зберегти'
   })
 
   actions.appendChild(cancelBtn)
@@ -3934,9 +4047,31 @@ async function changePlantPhoto(file) {
 ═══════════════════════════════════════ */
 function openAddNoteForm() {
   state.pendingNotePhotoFile = null
+  state.pendingNotePhotoFiles = []
   document.getElementById('note-form').reset()
-  document.getElementById('note-photo-preview').classList.add('hidden')
+  renderNoteFormPhotos()
   openSheet('sheet-note-form')
+}
+
+function renderNoteFormPhotos() {
+  const container = document.getElementById('note-photos-preview')
+  if (!container) return
+  container.innerHTML = ''
+  state.pendingNotePhotoFiles.forEach((file, idx) => {
+    const wrap = createElement('div', 'note-photo-thumb-wrap')
+    const img = document.createElement('img')
+    img.src = URL.createObjectURL(file)
+    img.alt = ''
+    const removeBtn = createElement('button', 'note-photo-thumb-remove', '✕')
+    removeBtn.type = 'button'
+    removeBtn.addEventListener('click', () => {
+      state.pendingNotePhotoFiles.splice(idx, 1)
+      renderNoteFormPhotos()
+    })
+    wrap.appendChild(img)
+    wrap.appendChild(removeBtn)
+    container.appendChild(wrap)
+  })
 }
 
 async function submitNoteForm(e) {
@@ -3947,14 +4082,16 @@ async function submitNoteForm(e) {
 
   const plantId = state.currentPlantId
   try {
-    let photoUrl = null
-    if (state.pendingNotePhotoFile) {
+    // Upload all pending photos
+    const photoUrls = []
+    for (const file of state.pendingNotePhotoFiles) {
       if (!sb) {
-        photoUrl = URL.createObjectURL(state.pendingNotePhotoFile)
+        photoUrls.push(URL.createObjectURL(file))
       } else {
-        photoUrl = await uploadPhoto(state.pendingNotePhotoFile, 'notes')
+        photoUrls.push(await uploadPhoto(file, 'notes'))
       }
     }
+    const photoUrl = photosToField(photoUrls)
 
     const text = document.getElementById('field-note-text').value.trim()
     if (!text && !photoUrl) {
@@ -3989,6 +4126,7 @@ async function submitNoteForm(e) {
     btn.disabled = false
     btn.textContent = 'Зберегти нотатку'
     state.pendingNotePhotoFile = null
+    state.pendingNotePhotoFiles = []
   }
 }
 
@@ -4044,6 +4182,20 @@ async function uploadPhoto(file, folder = 'plants') {
     .getPublicUrl(path)
 
   return publicUrl
+}
+
+/* ── Multi-photo helpers ───────────────── */
+function getNotePhotos(note) {
+  if (!note.photo_url) return []
+  if (note.photo_url.startsWith('[')) {
+    try { return JSON.parse(note.photo_url) } catch { return [note.photo_url] }
+  }
+  return [note.photo_url]
+}
+function photosToField(photos) {
+  if (!photos || !photos.length) return null
+  if (photos.length === 1) return photos[0]
+  return JSON.stringify(photos)
 }
 
 function setPhotoPreview(file, imgEl, placeholderEl) {
@@ -5072,22 +5224,16 @@ function bindEvents() {
   document.getElementById('btn-close-note-form').addEventListener('click', () => closeSheet('sheet-note-form'))
   document.getElementById('note-form').addEventListener('submit', submitNoteForm)
 
-  document.getElementById('input-note-photo-gallery').addEventListener('change', e => {
-    const file = e.target.files[0]
-    if (!file) return
-    state.pendingNotePhotoFile = file
-    const preview = document.getElementById('note-photo-preview')
-    preview.src = URL.createObjectURL(file)
-    preview.classList.remove('hidden')
-  })
-  document.getElementById('input-note-photo-camera').addEventListener('change', e => {
-    const file = e.target.files[0]
-    if (!file) return
-    state.pendingNotePhotoFile = file
-    const preview = document.getElementById('note-photo-preview')
-    preview.src = URL.createObjectURL(file)
-    preview.classList.remove('hidden')
-  })
+  function handleNotePhotoInput(e) {
+    const files = Array.from(e.target.files || [])
+    if (!files.length) return
+    const remaining = 5 - state.pendingNotePhotoFiles.length
+    files.slice(0, remaining).forEach(f => state.pendingNotePhotoFiles.push(f))
+    e.target.value = ''
+    renderNoteFormPhotos()
+  }
+  document.getElementById('input-note-photo-gallery').addEventListener('change', handleNotePhotoInput)
+  document.getElementById('input-note-photo-camera').addEventListener('change', handleNotePhotoInput)
 
   // Calendar day events close
   document.getElementById('btn-close-day-events').addEventListener('click', () => {

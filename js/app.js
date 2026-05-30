@@ -17,7 +17,8 @@ let state = {
   journalFilter: 'all',
   formMode: 'add',    // 'add' | 'edit'
   pendingPhotoFile: null,
-  pendingNotePhotoFile: null,
+  pendingNotePhotoFile: null,   // kept for compatibility
+  pendingNotePhotoFiles: [],    // multi-photo array
   selectedConditions: ['sun'],
   roomFilter: 'all',  // room filter for plants tab
   selectedPotSizes: [],
@@ -591,15 +592,18 @@ function buildNoteItem(note, plantId, isPreview = false) {
     if (isPreview) textEl.classList.add('note-item-text--preview')
     content.appendChild(textEl)
   }
-  if (note.photo_url) {
+  const photos = getNotePhotos(note)
+  if (photos.length) {
     const thumbs = createElement('div', 'note-item-thumbs')
-    const img = document.createElement('img')
-    img.src = note.photo_url
-    img.className = 'note-item-thumb'
-    img.alt = ''
-    img.loading = 'lazy'
-    if (!state.notesSelectMode) img.addEventListener('click', e => { e.stopPropagation(); openLightbox(note.photo_url) })
-    thumbs.appendChild(img)
+    photos.forEach(url => {
+      const img = document.createElement('img')
+      img.src = url
+      img.className = 'note-item-thumb'
+      img.alt = ''
+      img.loading = 'lazy'
+      if (!state.notesSelectMode) img.addEventListener('click', e => { e.stopPropagation(); openLightbox(url) })
+      thumbs.appendChild(img)
+    })
     content.appendChild(thumbs)
   }
   item.appendChild(content)
@@ -641,13 +645,18 @@ function openNoteDetail(note, plantId) {
 function renderNoteDetailView(note, plantId) {
   const body = document.getElementById('note-detail-body')
   body.innerHTML = ''
-  if (note.photo_url) {
-    const img = document.createElement('img')
-    img.src = note.photo_url
-    img.className = 'note-detail-photo'
-    img.alt = ''
-    img.addEventListener('click', () => openLightbox(note.photo_url))
-    body.appendChild(img)
+  const photos = getNotePhotos(note)
+  if (photos.length) {
+    const row = createElement('div', 'note-detail-photos-row')
+    photos.forEach(url => {
+      const img = document.createElement('img')
+      img.src = url
+      img.className = 'note-detail-photo'
+      img.alt = ''
+      img.addEventListener('click', () => openLightbox(url))
+      row.appendChild(img)
+    })
+    body.appendChild(row)
   }
   if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
 }
@@ -659,32 +668,39 @@ function renderNoteDetailEdit(note, plantId) {
   const area = createElement('div', 'note-detail-edit-area')
 
   // Photo state for this edit session
-  let currentPhotoUrl = note.photo_url || null
-  let pendingPhotoFile = null
+  let currentPhotos = getNotePhotos(note)     // array of existing URLs
+  let pendingPhotoFiles = []                  // new files to upload
 
   // ── Photo section ─────────────────────────────────────
   const photoSection = createElement('div', 'note-edit-photo-section')
 
   function renderPhotoSection() {
     photoSection.innerHTML = ''
-    if (currentPhotoUrl) {
-      const imgWrap = createElement('div', 'note-edit-photo-wrap')
-      const img = document.createElement('img')
-      img.src = currentPhotoUrl
-      img.className = 'note-detail-photo'
-      img.alt = ''
-      imgWrap.appendChild(img)
-
-      const removeBtn = createElement('button', 'note-edit-photo-remove', '✕ Видалити фото')
-      removeBtn.addEventListener('click', () => {
-        currentPhotoUrl = null
-        pendingPhotoFile = null
-        renderPhotoSection()
+    if (currentPhotos.length) {
+      const row = createElement('div', 'note-edit-photos-row')
+      currentPhotos.forEach((url, idx) => {
+        const wrap = createElement('div', 'note-edit-photo-thumb-wrap')
+        const img = document.createElement('img')
+        img.src = url
+        img.alt = ''
+        const removeBtn = createElement('button', 'note-edit-photo-thumb-remove', '✕')
+        removeBtn.type = 'button'
+        removeBtn.addEventListener('click', () => {
+          // If it's a pending blob, also remove the file
+          const blobIdx = currentPhotos.slice(0, idx + 1).filter(u => u.startsWith('blob:')).length - 1
+          if (url.startsWith('blob:') && blobIdx >= 0) pendingPhotoFiles.splice(blobIdx, 1)
+          currentPhotos.splice(idx, 1)
+          renderPhotoSection()
+        })
+        wrap.appendChild(img)
+        wrap.appendChild(removeBtn)
+        row.appendChild(wrap)
       })
-      imgWrap.appendChild(removeBtn)
-      photoSection.appendChild(imgWrap)
-    } else {
+      photoSection.appendChild(row)
+    }
+    if (currentPhotos.length < 5) {
       const addBtn = createElement('button', 'btn-outline btn-sm', '+ Додати фото')
+      addBtn.type = 'button'
       addBtn.addEventListener('click', () => document.getElementById('input-note-edit-photo').click())
       photoSection.appendChild(addBtn)
     }
@@ -698,8 +714,10 @@ function renderNoteDetailEdit(note, plantId) {
   fileInput.onchange = e => {
     const file = e.target.files[0]
     if (!file) return
-    pendingPhotoFile = file
-    currentPhotoUrl = URL.createObjectURL(file)
+    if (currentPhotos.length >= 5) return
+    pendingPhotoFiles.push(file)
+    currentPhotos.push(URL.createObjectURL(file))
+    fileInput.value = ''
     renderPhotoSection()
   }
 
@@ -720,18 +738,30 @@ function renderNoteDetailEdit(note, plantId) {
   const saveBtn = createElement('button', 'btn-note-save', 'Зберегти')
   saveBtn.addEventListener('click', async () => {
     const newText = textarea.value.trim()
-    let finalPhotoUrl = currentPhotoUrl
+    saveBtn.disabled = true
+    saveBtn.textContent = 'Збереження...'
 
-    // Upload new photo if selected
-    if (pendingPhotoFile) {
-      if (sb && state.user) {
-        finalPhotoUrl = await uploadPhoto(pendingPhotoFile)
+    // Build final photos array: replace blob URLs with uploaded URLs
+    const finalPhotos = []
+    let pendingIdx = 0
+    for (const url of currentPhotos) {
+      if (url.startsWith('blob:')) {
+        const file = pendingPhotoFiles[pendingIdx++]
+        if (file) {
+          if (sb && state.user) {
+            finalPhotos.push(await uploadPhoto(file, 'notes'))
+          } else {
+            finalPhotos.push(url)
+          }
+        }
       } else {
-        finalPhotoUrl = URL.createObjectURL(pendingPhotoFile)
+        finalPhotos.push(url)
       }
     }
 
-    await updateNote(note, plantId, newText, finalPhotoUrl)
+    await updateNote(note, plantId, newText, photosToField(finalPhotos))
+    saveBtn.disabled = false
+    saveBtn.textContent = 'Зберегти'
   })
 
   actions.appendChild(cancelBtn)
@@ -1063,9 +1093,31 @@ async function changePlantPhoto(file) {
 ═══════════════════════════════════════ */
 function openAddNoteForm() {
   state.pendingNotePhotoFile = null
+  state.pendingNotePhotoFiles = []
   document.getElementById('note-form').reset()
-  document.getElementById('note-photo-preview').classList.add('hidden')
+  renderNoteFormPhotos()
   openSheet('sheet-note-form')
+}
+
+function renderNoteFormPhotos() {
+  const container = document.getElementById('note-photos-preview')
+  if (!container) return
+  container.innerHTML = ''
+  state.pendingNotePhotoFiles.forEach((file, idx) => {
+    const wrap = createElement('div', 'note-photo-thumb-wrap')
+    const img = document.createElement('img')
+    img.src = URL.createObjectURL(file)
+    img.alt = ''
+    const removeBtn = createElement('button', 'note-photo-thumb-remove', '✕')
+    removeBtn.type = 'button'
+    removeBtn.addEventListener('click', () => {
+      state.pendingNotePhotoFiles.splice(idx, 1)
+      renderNoteFormPhotos()
+    })
+    wrap.appendChild(img)
+    wrap.appendChild(removeBtn)
+    container.appendChild(wrap)
+  })
 }
 
 async function submitNoteForm(e) {
@@ -1076,14 +1128,16 @@ async function submitNoteForm(e) {
 
   const plantId = state.currentPlantId
   try {
-    let photoUrl = null
-    if (state.pendingNotePhotoFile) {
+    // Upload all pending photos
+    const photoUrls = []
+    for (const file of state.pendingNotePhotoFiles) {
       if (!sb) {
-        photoUrl = URL.createObjectURL(state.pendingNotePhotoFile)
+        photoUrls.push(URL.createObjectURL(file))
       } else {
-        photoUrl = await uploadPhoto(state.pendingNotePhotoFile, 'notes')
+        photoUrls.push(await uploadPhoto(file, 'notes'))
       }
     }
+    const photoUrl = photosToField(photoUrls)
 
     const text = document.getElementById('field-note-text').value.trim()
     if (!text && !photoUrl) {
@@ -1118,6 +1172,7 @@ async function submitNoteForm(e) {
     btn.disabled = false
     btn.textContent = 'Зберегти нотатку'
     state.pendingNotePhotoFile = null
+    state.pendingNotePhotoFiles = []
   }
 }
 
@@ -1173,6 +1228,20 @@ async function uploadPhoto(file, folder = 'plants') {
     .getPublicUrl(path)
 
   return publicUrl
+}
+
+/* ── Multi-photo helpers ───────────────── */
+function getNotePhotos(note) {
+  if (!note.photo_url) return []
+  if (note.photo_url.startsWith('[')) {
+    try { return JSON.parse(note.photo_url) } catch { return [note.photo_url] }
+  }
+  return [note.photo_url]
+}
+function photosToField(photos) {
+  if (!photos || !photos.length) return null
+  if (photos.length === 1) return photos[0]
+  return JSON.stringify(photos)
 }
 
 function setPhotoPreview(file, imgEl, placeholderEl) {
@@ -2201,22 +2270,16 @@ function bindEvents() {
   document.getElementById('btn-close-note-form').addEventListener('click', () => closeSheet('sheet-note-form'))
   document.getElementById('note-form').addEventListener('submit', submitNoteForm)
 
-  document.getElementById('input-note-photo-gallery').addEventListener('change', e => {
-    const file = e.target.files[0]
-    if (!file) return
-    state.pendingNotePhotoFile = file
-    const preview = document.getElementById('note-photo-preview')
-    preview.src = URL.createObjectURL(file)
-    preview.classList.remove('hidden')
-  })
-  document.getElementById('input-note-photo-camera').addEventListener('change', e => {
-    const file = e.target.files[0]
-    if (!file) return
-    state.pendingNotePhotoFile = file
-    const preview = document.getElementById('note-photo-preview')
-    preview.src = URL.createObjectURL(file)
-    preview.classList.remove('hidden')
-  })
+  function handleNotePhotoInput(e) {
+    const files = Array.from(e.target.files || [])
+    if (!files.length) return
+    const remaining = 5 - state.pendingNotePhotoFiles.length
+    files.slice(0, remaining).forEach(f => state.pendingNotePhotoFiles.push(f))
+    e.target.value = ''
+    renderNoteFormPhotos()
+  }
+  document.getElementById('input-note-photo-gallery').addEventListener('change', handleNotePhotoInput)
+  document.getElementById('input-note-photo-camera').addEventListener('change', handleNotePhotoInput)
 
   // Calendar day events close
   document.getElementById('btn-close-day-events').addEventListener('click', () => {
