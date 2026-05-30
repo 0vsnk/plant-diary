@@ -443,21 +443,16 @@ function renderPlantDetail(plant) {
   const COND_ICONS = { sun: IC_SUN, partial: IC_CLOUDSUN, shade: IC_CLOUD }
   const metaChips = []
   if (plant.conditions) {
-    plant.conditions.split(',').forEach(v => {
-      const key = v.trim()
-      const c = CONDITIONS[key]
-      const label = c ? t(c.key) : key
-      const icon = COND_ICONS[key] || IC_SUN
-      metaChips.push(`<span class="meta-chip">${icon}${label}</span>`)
-    })
+    const condVals = plant.conditions.split(',').map(v => v.trim())
+    const firstIcon = COND_ICONS[condVals[0]] || IC_SUN
+    const condLabel = condVals.map(key => { const c = CONDITIONS[key]; return c ? t(c.key) : key }).join(', ')
+    metaChips.push(`<span class="meta-chip">${firstIcon}${condLabel}</span>`)
   }
   metaChips.push(`<span class="meta-chip">${IC_PLACE}${plant.room}</span>`)
   if (plant.pot_size) {
-    plant.pot_size.split(',').forEach(v => {
-      const p = POT_SIZES[v.trim()]
-      const label = p ? (state.lang === 'en' ? p.label_en : p.label_uk) : v.trim()
-      metaChips.push(`<span class="meta-chip">${IC_SPOT}${label}</span>`)
-    })
+    const potVals = plant.pot_size.split(',').map(v => v.trim())
+    const potLabel = potVals.map(v => { const p = POT_SIZES[v]; return p ? (state.lang === 'en' ? p.label_en : p.label_uk) : v }).join(', ')
+    metaChips.push(`<span class="meta-chip">${IC_SPOT}${potLabel}</span>`)
   }
   document.getElementById('detail-meta').innerHTML = metaChips.join('')
 
