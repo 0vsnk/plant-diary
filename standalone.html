@@ -288,7 +288,7 @@ img { display: block; max-width: 100%; }
   font-weight: 600;
   transition: color var(--trans-fast);
 }
-.tab-item.active { color: var(--text); }
+.tab-item.active { color: var(--accent); }
 .tab-item span { opacity: 0.45; transition: opacity var(--trans-fast); }
 .tab-item.active span { opacity: 1; }
 .tab-item svg { transition: transform var(--trans-fast); }
@@ -392,10 +392,10 @@ img { display: block; max-width: 100%; }
   box-sizing: border-box;
 }
 .status-badge svg { flex-shrink: 0; display: block; }
-.status-badge.ok { background: var(--accent-dim); color: var(--text); }
-.status-badge.soon { background: var(--accent-dim); color: var(--text); }
+.status-badge.ok { background: var(--accent-dim); color: var(--accent); }
+.status-badge.soon { background: var(--accent-dim); color: var(--accent); }
 .status-badge.overdue { background: rgba(237,156,51,0.15); color: #ed9c33; }
-.status-badge.today { background: var(--accent-dim); color: var(--text); }
+.status-badge.today { background: var(--accent-dim); color: var(--accent); }
 
 /* FAB */
 .fab {
@@ -431,7 +431,7 @@ img { display: block; max-width: 100%; }
 .spinner {
   width: 30px; height: 30px;
   border: 2px solid var(--border);
-  border-top-color: var(--text);
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 0.65s linear infinite;
 }
@@ -620,7 +620,7 @@ img { display: block; max-width: 100%; }
   margin-top: 4px;
   transition: background var(--trans-fast), color var(--trans-fast);
 }
-.btn-edit:active { background: var(--accent-dim); color: var(--text); border-color: var(--text); }
+.btn-edit:active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
 
 /* Detail sections */
 .detail-section {
@@ -650,7 +650,7 @@ img { display: block; max-width: 100%; }
   padding: 4px 10px;
   border-radius: var(--r-pill);
   background: var(--accent-dim);
-  color: var(--text);
+  color: var(--accent);
 }
 .detail-watering-badge svg { flex-shrink: 0; }
 .detail-watering-badge.overdue {
@@ -719,7 +719,7 @@ img { display: block; max-width: 100%; }
   gap: 2px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--accent);
   background: none;
   border: none;
   padding: 0;
@@ -780,11 +780,11 @@ img { display: block; max-width: 100%; }
   border-radius: var(--r-pill);
   font-size: 11px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--accent);
   border: none;
   transition: background var(--trans-fast), transform var(--trans-fast);
 }
-.btn-add-compact svg { flex-shrink: 0; stroke: var(--text); }
+.btn-add-compact svg { flex-shrink: 0; stroke: var(--accent); }
 .btn-add-compact:active { background: rgba(255,255,255,0.09); transform: scale(0.95); }
 
 /* Icon-only arrow button (ic_next in section headers) */
@@ -814,7 +814,7 @@ img { display: block; max-width: 100%; }
   border-radius: var(--r-pill);
   font-size: 11px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--accent);
   border: none;
   transition: background var(--trans-fast), transform var(--trans-fast);
 }
@@ -1032,7 +1032,7 @@ img { display: block; max-width: 100%; }
   -webkit-appearance: none;
 }
 .form-input:focus {
-  border-color: var(--text);
+  border-color: var(--accent);
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
 .form-input::placeholder { color: rgba(255,255,255,0.3); }
@@ -1074,7 +1074,7 @@ img { display: block; max-width: 100%; }
   transition: background var(--trans-fast), color var(--trans-fast);
 }
 .num-btn svg { display: block; flex-shrink: 0; width: 11px; height: auto; }
-.num-btn:active { background: var(--accent-dim); color: var(--text); border-color: var(--text); }
+.num-btn:active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
 .num-input { text-align: center; flex: 1; }
 .num-input::-webkit-inner-spin-button,
 .num-input::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -1104,11 +1104,11 @@ img { display: block; max-width: 100%; }
 }
 .condition-btn.active, .pot-btn.active {
   background: rgba(173,220,88,0.1);
-  border-color: var(--text);
+  border-color: var(--accent);
 }
 .condition-btn.active .picker-txt,
 .pot-btn.active .picker-txt {
-  color: var(--text);
+  color: var(--accent);
 }
 .condition-btn:active, .pot-btn:active { transform: scale(0.96); }
 
@@ -1177,7 +1177,7 @@ img { display: block; max-width: 100%; }
   cursor: pointer;
   transition: background var(--trans-fast), color var(--trans-fast);
 }
-.btn-outline:active { border-color: var(--text); color: var(--text); }
+.btn-outline:active { border-color: var(--accent); color: var(--accent); }
 .btn-sm { padding: 8px 12px; font-size: 12px; }
 
 .btn-icon {
@@ -1191,7 +1191,7 @@ img { display: block; max-width: 100%; }
   color: var(--text2);
   transition: background var(--trans-fast), color var(--trans-fast);
 }
-.btn-icon:active { background: var(--accent-dim); color: var(--text); }
+.btn-icon:active { background: var(--accent-dim); color: var(--accent); }
 
 /* Sheet close button — circular, 5% white */
 .sheet-header .btn-icon {
@@ -1249,7 +1249,7 @@ img { display: block; max-width: 100%; }
   font-size: 18px;
   transition: background var(--trans-fast), color var(--trans-fast);
 }
-.calendar-nav-btn:active { background: var(--accent-dim); color: var(--text); border-color: var(--text); }
+.calendar-nav-btn:active { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
 
 .calendar-weekdays {
   display: grid;
@@ -1368,7 +1368,7 @@ img { display: block; max-width: 100%; }
 }
 .day-event-check.done {
   background: var(--accent);
-  border-color: var(--text);
+  border-color: var(--accent);
   color: #0C0C0C;
 }
 .day-event-check.done.fertilizer-done {
@@ -1412,7 +1412,7 @@ img { display: block; max-width: 100%; }
 }
 .filter-chip.active {
   background: rgba(173,220,88,0.15);
-  color: var(--text);
+  color: var(--accent);
   font-weight: 500;
   border: 1px solid var(--accent);
 }
@@ -1554,7 +1554,7 @@ img { display: block; max-width: 100%; }
 .profile-stat-value {
   font-size: 28px;
   font-weight: 800;
-  color: var(--text);
+  color: var(--accent);
   line-height: 1;
 }
 .profile-stat-label { font-size: 12px; color: var(--text2); font-weight: 500; }
@@ -1606,7 +1606,7 @@ img { display: block; max-width: 100%; }
 }
 .btn-save-email {
   background: var(--accent-dim);
-  color: var(--text);
+  color: var(--accent);
   border: 1.5px solid var(--accent);
   padding: 9px 14px;
   border-radius: var(--r-pill);
@@ -1639,7 +1639,7 @@ img { display: block; max-width: 100%; }
 }
 .toggle-switch input:checked + .toggle-track {
   background: var(--accent-dim);
-  border-color: var(--text);
+  border-color: var(--accent);
 }
 .toggle-switch input:checked + .toggle-track::before {
   transform: translateX(22px);
@@ -1894,7 +1894,6 @@ img { display: block; max-width: 100%; }
   letter-spacing: -0.2px;
   text-align: center;
 }
-/* Back button inside subpage headers: inline, no blur */
 .subpage-header .btn-back {
   position: static;
   top: auto;
@@ -1952,7 +1951,7 @@ img { display: block; max-width: 100%; }
   transition: background var(--trans-fast), color var(--trans-fast);
 }
 .notes-sort-btn:active { background: rgba(255,255,255,0.09); }
-.notes-sort-btn.sort-asc { color: var(--text); background: rgba(255,255,255,0.09); }
+.notes-sort-btn.sort-asc { color: var(--accent); background: var(--accent-dim); }
 
 /* Note detail full photo */
 .note-detail-photo {
@@ -2023,11 +2022,11 @@ img { display: block; max-width: 100%; }
   border-radius: var(--r-md);
   font-size: 13px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--accent);
   margin-top: 6px;
   transition: background var(--trans-fast), border-color var(--trans-fast);
 }
-.btn-view-all:active { background: var(--accent-dim); border-color: var(--text); }
+.btn-view-all:active { background: var(--accent-dim); border-color: var(--accent); }
 
 /* ═══════════════════════════════════════
    DATE INPUT — ic_calendar icon
@@ -2044,7 +2043,7 @@ img { display: block; max-width: 100%; }
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
-  color: var(--text);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2124,7 +2123,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 .btn-danger-pill:disabled { opacity: 0.35; }
 .btn-danger-pill:not(:disabled):active { background: rgba(237, 80, 80, 0.25); }
-/* Select mode: btn-notes-select gets accent tint */
 #btn-notes-select.active { color: var(--accent); }
 
 </style>
