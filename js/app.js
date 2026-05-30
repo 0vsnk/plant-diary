@@ -561,10 +561,10 @@ function renderNotes(plantId) {
   // Reset filter/sort for fresh open
   state.notesFilter = 'all'
   state.notesSort = 'desc'
-  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId)))
+  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId, true)))
 }
 
-function buildNoteItem(note, plantId) {
+function buildNoteItem(note, plantId, isPreview = false) {
   const item = createElement('div', 'note-item')
   const isSelected = state.selectedNoteIds.has(note.id)
 
@@ -586,7 +586,11 @@ function buildNoteItem(note, plantId) {
   }
 
   const content = createElement('div', 'note-item-content')
-  if (note.text) content.appendChild(createElement('p', 'note-item-text', note.text))
+  if (note.text) {
+    const textEl = createElement('p', 'note-item-text', note.text)
+    if (isPreview) textEl.classList.add('note-item-text--preview')
+    content.appendChild(textEl)
+  }
   if (note.photo_url) {
     const thumbs = createElement('div', 'note-item-thumbs')
     const img = document.createElement('img')
@@ -1795,6 +1799,7 @@ async function deleteSelectedNotes() {
   state.notes[plantId] = (state.notes[plantId] || []).filter(n => !state.selectedNoteIds.has(n.id))
   state.selectedNoteIds = new Set()
   state.notesSelectMode = false
+  renderNotes(plantId)
   renderFullNotes()
   updateNotesSelectUI()
 }

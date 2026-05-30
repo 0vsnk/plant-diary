@@ -831,6 +831,13 @@ img { display: block; max-width: 100%; }
   gap: 8px;
 }
 .note-item-text { font-size: 12px; line-height: 1.5; color: var(--text); white-space: pre-wrap; }
+.note-item-text--preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+}
 .note-item-thumbs {
   display: flex;
   gap: 8px;
@@ -2090,6 +2097,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    NOTES MULTI-SELECT
 ═══════════════════════════════════════ */
 .note-item.note-selectable { cursor: pointer; }
+.note-item.note-selectable .note-item-content { padding-right: 38px; }
 .note-item.note-selected {
   border-color: rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.04);

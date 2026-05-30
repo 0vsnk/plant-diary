@@ -846,6 +846,13 @@ img { display: block; max-width: 100%; }
   gap: 8px;
 }
 .note-item-text { font-size: 12px; line-height: 1.5; color: var(--text); white-space: pre-wrap; }
+.note-item-text--preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+}
 .note-item-thumbs {
   display: flex;
   gap: 8px;
@@ -2105,6 +2112,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    NOTES MULTI-SELECT
 ═══════════════════════════════════════ */
 .note-item.note-selectable { cursor: pointer; }
+.note-item.note-selectable .note-item-content { padding-right: 38px; }
 .note-item.note-selected {
   border-color: rgba(255,255,255,0.3);
   background: rgba(255,255,255,0.04);
@@ -3426,10 +3434,10 @@ function renderNotes(plantId) {
   // Reset filter/sort for fresh open
   state.notesFilter = 'all'
   state.notesSort = 'desc'
-  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId)))
+  notes.slice(0, 3).forEach(note => container.appendChild(buildNoteItem(note, plantId, true)))
 }
 
-function buildNoteItem(note, plantId) {
+function buildNoteItem(note, plantId, isPreview = false) {
   const item = createElement('div', 'note-item')
   const isSelected = state.selectedNoteIds.has(note.id)
 
@@ -3451,7 +3459,11 @@ function buildNoteItem(note, plantId) {
   }
 
   const content = createElement('div', 'note-item-content')
-  if (note.text) content.appendChild(createElement('p', 'note-item-text', note.text))
+  if (note.text) {
+    const textEl = createElement('p', 'note-item-text', note.text)
+    if (isPreview) textEl.classList.add('note-item-text--preview')
+    content.appendChild(textEl)
+  }
   if (note.photo_url) {
     const thumbs = createElement('div', 'note-item-thumbs')
     const img = document.createElement('img')
@@ -4660,6 +4672,7 @@ async function deleteSelectedNotes() {
   state.notes[plantId] = (state.notes[plantId] || []).filter(n => !state.selectedNoteIds.has(n.id))
   state.selectedNoteIds = new Set()
   state.notesSelectMode = false
+  renderNotes(plantId)
   renderFullNotes()
   updateNotesSelectUI()
 }
