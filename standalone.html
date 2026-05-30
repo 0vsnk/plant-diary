@@ -4625,6 +4625,9 @@ function openFullRepotting(plantId) {
 /* ═══════════════════════════════════════
    FULL NOTES OVERLAY
 ═══════════════════════════════════════ */
+const IC_EDIT_BTN = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.529 1.76402C10.7724 1.52062 11.0614 1.32754 11.3794 1.19581C11.6974 1.06408 12.0383 0.996277 12.3825 0.996277C12.7267 0.996277 13.0676 1.06408 13.3856 1.19581C13.7037 1.32754 13.9926 1.52062 14.236 1.76402C14.4794 2.00743 14.6725 2.29639 14.8042 2.61441C14.936 2.93244 15.0038 3.27329 15.0038 3.61752C15.0038 3.96175 14.936 4.3026 14.8042 4.62063C14.6725 4.93865 14.4794 5.22762 14.236 5.47102L13.457 6.25002L9.75002 2.54302L10.529 1.76402ZM9.04302 3.25002L2.65702 9.63602C2.28335 10.0103 2.01677 10.4778 1.88502 10.99L1.01502 14.376C0.993445 14.4603 0.994218 14.5487 1.01726 14.6325C1.0403 14.7164 1.08482 14.7928 1.14642 14.8542C1.20801 14.9156 1.28456 14.9599 1.36849 14.9826C1.45242 15.0054 1.54084 15.0059 1.62502 14.984L5.01002 14.115C5.5224 13.9837 5.99006 13.7171 6.36402 13.343L12.75 6.95702L9.04302 3.25002Z" fill="currentColor"/></svg>`
+const IC_CLOSE_BTN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`
+
 function updateNotesSelectUI() {
   const selectBtn = document.getElementById('btn-notes-select')
   const selectBar = document.getElementById('notes-select-bar')
@@ -4632,12 +4635,14 @@ function updateNotesSelectUI() {
   const deleteBtn = document.getElementById('btn-notes-delete-selected')
   if (!selectBtn || !selectBar) return
   if (state.notesSelectMode) {
+    selectBtn.innerHTML = IC_CLOSE_BTN
     selectBtn.classList.add('active')
     selectBar.classList.remove('hidden')
     const n = state.selectedNoteIds.size
     countEl.textContent = n === 0 ? 'Оберіть нотатки' : `${n} обрано`
     deleteBtn.disabled = n === 0
   } else {
+    selectBtn.innerHTML = IC_EDIT_BTN
     selectBtn.classList.remove('active')
     selectBar.classList.add('hidden')
   }
