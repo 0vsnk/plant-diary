@@ -738,7 +738,7 @@ function renderNoteDetailEdit(note, plantId) {
 }
 
 async function updateNote(note, plantId, newText, newPhotoUrl) {
-  const updated = { text: newText, photo_url: newPhotoUrl ?? note.photo_url }
+  const updated = { text: newText, photo_url: newPhotoUrl }
 
   // Update state
   const notes = state.notes[plantId] || []
