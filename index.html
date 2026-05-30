@@ -366,6 +366,7 @@
         </svg>
       </button>
       <h1 class="subpage-title">Історія Поливів</h1>
+      <div class="subpage-header-action"></div>
     </div>
     <div class="subpage-content" id="full-history-list"></div>
   </div>
@@ -380,7 +381,12 @@
           <polyline points="15 18 9 12 15 6"/>
         </svg>
       </button>
-      <h1 class="subpage-title">Всі Нотатки</h1>
+      <h1 class="subpage-title">Нотатки</h1>
+      <div class="subpage-header-action">
+        <button class="btn-icon-only" id="btn-notes-select" title="Вибрати">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="6" r="1" fill="currentColor"/><circle cx="9" cy="12" r="1" fill="currentColor"/><circle cx="9" cy="18" r="1" fill="currentColor"/><line x1="14" y1="6" x2="20" y2="6"/><line x1="14" y1="12" x2="20" y2="12"/><line x1="14" y1="18" x2="20" y2="18"/></svg>
+        </button>
+      </div>
     </div>
     <!-- Notes filters -->
     <div class="notes-filter-bar" id="notes-filter-bar">
@@ -394,6 +400,11 @@
       </button>
     </div>
     <div class="subpage-content" id="full-notes-list"></div>
+    <!-- Select mode delete bar -->
+    <div id="notes-select-bar" class="notes-select-bar hidden">
+      <span id="notes-select-count" class="notes-select-count">0 обрано</span>
+      <button id="btn-notes-delete-selected" class="btn-danger-pill" disabled>Видалити</button>
+    </div>
   </div>
 </div>
 

@@ -22,6 +22,8 @@ let state = {
   roomFilter: 'all',  // room filter for plants tab
   selectedPotSizes: [],
   lang: localStorage.getItem('lang') || 'uk',
+  notesSelectMode: false,
+  selectedNoteIds: new Set(),
 }
 
 /* ═══════════════════════════════════════
@@ -564,7 +566,24 @@ function renderNotes(plantId) {
 
 function buildNoteItem(note, plantId) {
   const item = createElement('div', 'note-item')
-  item.style.cursor = 'pointer'
+  const isSelected = state.selectedNoteIds.has(note.id)
+
+  if (state.notesSelectMode) {
+    item.classList.add('note-selectable')
+    if (isSelected) item.classList.add('note-selected')
+    // Checkbox indicator
+    const check = createElement('div', 'note-select-check')
+    if (isSelected) check.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+    item.appendChild(check)
+    item.addEventListener('click', () => {
+      if (state.selectedNoteIds.has(note.id)) state.selectedNoteIds.delete(note.id)
+      else state.selectedNoteIds.add(note.id)
+      renderFullNotes()
+    })
+  } else {
+    item.style.cursor = 'pointer'
+    item.addEventListener('click', () => openNoteDetail(note, plantId))
+  }
 
   const content = createElement('div', 'note-item-content')
   if (note.text) content.appendChild(createElement('p', 'note-item-text', note.text))
@@ -575,7 +594,7 @@ function buildNoteItem(note, plantId) {
     img.className = 'note-item-thumb'
     img.alt = ''
     img.loading = 'lazy'
-    img.addEventListener('click', e => { e.stopPropagation(); openLightbox(note.photo_url) })
+    if (!state.notesSelectMode) img.addEventListener('click', e => { e.stopPropagation(); openLightbox(note.photo_url) })
     thumbs.appendChild(img)
     content.appendChild(thumbs)
   }
@@ -585,7 +604,6 @@ function buildNoteItem(note, plantId) {
   footer.appendChild(createElement('p', 'note-item-date', formatDateTime(new Date(note.created_at))))
   item.appendChild(footer)
 
-  item.addEventListener('click', () => openNoteDetail(note, plantId))
   return item
 }
 
@@ -1724,11 +1742,46 @@ function openFullHistory(plantId) {
 /* ═══════════════════════════════════════
    FULL NOTES OVERLAY
 ═══════════════════════════════════════ */
+function updateNotesSelectUI() {
+  const selectBtn = document.getElementById('btn-notes-select')
+  const selectBar = document.getElementById('notes-select-bar')
+  const countEl = document.getElementById('notes-select-count')
+  const deleteBtn = document.getElementById('btn-notes-delete-selected')
+  if (!selectBtn || !selectBar) return
+  if (state.notesSelectMode) {
+    selectBtn.classList.add('active')
+    selectBar.classList.remove('hidden')
+    const n = state.selectedNoteIds.size
+    countEl.textContent = n === 0 ? 'Оберіть нотатки' : `${n} обрано`
+    deleteBtn.disabled = n === 0
+  } else {
+    selectBtn.classList.remove('active')
+    selectBar.classList.add('hidden')
+  }
+}
+
+async function deleteSelectedNotes() {
+  const plantId = state.currentNotesPlantId
+  const ids = [...state.selectedNoteIds]
+  if (!ids.length) return
+  if (sb && state.user) {
+    await sb.from('notes').delete().in('id', ids)
+  }
+  state.notes[plantId] = (state.notes[plantId] || []).filter(n => !state.selectedNoteIds.has(n.id))
+  state.selectedNoteIds = new Set()
+  state.notesSelectMode = false
+  renderFullNotes()
+  updateNotesSelectUI()
+}
+
 function openFullNotes(plantId) {
   state.currentNotesPlantId = plantId
   state.notesFilter = state.notesFilter || 'all'
   state.notesSort = state.notesSort || 'desc'
+  state.notesSelectMode = false
+  state.selectedNoteIds = new Set()
   renderFullNotes()
+  updateNotesSelectUI()
   openOverlay('overlay-notes')
 }
 
@@ -1762,10 +1815,11 @@ function renderFullNotes() {
   }
 
   if (!notes.length) {
-    container.innerHTML = '<p style="font-size:14px;color:var(--text3);padding:20px 0">Нотаток не знайдено</p>'
+    container.innerHTML = '<p class="repotting-empty" style="padding:20px 0">Нотаток не знайдено</p>'
   } else {
     notes.forEach(note => container.appendChild(buildNoteItem(note, plantId)))
   }
+  updateNotesSelectUI()
 }
 
 /* ═══════════════════════════════════════
@@ -1994,7 +2048,17 @@ function bindEvents() {
 
   // Sub-page overlays
   document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))
-  document.getElementById('btn-notes-back').addEventListener('click', () => closeOverlay('overlay-notes'))
+  document.getElementById('btn-notes-back').addEventListener('click', () => {
+    state.notesSelectMode = false
+    state.selectedNoteIds = new Set()
+    closeOverlay('overlay-notes')
+  })
+  document.getElementById('btn-notes-select').addEventListener('click', () => {
+    state.notesSelectMode = !state.notesSelectMode
+    state.selectedNoteIds = new Set()
+    renderFullNotes()
+  })
+  document.getElementById('btn-notes-delete-selected').addEventListener('click', deleteSelectedNotes)
   document.getElementById('btn-note-detail-back').addEventListener('click', () => closeOverlay('overlay-note-detail'))
 
   // Notes filter chips + sort
