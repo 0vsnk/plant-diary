@@ -32,5 +32,11 @@ const publicDir = path.join(BASE, 'public')
 if (!fs.existsSync(publicDir)) fs.mkdirSync(publicDir)
 fs.writeFileSync(path.join(publicDir, 'index.html'), html, 'utf8')
 
+// Copy assets to public/
+const publicImgDir = path.join(publicDir, 'img')
+if (!fs.existsSync(publicImgDir)) fs.mkdirSync(publicImgDir)
+fs.copyFileSync(path.join(BASE, 'img/app-icon.png'), path.join(publicImgDir, 'app-icon.png'))
+fs.copyFileSync(path.join(BASE, 'manifest.json'), path.join(publicDir, 'manifest.json'))
+
 const size = fs.statSync(path.join(BASE, 'standalone.html')).size
 console.log(`✅ standalone.html + public/index.html rebuilt — ${(size/1024).toFixed(1)} KB`)
