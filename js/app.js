@@ -626,13 +626,6 @@ function openNoteDetail(note, plantId) {
   document.getElementById('note-detail-title').textContent = formatDateTime(new Date(note.created_at))
   renderNoteDetailView(note, plantId)
 
-  // Wire delete button
-  document.getElementById('btn-note-detail-delete').onclick = () =>
-    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
-      await deleteNote(note.id, plantId)
-      closeOverlay('overlay-note-detail')
-    })
-
   // Wire edit button
   document.getElementById('btn-note-detail-edit').onclick = () =>
     renderNoteDetailEdit(note, plantId)
@@ -652,6 +645,15 @@ function renderNoteDetailView(note, plantId) {
     body.appendChild(img)
   }
   if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
+
+  const deleteBtn = createElement('button', 'btn-note-delete', 'Видалити нотатку')
+  deleteBtn.addEventListener('click', () =>
+    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
+      await deleteNote(note.id, plantId)
+      closeOverlay('overlay-note-detail')
+    })
+  )
+  body.appendChild(deleteBtn)
 }
 
 function renderNoteDetailEdit(note, plantId) {

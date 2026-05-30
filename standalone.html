@@ -1988,6 +1988,19 @@ img { display: block; max-width: 100%; }
   font-size: 13px;
   color: var(--text2);
 }
+.btn-note-delete {
+  margin-top: 24px;
+  width: 100%;
+  height: 44px;
+  border-radius: var(--r-pill);
+  background: rgba(237, 80, 80, 0.1);
+  border: none;
+  color: #ff6b6b;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background var(--trans-fast);
+}
+.btn-note-delete:active { background: rgba(237, 80, 80, 0.2); }
 
 /* Lightbox */
 .lightbox {
@@ -3454,13 +3467,6 @@ function openNoteDetail(note, plantId) {
   document.getElementById('note-detail-title').textContent = formatDateTime(new Date(note.created_at))
   renderNoteDetailView(note, plantId)
 
-  // Wire delete button
-  document.getElementById('btn-note-detail-delete').onclick = () =>
-    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
-      await deleteNote(note.id, plantId)
-      closeOverlay('overlay-note-detail')
-    })
-
   // Wire edit button
   document.getElementById('btn-note-detail-edit').onclick = () =>
     renderNoteDetailEdit(note, plantId)
@@ -3480,6 +3486,15 @@ function renderNoteDetailView(note, plantId) {
     body.appendChild(img)
   }
   if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
+
+  const deleteBtn = createElement('button', 'btn-note-delete', 'Видалити нотатку')
+  deleteBtn.addEventListener('click', () =>
+    showConfirm('Видалити нотатку?', 'Цю дію неможливо скасувати.', async () => {
+      await deleteNote(note.id, plantId)
+      closeOverlay('overlay-note-detail')
+    })
+  )
+  body.appendChild(deleteBtn)
 }
 
 function renderNoteDetailEdit(note, plantId) {
