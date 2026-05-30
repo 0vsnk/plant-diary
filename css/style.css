@@ -2043,8 +2043,10 @@ img { display: block; max-width: 100%; }
 /* Note detail full photo */
 .note-detail-photos-row {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
 }
 .note-detail-photo {
   width: 100%;
@@ -2052,6 +2054,15 @@ img { display: block; max-width: 100%; }
   object-fit: cover;
   display: block;
   cursor: zoom-in;
+}
+.note-detail-photo-thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--r-sm);
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+  flex-shrink: 0;
 }
 .note-detail-text {
   font-size: 15px;

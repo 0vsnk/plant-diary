@@ -501,6 +501,9 @@ function renderPlantDetail(plant) {
   document.getElementById('detail-repotting-section').classList.remove('hidden')
   const repLog = document.getElementById('repotting-log')
   repLog.innerHTML = ''
+  if (plant.repotting_notes) {
+    repLog.appendChild(createElement('p', 'repotting-notes-text', plant.repotting_notes))
+  }
   if (plant.next_repotting_date) {
     const entry = createElement('div', 'history-item')
     const iconEl = createElement('span', 'history-item-icon')
@@ -510,10 +513,6 @@ function renderPlantDetail(plant) {
     repLog.appendChild(entry)
   } else {
     repLog.appendChild(createElement('p', 'repotting-empty', 'Пересадку не заплановано'))
-  }
-  if (plant.repotting_notes) {
-    const notesEl = createElement('p', 'repotting-notes-text', plant.repotting_notes)
-    repLog.appendChild(notesEl)
   }
 
   // Notes
@@ -645,20 +644,22 @@ function openNoteDetail(note, plantId) {
 function renderNoteDetailView(note, plantId) {
   const body = document.getElementById('note-detail-body')
   body.innerHTML = ''
+  // Text first
+  if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
+  // Photos as small thumbnails below
   const photos = getNotePhotos(note)
   if (photos.length) {
     const row = createElement('div', 'note-detail-photos-row')
     photos.forEach(url => {
       const img = document.createElement('img')
       img.src = url
-      img.className = 'note-detail-photo'
+      img.className = 'note-detail-photo-thumb'
       img.alt = ''
       img.addEventListener('click', () => openLightbox(url))
       row.appendChild(img)
     })
     body.appendChild(row)
   }
-  if (note.text) body.appendChild(createElement('p', 'note-detail-text', note.text))
 }
 
 function renderNoteDetailEdit(note, plantId) {
@@ -1764,10 +1765,11 @@ function showToast(msg, duration = 2500) {
 }
 
 let _confirmCallback = null
-function showConfirm(title, msg, onConfirm) {
+function showConfirm(title, msg, onConfirm, confirmLabel) {
   _confirmCallback = onConfirm
   document.getElementById('dialog-title').textContent = title
   document.getElementById('dialog-message').textContent = msg
+  document.getElementById('dialog-confirm-btn').textContent = confirmLabel || 'Видалити'
   document.getElementById('dialog-confirm').classList.remove('hidden')
 }
 
@@ -1813,6 +1815,9 @@ function openFullRepotting(plantId) {
 
   if (!plant) { openOverlay('overlay-repotting'); return }
 
+  if (plant.repotting_notes) {
+    container.appendChild(createElement('p', 'repotting-notes-text', plant.repotting_notes))
+  }
   if (plant.next_repotting_date) {
     const entry = createElement('div', 'history-item')
     const iconEl = createElement('span', 'history-item-icon')
@@ -1822,11 +1827,6 @@ function openFullRepotting(plantId) {
     container.appendChild(entry)
   } else {
     container.appendChild(createElement('p', 'repotting-empty', 'Пересадку не заплановано'))
-  }
-
-  if (plant.repotting_notes) {
-    const notesEl = createElement('p', 'repotting-notes-text', plant.repotting_notes)
-    container.appendChild(notesEl)
   }
 
   openOverlay('overlay-repotting')
@@ -2306,7 +2306,7 @@ function bindEvents() {
 
   // Profile tab
   document.getElementById('btn-profile-signout').addEventListener('click', () => {
-    showConfirm('Вийти?', 'Ви впевнені що хочете вийти?', signOut)
+    showConfirm('Вийти?', 'Ви впевнені що хочете вийти?', signOut, 'Вийти')
   })
   document.getElementById('btn-delete-account').addEventListener('click', () => {
     showConfirm(
