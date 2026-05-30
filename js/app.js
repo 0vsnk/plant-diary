@@ -594,13 +594,13 @@ function buildNoteItem(note, plantId, isPreview = false) {
   const photos = getNotePhotos(note)
   if (photos.length) {
     const thumbs = createElement('div', 'note-item-thumbs')
-    photos.forEach(url => {
+    photos.forEach((url, idx) => {
       const img = document.createElement('img')
       img.src = url
       img.className = 'note-item-thumb'
       img.alt = ''
       img.loading = 'lazy'
-      if (!state.notesSelectMode) img.addEventListener('click', e => { e.stopPropagation(); openLightbox(url) })
+      if (!state.notesSelectMode) img.addEventListener('click', e => { e.stopPropagation(); openLightbox(url, photos, idx) })
       thumbs.appendChild(img)
     })
     content.appendChild(thumbs)
@@ -615,17 +615,45 @@ function buildNoteItem(note, plantId, isPreview = false) {
 }
 
 // ─── Lightbox ───────────────────────────────────────────
-function openLightbox(src) {
-  const lb = document.getElementById('lightbox')
-  document.getElementById('lightbox-img').src = src
-  lb.style.display = 'flex'
+let _lbPhotos = []
+let _lbIndex = 0
+
+function openLightbox(src, photos, startIndex) {
+  _lbPhotos = photos && photos.length ? photos : [src]
+  _lbIndex = (startIndex != null) ? startIndex : _lbPhotos.indexOf(src)
+  if (_lbIndex < 0) _lbIndex = 0
+  _renderLightbox()
+  document.getElementById('lightbox').style.display = 'flex'
   document.body.style.overflow = 'hidden'
 }
+
+function _renderLightbox() {
+  document.getElementById('lightbox-img').src = _lbPhotos[_lbIndex]
+  const dotsEl = document.getElementById('lightbox-dots')
+  dotsEl.innerHTML = ''
+  if (_lbPhotos.length > 1) {
+    _lbPhotos.forEach((_, i) => {
+      const dot = createElement('div', 'lightbox-dot')
+      if (i === _lbIndex) dot.classList.add('active')
+      dotsEl.appendChild(dot)
+    })
+  }
+}
+
+function _lbNext() {
+  if (_lbIndex < _lbPhotos.length - 1) { _lbIndex++; _renderLightbox() }
+}
+function _lbPrev() {
+  if (_lbIndex > 0) { _lbIndex--; _renderLightbox() }
+}
+
 function closeLightbox() {
-  const lb = document.getElementById('lightbox')
-  lb.style.display = 'none'
+  document.getElementById('lightbox').style.display = 'none'
   document.getElementById('lightbox-img').src = ''
+  document.getElementById('lightbox-dots').innerHTML = ''
   document.body.style.overflow = ''
+  _lbPhotos = []
+  _lbIndex = 0
 }
 
 // ─── Note Detail overlay ─────────────────────────────────
@@ -650,12 +678,12 @@ function renderNoteDetailView(note, plantId) {
   const photos = getNotePhotos(note)
   if (photos.length) {
     const row = createElement('div', 'note-detail-photos-row')
-    photos.forEach(url => {
+    photos.forEach((url, idx) => {
       const img = document.createElement('img')
       img.src = url
       img.className = 'note-detail-photo-thumb'
       img.alt = ''
-      img.addEventListener('click', () => openLightbox(url))
+      img.addEventListener('click', () => openLightbox(url, photos, idx))
       row.appendChild(img)
     })
     body.appendChild(row)
@@ -2193,9 +2221,20 @@ function bindEvents() {
 
   // Lightbox
   document.getElementById('lightbox-close').addEventListener('click', closeLightbox)
-  document.getElementById('lightbox').addEventListener('click', e => {
-    if (e.target === document.getElementById('lightbox')) closeLightbox()
+  const _lb = document.getElementById('lightbox')
+  _lb.addEventListener('click', e => {
+    if (e.target === _lb) closeLightbox()
   })
+  // Swipe support
+  let _lbTouchX = null
+  _lb.addEventListener('touchstart', e => { _lbTouchX = e.touches[0].clientX }, { passive: true })
+  _lb.addEventListener('touchend', e => {
+    if (_lbTouchX === null) return
+    const dx = e.changedTouches[0].clientX - _lbTouchX
+    _lbTouchX = null
+    if (Math.abs(dx) < 40) return
+    if (dx < 0) _lbNext(); else _lbPrev()
+  }, { passive: true })
 
   // Change photo from detail
   document.getElementById('input-change-photo').addEventListener('change', e => {
