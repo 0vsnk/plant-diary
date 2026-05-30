@@ -1739,6 +1739,32 @@ function openFullHistory(plantId) {
   openOverlay('overlay-history')
 }
 
+function openFullRepotting(plantId) {
+  const plant = state.plants.find(p => p.id === plantId)
+  const container = document.getElementById('full-repotting-list')
+  container.innerHTML = ''
+
+  if (!plant) { openOverlay('overlay-repotting'); return }
+
+  if (plant.next_repotting_date) {
+    const entry = createElement('div', 'history-item')
+    const iconEl = createElement('span', 'history-item-icon')
+    iconEl.innerHTML = IC_POT
+    const dateEl = createElement('span', 'history-item-date', formatDate(new Date(plant.next_repotting_date)))
+    entry.append(iconEl, dateEl)
+    container.appendChild(entry)
+  } else {
+    container.appendChild(createElement('p', 'repotting-empty', 'Пересадку не заплановано'))
+  }
+
+  if (plant.repotting_notes) {
+    const notesEl = createElement('p', 'repotting-notes-text', plant.repotting_notes)
+    container.appendChild(notesEl)
+  }
+
+  openOverlay('overlay-repotting')
+}
+
 /* ═══════════════════════════════════════
    FULL NOTES OVERLAY
 ═══════════════════════════════════════ */
@@ -2032,6 +2058,7 @@ function bindEvents() {
   })
   document.getElementById('btn-add-note').addEventListener('click', openAddNoteForm)
   document.getElementById('btn-view-all-history').addEventListener('click', () => openFullHistory(state.currentPlantId))
+  document.getElementById('btn-view-all-repotting').addEventListener('click', () => openFullRepotting(state.currentPlantId))
   document.getElementById('btn-view-all-notes').addEventListener('click', () => openFullNotes(state.currentPlantId))
   document.getElementById('btn-log-repotting').addEventListener('click', () => logRepotting())
 
@@ -2048,6 +2075,7 @@ function bindEvents() {
 
   // Sub-page overlays
   document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))
+  document.getElementById('btn-repotting-back').addEventListener('click', () => closeOverlay('overlay-repotting'))
   document.getElementById('btn-notes-back').addEventListener('click', () => {
     state.notesSelectMode = false
     state.selectedNoteIds = new Set()

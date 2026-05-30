@@ -1904,6 +1904,20 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: flex-end;
 }
+/* Action button in subpage header — same size as back button */
+.btn-subpage-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  border: none;
+  color: var(--text);
+  transition: background var(--trans-fast), transform var(--trans-fast);
+}
+.btn-subpage-back:active { background: rgba(255,255,255,0.09); transform: scale(0.9); }
 .subpage-content {
   flex: 1;
   overflow-y: auto;
