@@ -912,12 +912,32 @@ img { display: block; max-width: 100%; }
   font-size: 13px;
   color: var(--text2);
 }
+.repotting-empty-label {
+  color: var(--text2);
+  flex: 1;
+}
+.repotting-unplanned {
+  cursor: default;
+}
+.repotting-calendar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--trans-fast);
+}
+.repotting-calendar-btn:active { background: var(--accent-dim); }
 .repotting-notes-text {
   font-size: 13px;
-  color: var(--text2);
+  color: #ED9C33;
   line-height: 1.55;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(237,156,51,0.10);
   border-radius: var(--r-md);
   padding: 12px 14px;
 }
