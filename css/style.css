@@ -502,10 +502,17 @@ img { display: block; max-width: 100%; }
 .detail-header-gradient {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.08) 22%, transparent 45%),
-    linear-gradient(to top, #111111 0%, rgba(17,17,17,0.95) 15%, rgba(17,17,17,0.7) 30%, rgba(17,17,17,0.3) 50%, transparent 70%);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0.08) 22%, transparent 45%);
   pointer-events: none;
+}
+.detail-photo-fade {
+  height: 120px;
+  margin-top: -120px;
+  background: linear-gradient(to bottom, transparent 0%, #111111 100%);
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  flex-shrink: 0;
 }
 
 .btn-back {
@@ -549,9 +556,9 @@ img { display: block; max-width: 100%; }
   padding: 20px 20px 0;
   display: flex;
   flex-direction: column;
-  margin-top: -48px;
+  margin-top: -60px;
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 .detail-title-row {
