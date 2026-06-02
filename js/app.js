@@ -424,37 +424,71 @@ function showLoadingInDetail() {
   // We just open the overlay with existing DOM — data renders async
 }
 
+/* ── Long-press utility ──────────────────
+   Calls cb after 500ms hold; cancels on move/release */
+let _itemDeleteCallback = null
+function addLongPress(el, cb) {
+  let timer = null
+  const start = e => {
+    timer = setTimeout(() => { timer = null; cb() }, 500)
+  }
+  const cancel = () => { if (timer) { clearTimeout(timer); timer = null } }
+  el.addEventListener('touchstart', start, { passive: true })
+  el.addEventListener('touchend', cancel)
+  el.addEventListener('touchmove', cancel)
+  el.addEventListener('mousedown', start)
+  el.addEventListener('mouseup', cancel)
+  el.addEventListener('mouseleave', cancel)
+  el.addEventListener('contextmenu', e => { e.preventDefault(); cb() })
+}
+function openItemActions(cb) {
+  _itemDeleteCallback = cb
+  openSheet('sheet-item-actions')
+}
+
 function buildRepottingRow(plant, fromOverlay = false) {
   const entry = createElement('div', 'history-item')
+  const iconEl = createElement('span', 'history-item-icon')
+  iconEl.innerHTML = IC_POT
+  entry.appendChild(iconEl)
+
   if (plant.next_repotting_date) {
     const label = createElement('span', 'history-item-date', 'Заплановано')
     label.style.flex = '1'
     const dateEl = createElement('span', 'repotting-planned-date', formatDate(new Date(plant.next_repotting_date)))
     entry.append(label, dateEl)
+
+    // Long-press → delete repotting date
+    addLongPress(entry, () => openItemActions(async () => {
+      const idx = state.plants.findIndex(p => p.id === plant.id)
+      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: null }
+      if (sb && state.user) await sb.from('plants').update({ next_repotting_date: null }).eq('id', plant.id)
+      renderPlantDetail(state.plants[idx])
+      showToast('Пересадку видалено')
+    }))
   } else {
-    const iconEl = createElement('span', 'history-item-icon')
-    iconEl.innerHTML = IC_POT
     const label = createElement('span', 'history-item-date repotting-empty-label', 'Пересадку не заплановано')
     const calBtn = createElement('button', 'repotting-calendar-btn')
     calBtn.innerHTML = IC_CALENDAR
-    calBtn.addEventListener('click', () => {
+    calBtn.addEventListener('click', e => {
+      e.stopPropagation()
       const input = document.getElementById('input-repotting-date-quick')
       input.value = ''
-      input.onchange = async (e) => {
-        const dateStr = e.target.value
+      input.onchange = null
+      input.addEventListener('change', async function handler(ev) {
+        input.removeEventListener('change', handler)
+        const dateStr = ev.target.value
         if (!dateStr) return
         if (fromOverlay) closeOverlay('overlay-repotting')
         const idx = state.plants.findIndex(p => p.id === plant.id)
         if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: dateStr }
-        if (sb && state.user) {
-          await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plant.id)
-        }
+        if (sb && state.user) await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plant.id)
         renderPlantDetail(state.plants[idx])
         showToast('Пересадку заплановано ✓')
-      }
+      }, { once: true })
       input.click()
     })
-    entry.append(iconEl, label, calBtn)
+    entry.append(label, calBtn)
   }
   return entry
 }
@@ -538,7 +572,15 @@ function renderPlantDetail(plant) {
   const repLog = document.getElementById('repotting-log')
   repLog.innerHTML = ''
   if (plant.repotting_notes) {
-    repLog.appendChild(createElement('p', 'repotting-notes-text', plant.repotting_notes))
+    const notesEl = createElement('p', 'repotting-notes-text', plant.repotting_notes)
+    addLongPress(notesEl, () => openItemActions(async () => {
+      const idx = state.plants.findIndex(p => p.id === plant.id)
+      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], repotting_notes: null }
+      if (sb && state.user) await sb.from('plants').update({ repotting_notes: null }).eq('id', plant.id)
+      renderPlantDetail(state.plants[idx])
+      showToast('Коментар видалено')
+    }))
+    repLog.appendChild(notesEl)
   }
   repLog.appendChild(buildRepottingRow(plant))
 
@@ -572,6 +614,18 @@ function buildHistoryItem(log) {
   if (log.with_fertilizer) {
     item.appendChild(createElement('span', 'history-item-badge', 'З Добривом'))
   }
+  // Long-press → delete this watering log
+  addLongPress(item, () => openItemActions(async () => {
+    const plantId = log.plant_id
+    if (sb && state.user && !log.id.toString().startsWith('demo-')) {
+      await sb.from('watering_logs').delete().eq('id', log.id)
+    }
+    if (state.wateringLogs[plantId]) {
+      state.wateringLogs[plantId] = state.wateringLogs[plantId].filter(l => l.id !== log.id)
+    }
+    renderWateringHistory(plantId)
+    showToast('Полив видалено')
+  }))
   return item
 }
 
@@ -1871,7 +1925,16 @@ function openFullRepotting(plantId) {
   if (!plant) { openOverlay('overlay-repotting'); return }
 
   if (plant.repotting_notes) {
-    container.appendChild(createElement('p', 'repotting-notes-text', plant.repotting_notes))
+    const notesEl = createElement('p', 'repotting-notes-text', plant.repotting_notes)
+    addLongPress(notesEl, () => openItemActions(async () => {
+      const idx = state.plants.findIndex(p => p.id === plant.id)
+      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], repotting_notes: null }
+      if (sb && state.user) await sb.from('plants').update({ repotting_notes: null }).eq('id', plant.id)
+      closeOverlay('overlay-repotting')
+      renderPlantDetail(state.plants[idx])
+      showToast('Коментар видалено')
+    }))
+    container.appendChild(notesEl)
   }
   container.appendChild(buildRepottingRow(plant, true))
 
@@ -2220,6 +2283,11 @@ function bindEvents() {
     }), 100)
   })
   document.getElementById('note-action-cancel').addEventListener('click', () => closeSheet('sheet-note-actions'))
+  document.getElementById('item-action-delete').addEventListener('click', () => {
+    closeSheet('sheet-item-actions')
+    if (_itemDeleteCallback) { const cb = _itemDeleteCallback; _itemDeleteCallback = null; cb() }
+  })
+  document.getElementById('item-action-cancel').addEventListener('click', () => closeSheet('sheet-item-actions'))
 
   // Sub-page overlays
   document.getElementById('btn-history-back').addEventListener('click', () => closeOverlay('overlay-history'))
