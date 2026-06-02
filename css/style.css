@@ -906,7 +906,7 @@ img { display: block; max-width: 100%; }
 .repotting-log {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 .repotting-empty {
   font-size: 13px;
@@ -915,6 +915,12 @@ img { display: block; max-width: 100%; }
 .repotting-empty-label {
   color: var(--text2);
   flex: 1;
+}
+.repotting-planned-date {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 500;
+  flex-shrink: 0;
 }
 .repotting-unplanned {
   cursor: default;
