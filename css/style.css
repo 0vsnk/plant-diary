@@ -513,6 +513,7 @@ img { display: block; max-width: 100%; }
   right: 0;
   height: 75%;
   background: url('/scrim.png') bottom center / 100% 100% no-repeat;
+  mix-blend-mode: multiply;
   pointer-events: none;
 }
 
