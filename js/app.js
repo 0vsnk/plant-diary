@@ -466,30 +466,7 @@ function buildRepottingRow(plant, fromOverlay = false) {
     }))
   } else {
     const label = createElement('span', 'history-item-date repotting-empty-label', 'Пересадку не заплановано')
-    // <label for> triggers date input on iOS without JS click()
-    const calLabel = document.createElement('label')
-    calLabel.className = 'repotting-calendar-btn'
-    calLabel.htmlFor = 'input-repotting-date-quick'
-    calLabel.innerHTML = IC_CALENDAR
-    // Register handler on the input itself
-    const input = document.getElementById('input-repotting-date-quick')
-    const onDatePick = async (ev) => {
-      input.removeEventListener('change', onDatePick)
-      const dateStr = ev.target.value
-      if (!dateStr) return
-      if (fromOverlay) closeOverlay('overlay-repotting')
-      const idx = state.plants.findIndex(p => p.id === plant.id)
-      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: dateStr }
-      if (sb && state.user) await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plant.id)
-      renderPlantDetail(state.plants[idx])
-      showToast('Пересадку заплановано ✓')
-    }
-    calLabel.addEventListener('click', () => {
-      input.value = ''
-      input.addEventListener('change', onDatePick, { once: true })
-    })
-    // Also clear value so change fires even if same date selected again
-    entry.append(label, calLabel)
+    entry.append(label)
   }
   return entry
 }
@@ -1130,30 +1107,23 @@ async function waterPlant() {
 /* ═══════════════════════════════════════
    LOG REPOTTING
 ═══════════════════════════════════════ */
-function logRepotting() {
-  // Called when label#btn-log-repotting is clicked — just registers the change handler.
-  // The label's for="input-repotting-date-quick" opens the native date picker on iOS.
+async function logRepotting() {
   const plantId = state.currentPlantId
   if (!plantId) return
-  const input = document.getElementById('input-repotting-date-quick')
-  input.value = ''
-  input.addEventListener('change', async function handler(ev) {
-    const dateStr = ev.target.value
-    if (!dateStr) return
-    const idx = state.plants.findIndex(p => p.id === plantId)
-    try {
-      if (!sb) {
-        if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: dateStr }
-        renderPlantDetail(state.plants[idx])
-      } else {
-        const { data, error } = await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plantId).select().single()
-        if (error) throw error
-        if (idx !== -1) state.plants[idx] = data
-        renderPlantDetail(data)
-      }
-      showToast('Пересадку зафіксовано!')
-    } catch (err) { showToast('Помилка збереження') }
-  }, { once: true })
+  const today = new Date().toISOString().split('T')[0]
+  const idx = state.plants.findIndex(p => p.id === plantId)
+  try {
+    if (!sb) {
+      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: today }
+      renderPlantDetail(state.plants[idx])
+    } else {
+      const { data, error } = await sb.from('plants').update({ next_repotting_date: today }).eq('id', plantId).select().single()
+      if (error) throw error
+      if (idx !== -1) state.plants[idx] = data
+      renderPlantDetail(data)
+    }
+    showToast('Пересадку зафіксовано!')
+  } catch (err) { showToast('Помилка збереження') }
 }
 
 /* ═══════════════════════════════════════
@@ -2248,10 +2218,10 @@ function bindEvents() {
     document.getElementById('btn-water').textContent = e.target.checked ? 'Полити з добривом' : 'Полити'
   })
   document.getElementById('btn-add-note').addEventListener('click', openAddNoteForm)
+  document.getElementById('btn-log-repotting').addEventListener('click', logRepotting)
   document.getElementById('btn-view-all-history').addEventListener('click', () => openFullHistory(state.currentPlantId))
   document.getElementById('btn-view-all-repotting').addEventListener('click', () => openFullRepotting(state.currentPlantId))
   document.getElementById('btn-view-all-notes').addEventListener('click', () => openFullNotes(state.currentPlantId))
-  document.getElementById('btn-log-repotting').addEventListener('click', () => logRepotting())
 
   // More actions sheet
   document.getElementById('more-btn-edit').addEventListener('click', () => {

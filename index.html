@@ -331,10 +331,10 @@
         <div class="section-header-row">
           <h2 class="section-title">Пересадка</h2>
           <div class="section-header-actions">
-            <label class="btn-add-compact" id="btn-log-repotting" for="input-repotting-date-quick">
+            <button class="btn-add-compact" id="btn-log-repotting">
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3.33331V12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.33325 8H12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               Додати
-            </label>
+            </button>
             <button class="btn-icon-only" id="btn-view-all-repotting"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
         </div>
@@ -455,8 +455,6 @@
 </div>
 <input type="file" id="input-note-edit-photo" accept="image/*" style="display:none">
 
-<!-- Hidden date input for quick repotting scheduling (off-screen, not display:none — iOS requires visible to trigger) -->
-<input type="date" id="input-repotting-date-quick" style="position:fixed;left:-9999px;top:-9999px;opacity:0;pointer-events:none;width:1px;height:1px;">
 
 <!-- Photo lightbox -->
 <div id="lightbox" class="lightbox" style="display:none">
