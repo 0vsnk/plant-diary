@@ -119,7 +119,7 @@ img { display: block; max-width: 100%; }
   padding: 8px 14px;
   transition: color var(--trans-fast), background var(--trans-fast);
 }
-.btn-auth-back:active { color: var(--text); background: rgba(255,255,255,0.10); }
+.btn-auth-back:active { color: var(--text); background: rgba(255,255,255,0.03); }
 
 .auth-bg {
   position: absolute;
@@ -302,7 +302,7 @@ img { display: block; max-width: 100%; }
 .plants-list::-webkit-scrollbar { display: none; }
 
 .plant-card {
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -318,7 +318,7 @@ img { display: block; max-width: 100%; }
   width: 74px;
   height: 74px;
   flex-shrink: 0;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -587,7 +587,7 @@ img { display: block; max-width: 100%; }
   gap: 5px;
   height: 24px;
   padding: 0 10px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-pill);
   font-size: 12px;
   color: var(--text2);
@@ -602,7 +602,7 @@ img { display: block; max-width: 100%; }
 
 .btn-edit {
   width: 36px; height: 36px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-sm);
   border: 1px solid rgba(255,255,255,0.06);
   display: flex;
@@ -767,7 +767,7 @@ img { display: block; max-width: 100%; }
   gap: 4px;
   height: 28px;
   padding: 0 10px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-pill);
   font-size: 11px;
   font-weight: 500;
@@ -786,7 +786,7 @@ img { display: block; max-width: 100%; }
   width: 28px;
   height: 28px;
   color: var(--text2);
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: none;
   border-radius: var(--r-pill);
   padding: 0;
@@ -801,7 +801,7 @@ img { display: block; max-width: 100%; }
   gap: 4px;
   height: 28px;
   padding: 0 10px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-pill);
   font-size: 11px;
   font-weight: 500;
@@ -817,7 +817,7 @@ img { display: block; max-width: 100%; }
   gap: 8px;
 }
 .note-item {
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: none;
   border-radius: var(--r-md);
   padding: 16px;
@@ -1009,7 +1009,7 @@ img { display: block; max-width: 100%; }
 
 .sheet-handle {
   width: 32px; height: 4px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: 2px;
   margin: 12px auto 4px;
 }
@@ -1052,7 +1052,7 @@ img { display: block; max-width: 100%; }
   color: rgba(247,255,231,0.3);
 }
 .form-input {
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--r-md);
   color: var(--text);
@@ -1093,7 +1093,7 @@ img { display: block; max-width: 100%; }
 }
 .num-btn {
   width: 49px; height: 49px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--r-md);
   padding: 0;
@@ -1118,7 +1118,7 @@ img { display: block; max-width: 100%; }
   flex: 1;
   padding: 0 12px;
   height: 40px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: 1px solid transparent;
   border-radius: var(--r-md);
   font-size: 14px;
@@ -1154,7 +1154,7 @@ img { display: block; max-width: 100%; }
 .form-photo-preview {
   width: 80px; height: 80px;
   border-radius: var(--r-lg);
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: 1px dashed rgba(255,255,255,0.12);
   display: flex;
   align-items: center;
@@ -1170,7 +1170,7 @@ img { display: block; max-width: 100%; }
 .form-photo-buttons .btn-outline,
 .note-photo-section .form-photo-buttons .btn-outline {
   border-radius: var(--r-pill);
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
 }
 
@@ -1276,7 +1276,7 @@ img { display: block; max-width: 100%; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   color: #F7FFE7;
   padding: 9px 14px;
@@ -1294,7 +1294,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-sm);
   border: 1px solid rgba(255,255,255,0.06);
   color: var(--text2);
@@ -1304,7 +1304,7 @@ img { display: block; max-width: 100%; }
 
 /* Sheet close button — circular, 5% white */
 .sheet-header .btn-icon {
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: 50%;
   border: none;
 }
@@ -1348,7 +1348,7 @@ img { display: block; max-width: 100%; }
 }
 .calendar-nav-btn {
   width: 36px; height: 36px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-sm);
   border: 1px solid rgba(255,255,255,0.06);
   display: flex;
@@ -1512,7 +1512,7 @@ img { display: block; max-width: 100%; }
   white-space: nowrap;
   height: 32px;
   padding: 6px 10px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: 117px;
   font-size: 14px;
   font-weight: 400;
@@ -1914,7 +1914,7 @@ img { display: block; max-width: 100%; }
 .plant-card-more {
   width: 32px;
   height: 32px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -1956,7 +1956,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   flex-direction: column;
   margin: 8px 16px 0;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-xl);
   overflow: hidden;
   border: none;
@@ -1984,7 +1984,7 @@ img { display: block; max-width: 100%; }
 .more-cancel-btn {
   width: 100%;
   padding: 16px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: var(--r-xl);
   font-size: 16px;
   font-weight: 600;
@@ -2024,7 +2024,7 @@ img { display: block; max-width: 100%; }
   left: auto;
   width: 36px;
   height: 36px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   color: var(--text);
@@ -2061,7 +2061,7 @@ img { display: block; max-width: 100%; }
   justify-content: center;
   width: 36px;
   height: 36px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border-radius: 50%;
   border: none;
   color: var(--text);
@@ -2096,7 +2096,7 @@ img { display: block; max-width: 100%; }
   height: 32px;
   padding: 0 12px;
   border-radius: var(--r-pill);
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: none;
   font-size: 13px;
   font-weight: 500;
@@ -2218,7 +2218,7 @@ img { display: block; max-width: 100%; }
   gap: 6px;
   width: 100%;
   padding: 11px;
-  background: rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.06);
   border-radius: var(--r-md);
   font-size: 13px;
