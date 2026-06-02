@@ -508,7 +508,7 @@ img { display: block; max-width: 100%; }
 }
 .detail-header-scrim {
   position: absolute;
-  bottom: -10px;
+  bottom: -5px;
   left: 0;
   right: 0;
   height: 75%;
