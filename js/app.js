@@ -1345,9 +1345,9 @@ function renderCalendar() {
 
   container.innerHTML = `
     <div class="calendar-nav">
-      <button class="calendar-nav-btn" id="cal-prev">‹</button>
+      <button class="calendar-nav-btn" id="cal-prev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M9.33325 11.1666L5.99994 7.8333L9.33325 4.49998" stroke="white" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <span class="calendar-month-label">${monthLabel}</span>
-      <button class="calendar-nav-btn" id="cal-next">›</button>
+      <button class="calendar-nav-btn" id="cal-next"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="transform:rotate(180deg)"><path d="M9.33325 11.1666L5.99994 7.8333L9.33325 4.49998" stroke="white" stroke-opacity="0.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <div class="calendar-weekdays">
       ${['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d => `<div class="calendar-weekday">${d}</div>`).join('')}
