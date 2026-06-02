@@ -679,7 +679,7 @@ img { display: block; max-width: 100%; }
   padding: 0 14px;
   background: rgba(255,255,255,0.04);
   border-radius: var(--r-md);
-  margin-bottom: 6px;
+  margin-bottom: 2px;
 }
 .fertilizer-label {
   font-size: 14px;
