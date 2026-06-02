@@ -1977,7 +1977,7 @@ img { display: block; max-width: 100%; }
 ═══════════════════════════════════════ */
 .subpage-header {
   display: grid;
-  grid-template-columns: 44px 1fr 44px;
+  grid-template-columns: 44px 1fr auto;
   align-items: center;
   padding: calc(var(--safe-top) + 14px) 12px 14px;
   background: var(--bg);
@@ -2009,7 +2009,22 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 8px;
 }
+.btn-subpage-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #111;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity var(--trans-fast);
+}
+.btn-subpage-add:active { opacity: 0.75; }
 /* Action button in subpage header — same size as back button */
 .btn-subpage-back {
   display: inline-flex;
@@ -2677,6 +2692,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
       <div class="subpage-header-action">
         <button class="btn-subpage-back" id="btn-notes-select" title="Вибрати" style="color:#fff">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.529 1.76402C10.7724 1.52062 11.0614 1.32754 11.3794 1.19581C11.6974 1.06408 12.0383 0.996277 12.3825 0.996277C12.7267 0.996277 13.0676 1.06408 13.3856 1.19581C13.7037 1.32754 13.9926 1.52062 14.236 1.76402C14.4794 2.00743 14.6725 2.29639 14.8042 2.61441C14.936 2.93244 15.0038 3.27329 15.0038 3.61752C15.0038 3.96175 14.936 4.3026 14.8042 4.62063C14.6725 4.93865 14.4794 5.22762 14.236 5.47102L13.457 6.25002L9.75002 2.54302L10.529 1.76402ZM9.04302 3.25002L2.65702 9.63602C2.28335 10.0103 2.01677 10.4778 1.88502 10.99L1.01502 14.376C0.993445 14.4603 0.994218 14.5487 1.01726 14.6325C1.0403 14.7164 1.08482 14.7928 1.14642 14.8542C1.20801 14.9156 1.28456 14.9599 1.36849 14.9826C1.45242 15.0054 1.54084 15.0059 1.62502 14.984L5.01002 14.115C5.5224 13.9837 5.99006 13.7171 6.36402 13.343L12.75 6.95702L9.04302 3.25002Z" fill="currentColor"/></svg>
+        </button>
+        <button class="btn-subpage-add" id="btn-notes-add" title="Додати нотатку">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
       </div>
     </div>
@@ -4860,10 +4878,18 @@ const IC_CLOSE_BTN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none
 
 function updateNotesSelectUI() {
   const selectBtn = document.getElementById('btn-notes-select')
+  const addBtn = document.getElementById('btn-notes-add')
   const selectBar = document.getElementById('notes-select-bar')
   const countEl = document.getElementById('notes-select-count')
   const deleteBtn = document.getElementById('btn-notes-delete-selected')
   if (!selectBtn || !selectBar) return
+
+  const plantId = state.currentNotesPlantId
+  const hasNotes = (state.notes[plantId] || []).length > 0
+
+  // Show/hide edit button based on whether there are notes
+  selectBtn.style.display = hasNotes ? '' : 'none'
+
   if (state.notesSelectMode) {
     selectBtn.innerHTML = IC_CLOSE_BTN
     selectBtn.classList.add('active')
@@ -4871,10 +4897,12 @@ function updateNotesSelectUI() {
     const n = state.selectedNoteIds.size
     countEl.textContent = n === 0 ? 'Оберіть нотатки' : `${n} обрано`
     deleteBtn.disabled = n === 0
+    if (addBtn) addBtn.style.display = 'none'
   } else {
     selectBtn.innerHTML = IC_EDIT_BTN
     selectBtn.classList.remove('active')
     selectBar.classList.add('hidden')
+    if (addBtn) addBtn.style.display = ''
   }
 }
 
@@ -5198,6 +5226,7 @@ function bindEvents() {
     state.selectedNoteIds = new Set()
     renderFullNotes()
   })
+  document.getElementById('btn-notes-add').addEventListener('click', openAddNoteForm)
   document.getElementById('btn-notes-delete-selected').addEventListener('click', deleteSelectedNotes)
   document.getElementById('btn-note-detail-back').addEventListener('click', () => closeOverlay('overlay-note-detail'))
 

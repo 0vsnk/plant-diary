@@ -1868,10 +1868,18 @@ const IC_CLOSE_BTN = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none
 
 function updateNotesSelectUI() {
   const selectBtn = document.getElementById('btn-notes-select')
+  const addBtn = document.getElementById('btn-notes-add')
   const selectBar = document.getElementById('notes-select-bar')
   const countEl = document.getElementById('notes-select-count')
   const deleteBtn = document.getElementById('btn-notes-delete-selected')
   if (!selectBtn || !selectBar) return
+
+  const plantId = state.currentNotesPlantId
+  const hasNotes = (state.notes[plantId] || []).length > 0
+
+  // Show/hide edit button based on whether there are notes
+  selectBtn.style.display = hasNotes ? '' : 'none'
+
   if (state.notesSelectMode) {
     selectBtn.innerHTML = IC_CLOSE_BTN
     selectBtn.classList.add('active')
@@ -1879,10 +1887,12 @@ function updateNotesSelectUI() {
     const n = state.selectedNoteIds.size
     countEl.textContent = n === 0 ? 'Оберіть нотатки' : `${n} обрано`
     deleteBtn.disabled = n === 0
+    if (addBtn) addBtn.style.display = 'none'
   } else {
     selectBtn.innerHTML = IC_EDIT_BTN
     selectBtn.classList.remove('active')
     selectBar.classList.add('hidden')
+    if (addBtn) addBtn.style.display = ''
   }
 }
 
@@ -2206,6 +2216,7 @@ function bindEvents() {
     state.selectedNoteIds = new Set()
     renderFullNotes()
   })
+  document.getElementById('btn-notes-add').addEventListener('click', openAddNoteForm)
   document.getElementById('btn-notes-delete-selected').addEventListener('click', deleteSelectedNotes)
   document.getElementById('btn-note-detail-back').addEventListener('click', () => closeOverlay('overlay-note-detail'))
 

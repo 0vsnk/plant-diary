@@ -1962,7 +1962,7 @@ img { display: block; max-width: 100%; }
 ═══════════════════════════════════════ */
 .subpage-header {
   display: grid;
-  grid-template-columns: 44px 1fr 44px;
+  grid-template-columns: 44px 1fr auto;
   align-items: center;
   padding: calc(var(--safe-top) + 14px) 12px 14px;
   background: var(--bg);
@@ -1994,7 +1994,22 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   justify-content: flex-end;
+  gap: 8px;
 }
+.btn-subpage-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #111;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity var(--trans-fast);
+}
+.btn-subpage-add:active { opacity: 0.75; }
 /* Action button in subpage header — same size as back button */
 .btn-subpage-back {
   display: inline-flex;
