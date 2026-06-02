@@ -954,10 +954,9 @@ img { display: block; max-width: 100%; }
   line-height: 1.55;
   background: rgba(251,236,107,0.10);
   border-radius: var(--r-md);
-  padding: 0 14px;
+  padding: 14px;
   min-height: 49px;
-  display: flex;
-  align-items: center;
+  box-sizing: border-box;
 }
 
 .detail-spacer { height: calc(var(--tab-h) + var(--safe-bottom) + 20px); }
@@ -1395,14 +1394,21 @@ img { display: block; max-width: 100%; }
 .calendar-day:active { background: rgba(255,255,255,0.06); }
 .calendar-day.today .calendar-day-num {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #fff;
+  color: #111111;
   width: 30px; height: 30px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  box-shadow: 0 2px 8px var(--accent-glow);
+}
+.calendar-day.selected:not(.today) .calendar-day-num {
+  background: rgba(255,255,255,0.12);
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .calendar-day.other-month .calendar-day-num { color: var(--text3); }
 .calendar-day.has-events .calendar-day-num { font-weight: 600; }
@@ -1748,7 +1754,7 @@ img { display: block; max-width: 100%; }
   box-shadow: 0 2px 6px rgba(0,0,0,0.35);
 }
 .toggle-switch input:checked + .toggle-track {
-  background: #34C759;
+  background: var(--accent);
 }
 .toggle-switch input:checked + .toggle-track::before {
   transform: translateX(20px);

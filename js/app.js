@@ -14,6 +14,7 @@ let state = {
   currentPlantId: null,
   activeTab: 'plants',
   calendarDate: new Date(),
+  calendarSelectedDate: null,
   journalFilter: 'all',
   formMode: 'add',    // 'add' | 'edit'
   pendingPhotoFile: null,
@@ -1392,8 +1393,9 @@ function renderCalendar() {
     const key = dateKey(cellDate)
     const dayEvents = events[key] || []
     const isToday = cellDate.getTime() === today.getTime()
+    const isSelected = state.calendarSelectedDate && cellDate.getTime() === state.calendarSelectedDate.getTime()
 
-    const dayEl = createElement('div', `calendar-day${otherMonth ? ' other-month' : ''}${isToday ? ' today' : ''}${dayEvents.length ? ' has-events' : ''}`)
+    const dayEl = createElement('div', `calendar-day${otherMonth ? ' other-month' : ''}${isToday ? ' today' : ''}${dayEvents.length ? ' has-events' : ''}${isSelected ? ' selected' : ''}`)
 
     const numEl = createElement('div', 'calendar-day-num', String(cellDate.getDate()))
     dayEl.appendChild(numEl)
@@ -1408,7 +1410,11 @@ function renderCalendar() {
 
       const capturedDate = new Date(cellDate)
       const capturedKey = key
-      dayEl.addEventListener('click', () => showDayEvents(capturedDate, dayEvents))
+      dayEl.addEventListener('click', () => {
+        state.calendarSelectedDate = capturedDate
+        renderCalendar()
+        showDayEvents(capturedDate, dayEvents)
+      })
     }
 
     grid.appendChild(dayEl)
@@ -2389,6 +2395,8 @@ function bindEvents() {
   // Calendar day events close
   document.getElementById('btn-close-day-events').addEventListener('click', () => {
     document.getElementById('calendar-day-events').classList.add('hidden')
+    state.calendarSelectedDate = null
+    renderCalendar()
   })
 
   // Journal filters
