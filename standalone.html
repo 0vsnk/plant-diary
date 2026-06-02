@@ -17,22 +17,22 @@
    DESIGN TOKENS
 ═══════════════════════════════════════ */
 :root {
-  --bg: #111211;
-  --bg2: #191a19;
-  --bg3: #202220;
-  --bg4: #2a2d2a;
-  --card: #1a1c1a;
-  --card2: #1e211e;
-  --border: #2a2d2a;
+  --bg: #111111;
+  --bg2: #191919;
+  --bg3: #202020;
+  --bg4: #2a2a2a;
+  --card: #1a1a1a;
+  --card2: #1e1e1e;
+  --border: #2a2a2a;
   --border2: rgba(255,255,255,0.06);
   --text: #F7FFE7;
   --text2: rgba(247,255,231,0.5);
-  --text3: #505850;
-  --accent: #ADDC58;
-  --accent2: #93c43e;
-  --accent-dim: rgba(173,220,88,0.14);
-  --accent-glow: rgba(173,220,88,0.22);
-  --accent-glow2: rgba(173,220,88,0.08);
+  --text3: #505050;
+  --accent: #9EE970;
+  --accent2: #7BCF50;
+  --accent-dim: rgba(158,233,112,0.14);
+  --accent-glow: rgba(158,233,112,0.22);
+  --accent-glow2: rgba(158,233,112,0.08);
   --danger: #d05f72;
   --danger-dim: rgba(208,95,114,0.12);
   --warn: #e0a04a;
@@ -764,8 +764,8 @@ img { display: block; max-width: 100%; }
   font-size: 11px;
   padding: 3px 8px;
   border-radius: var(--r-pill);
-  background: rgba(168,85,247,0.15);
-  color: #a855f7;
+  background: rgba(151,108,255,0.15);
+  color: #976CFF;
   font-weight: 600;
 }
 
@@ -962,9 +962,9 @@ img { display: block; max-width: 100%; }
 .repotting-calendar-btn:active { background: var(--accent-dim); }
 .repotting-notes-text {
   font-size: 13px;
-  color: #ED9C33;
+  color: #FBEC6B;
   line-height: 1.55;
-  background: rgba(237,156,51,0.10);
+  background: rgba(251,236,107,0.10);
   border-radius: var(--r-md);
   padding: 12px 14px;
 }
@@ -1434,8 +1434,9 @@ img { display: block; max-width: 100%; }
   border-radius: 50%;
 }
 .dot-water { background: var(--accent); }
-.dot-fertilizer { background: #a855f7; }
+.dot-fertilizer { background: #976CFF; }
 .dot-repotting { background: var(--warn); }
+.dot-note { background: #FBEC6B; }
 
 .calendar-day-events {
   margin-top: 16px;
@@ -1490,8 +1491,8 @@ img { display: block; max-width: 100%; }
   color: #0C0C0C;
 }
 .day-event-check.done.fertilizer-done {
-  background: #a855f7;
-  border-color: #a855f7;
+  background: #976CFF;
+  border-color: #976CFF;
   color: #fff;
 }
 
@@ -1581,8 +1582,8 @@ img { display: block; max-width: 100%; }
   flex-shrink: 0;
 }
 .journal-item-accent.water { background: var(--accent); }
-.journal-item-accent.fertilizer { background: #a855f7; }
-.journal-item-accent.note { background: #9b8dd4; }
+.journal-item-accent.fertilizer { background: #976CFF; }
+.journal-item-accent.note { background: #FBEC6B; }
 .journal-item-accent.repotting { background: var(--warn); }
 
 .journal-item-content {
