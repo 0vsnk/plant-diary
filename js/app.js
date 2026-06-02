@@ -488,6 +488,7 @@ function buildRepottingRow(plant, fromOverlay = false) {
       input.value = ''
       input.addEventListener('change', onDatePick, { once: true })
     })
+    // Also clear value so change fires even if same date selected again
     entry.append(label, calLabel)
   }
   return entry
@@ -1130,12 +1131,13 @@ async function waterPlant() {
    LOG REPOTTING
 ═══════════════════════════════════════ */
 function logRepotting() {
+  // Called when label#btn-log-repotting is clicked — just registers the change handler.
+  // The label's for="input-repotting-date-quick" opens the native date picker on iOS.
   const plantId = state.currentPlantId
   if (!plantId) return
   const input = document.getElementById('input-repotting-date-quick')
-  input.value = new Date().toISOString().slice(0, 10)
+  input.value = ''
   input.addEventListener('change', async function handler(ev) {
-    input.removeEventListener('change', handler)
     const dateStr = ev.target.value
     if (!dateStr) return
     const idx = state.plants.findIndex(p => p.id === plantId)
@@ -1152,7 +1154,6 @@ function logRepotting() {
       showToast('Пересадку зафіксовано!')
     } catch (err) { showToast('Помилка збереження') }
   }, { once: true })
-  input.click()
 }
 
 /* ═══════════════════════════════════════

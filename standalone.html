@@ -2655,10 +2655,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         <div class="section-header-row">
           <h2 class="section-title">Пересадка</h2>
           <div class="section-header-actions">
-            <button class="btn-add-compact" id="btn-log-repotting">
+            <label class="btn-add-compact" id="btn-log-repotting" for="input-repotting-date-quick">
               <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3.33331V12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M3.33325 8H12.6666" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
               Додати
-            </button>
+            </label>
             <button class="btn-icon-only" id="btn-view-all-repotting"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M6.5 11.1666L9.83331 7.8333L6.5 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           </div>
         </div>
@@ -3555,6 +3555,7 @@ function buildRepottingRow(plant, fromOverlay = false) {
       input.value = ''
       input.addEventListener('change', onDatePick, { once: true })
     })
+    // Also clear value so change fires even if same date selected again
     entry.append(label, calLabel)
   }
   return entry
@@ -4197,12 +4198,13 @@ async function waterPlant() {
    LOG REPOTTING
 ═══════════════════════════════════════ */
 function logRepotting() {
+  // Called when label#btn-log-repotting is clicked — just registers the change handler.
+  // The label's for="input-repotting-date-quick" opens the native date picker on iOS.
   const plantId = state.currentPlantId
   if (!plantId) return
   const input = document.getElementById('input-repotting-date-quick')
-  input.value = new Date().toISOString().slice(0, 10)
+  input.value = ''
   input.addEventListener('change', async function handler(ev) {
-    input.removeEventListener('change', handler)
     const dateStr = ev.target.value
     if (!dateStr) return
     const idx = state.plants.findIndex(p => p.id === plantId)
@@ -4219,7 +4221,6 @@ function logRepotting() {
       showToast('Пересадку зафіксовано!')
     } catch (err) { showToast('Помилка збереження') }
   }, { once: true })
-  input.click()
 }
 
 /* ═══════════════════════════════════════
