@@ -38,6 +38,7 @@ if (!fs.existsSync(publicImgDir)) fs.mkdirSync(publicImgDir)
 fs.copyFileSync(path.join(BASE, 'img/app-icon.png'), path.join(publicImgDir, 'app-icon.png'))
 fs.copyFileSync(path.join(BASE, 'manifest.json'), path.join(publicDir, 'manifest.json'))
 fs.copyFileSync(path.join(BASE, 'scrim.png'), path.join(publicDir, 'scrim.png'))
+fs.copyFileSync(path.join(BASE, 'scrim1.png'), path.join(publicDir, 'scrim1.png'))
 
 const size = fs.statSync(path.join(BASE, 'standalone.html')).size
 console.log(`✅ standalone.html + public/index.html rebuilt — ${(size/1024).toFixed(1)} KB`)
