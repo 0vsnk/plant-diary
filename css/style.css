@@ -916,6 +916,12 @@ img { display: block; max-width: 100%; }
   color: var(--text2);
   flex: 1;
 }
+.section-mini-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  padding: 4px 0 2px;
+}
 .repotting-planned-date {
   font-size: 13px;
   color: rgba(255,255,255,0.5);
@@ -1987,19 +1993,24 @@ img { display: block; max-width: 100%; }
    SUB-PAGE OVERLAYS (History / Notes)
 ═══════════════════════════════════════ */
 .subpage-header {
-  display: grid;
-  grid-template-columns: 44px 1fr auto;
+  display: flex;
   align-items: center;
+  position: relative;
   padding: calc(var(--safe-top) + 14px) 12px 14px;
   background: var(--bg);
   border-bottom: 1px solid rgba(255,255,255,0.05);
   flex-shrink: 0;
 }
 .subpage-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.2px;
   text-align: center;
+  pointer-events: none;
+  white-space: nowrap;
 }
 .subpage-header .btn-back {
   position: static;
@@ -2021,6 +2032,7 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: flex-end;
   gap: 8px;
+  margin-left: auto;
 }
 .btn-subpage-add {
   display: inline-flex;

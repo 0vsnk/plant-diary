@@ -453,12 +453,10 @@ function buildRepottingRow(plant, fromOverlay = false) {
   entry.appendChild(iconEl)
 
   if (plant.next_repotting_date) {
-    const label = createElement('span', 'history-item-date', 'Заплановано')
-    label.style.flex = '1'
-    const dateEl = createElement('span', 'repotting-planned-date', formatDate(new Date(plant.next_repotting_date)))
-    entry.append(label, dateEl)
-
-    // Long-press → delete repotting date
+    const dateEl = createElement('span', 'history-item-date', formatDate(new Date(plant.next_repotting_date)))
+    dateEl.style.flex = '1'
+    entry.append(dateEl)
+    // Long-press → delete
     addLongPress(entry, () => openItemActions(async () => {
       const idx = state.plants.findIndex(p => p.id === plant.id)
       if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: null }
@@ -468,27 +466,29 @@ function buildRepottingRow(plant, fromOverlay = false) {
     }))
   } else {
     const label = createElement('span', 'history-item-date repotting-empty-label', 'Пересадку не заплановано')
-    const calBtn = createElement('button', 'repotting-calendar-btn')
-    calBtn.innerHTML = IC_CALENDAR
-    calBtn.addEventListener('click', e => {
-      e.stopPropagation()
-      const input = document.getElementById('input-repotting-date-quick')
+    // <label for> triggers date input on iOS without JS click()
+    const calLabel = document.createElement('label')
+    calLabel.className = 'repotting-calendar-btn'
+    calLabel.htmlFor = 'input-repotting-date-quick'
+    calLabel.innerHTML = IC_CALENDAR
+    // Register handler on the input itself
+    const input = document.getElementById('input-repotting-date-quick')
+    const onDatePick = async (ev) => {
+      input.removeEventListener('change', onDatePick)
+      const dateStr = ev.target.value
+      if (!dateStr) return
+      if (fromOverlay) closeOverlay('overlay-repotting')
+      const idx = state.plants.findIndex(p => p.id === plant.id)
+      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: dateStr }
+      if (sb && state.user) await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plant.id)
+      renderPlantDetail(state.plants[idx])
+      showToast('Пересадку заплановано ✓')
+    }
+    calLabel.addEventListener('click', () => {
       input.value = ''
-      input.onchange = null
-      input.addEventListener('change', async function handler(ev) {
-        input.removeEventListener('change', handler)
-        const dateStr = ev.target.value
-        if (!dateStr) return
-        if (fromOverlay) closeOverlay('overlay-repotting')
-        const idx = state.plants.findIndex(p => p.id === plant.id)
-        if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: dateStr }
-        if (sb && state.user) await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plant.id)
-        renderPlantDetail(state.plants[idx])
-        showToast('Пересадку заплановано ✓')
-      }, { once: true })
-      input.click()
+      input.addEventListener('change', onDatePick, { once: true })
     })
-    entry.append(label, calBtn)
+    entry.append(label, calLabel)
   }
   return entry
 }
@@ -1129,34 +1129,30 @@ async function waterPlant() {
 /* ═══════════════════════════════════════
    LOG REPOTTING
 ═══════════════════════════════════════ */
-async function logRepotting() {
+function logRepotting() {
   const plantId = state.currentPlantId
   if (!plantId) return
-
-  try {
-    const today = new Date().toISOString().slice(0, 10)
+  const input = document.getElementById('input-repotting-date-quick')
+  input.value = new Date().toISOString().slice(0, 10)
+  input.addEventListener('change', async function handler(ev) {
+    input.removeEventListener('change', handler)
+    const dateStr = ev.target.value
+    if (!dateStr) return
     const idx = state.plants.findIndex(p => p.id === plantId)
-
-    if (!sb) {
-      // Demo mode: simulate locally
-      if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: today }
-      renderPlantDetail(state.plants[idx])
-    } else {
-      const { data, error } = await sb
-        .from('plants')
-        .update({ next_repotting_date: today })
-        .eq('id', plantId)
-        .select().single()
-      if (error) throw error
-      if (idx !== -1) state.plants[idx] = data
-      renderPlantDetail(data)
-    }
-
-    showToast('Пересадку зафіксовано!')
-  } catch (err) {
-    console.error(err)
-    showToast('Помилка збереження')
-  }
+    try {
+      if (!sb) {
+        if (idx !== -1) state.plants[idx] = { ...state.plants[idx], next_repotting_date: dateStr }
+        renderPlantDetail(state.plants[idx])
+      } else {
+        const { data, error } = await sb.from('plants').update({ next_repotting_date: dateStr }).eq('id', plantId).select().single()
+        if (error) throw error
+        if (idx !== -1) state.plants[idx] = data
+        renderPlantDetail(data)
+      }
+      showToast('Пересадку зафіксовано!')
+    } catch (err) { showToast('Помилка збереження') }
+  }, { once: true })
+  input.click()
 }
 
 /* ═══════════════════════════════════════
@@ -1936,6 +1932,8 @@ function openFullRepotting(plantId) {
     }))
     container.appendChild(notesEl)
   }
+  const sectionLabel = createElement('p', 'section-mini-label', 'Історія Пересадки')
+  container.appendChild(sectionLabel)
   container.appendChild(buildRepottingRow(plant, true))
 
   openOverlay('overlay-repotting')
