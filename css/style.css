@@ -510,7 +510,7 @@ img { display: block; max-width: 100%; }
 }
 .detail-photo-scrim {
   position: absolute;
-  bottom: 0;
+  bottom: -3px;
   left: 0;
   right: 0;
   width: 100%;
