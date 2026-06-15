@@ -2035,9 +2035,18 @@ function renderProfile() {
   document.getElementById('profile-display-name').textContent = name
   document.getElementById('profile-email-text').textContent = user?.email || 'demo@plantdiary.app'
 
-  // Pre-fill notification email
-  const notifEmail = document.getElementById('field-notif-email')
-  if (!notifEmail.value) notifEmail.value = user?.email || ''
+  // Telegram connect button state
+  const tgChatId = user?.user_metadata?.telegram_chat_id
+  const tgBtn = document.getElementById('btn-connect-telegram')
+  const tgLabel = document.getElementById('tg-connect-label')
+  if (tgChatId) {
+    tgBtn.classList.add('connected')
+    tgLabel.textContent = '✓ Підключено'
+  } else {
+    tgBtn.classList.remove('connected')
+    tgLabel.setAttribute('data-i18n', 'notif_tg_connect')
+    tgLabel.textContent = t('notif_tg_connect')
+  }
 
   // Stats
   const totalWaterings = Object.values(state.wateringLogs).reduce((s, logs) => s + logs.length, 0)
@@ -2047,12 +2056,11 @@ function renderProfile() {
   document.getElementById('profile-notes-count').textContent = totalNotes
 }
 
-async function saveNotifEmail() {
-  const email = document.getElementById('field-notif-email').value.trim()
-  if (!email || !email.includes('@')) { showToast('Введіть коректну пошту'); return }
-  // In real app: save to user metadata via Supabase
-  // await sb.auth.updateUser({ data: { notification_email: email } })
-  showToast('Пошту збережено ✓')
+function connectTelegram() {
+  if (!sb || !state.user) { showToast('Увійдіть в акаунт'); return }
+  const botName = 'PlantDiaryNotifyBot'
+  const userId = state.user.id
+  window.open(`https://t.me/${botName}?start=${userId}`, '_blank')
 }
 
 async function deleteAccount() {
@@ -2108,7 +2116,7 @@ const LANG = {
     title_plants: 'Мої Рослини', title_calendar: 'Календар', title_journal: 'Журнал Догляду', title_profile: 'Профіль',
     filter_all: 'Всі', filter_water: 'Полив', filter_fertilizer: 'Добриво', filter_note: 'Нотатки',
     stat_plants: 'Рослин', stat_waterings: 'Поливів', stat_notes: 'Нотаток',
-    section_notifications: 'Сповіщення', toggle_notifications: 'Увімкнути сповіщення', notif_email: 'Пошта для сповіщень',
+    section_notifications: 'Сповіщення', toggle_notifications: 'Увімкнути сповіщення', notif_telegram: 'Telegram сповіщення', notif_tg_connect: 'Підключити', notif_tg_connected: 'Підключено',
     section_account: 'Акаунт', signout: 'Вийти з акаунту', delete_account: 'Видалити акаунт',
     section_settings: 'Налаштування', language: 'Мова', save: 'Зберегти',
     status_ok: n => `Через ${n} дн.`, status_today: 'Полити сьогодні', status_soon: 'Завтра полив', status_overdue: n => `Прострочено ${n} дн.`,
@@ -2123,7 +2131,7 @@ const LANG = {
     title_plants: 'My Plants', title_calendar: 'Calendar', title_journal: 'Care Journal', title_profile: 'Profile',
     filter_all: 'All', filter_water: 'Watering', filter_fertilizer: 'Fertilizer', filter_note: 'Notes',
     stat_plants: 'Plants', stat_waterings: 'Waterings', stat_notes: 'Notes',
-    section_notifications: 'Notifications', toggle_notifications: 'Enable notifications', notif_email: 'Notification email',
+    section_notifications: 'Notifications', toggle_notifications: 'Enable notifications', notif_telegram: 'Telegram notifications', notif_tg_connect: 'Connect', notif_tg_connected: 'Connected',
     section_account: 'Account', signout: 'Sign out', delete_account: 'Delete account',
     section_settings: 'Settings', language: 'Language', save: 'Save',
     status_ok: n => `In ${n} d.`, status_today: 'Water today', status_soon: 'Tomorrow', status_overdue: n => `Overdue ${n} d.`,
@@ -2428,9 +2436,9 @@ function bindEvents() {
       deleteAccount
     )
   })
-  document.getElementById('btn-save-notif-email').addEventListener('click', saveNotifEmail)
+  document.getElementById('btn-connect-telegram').addEventListener('click', connectTelegram)
   document.getElementById('toggle-notifications').addEventListener('change', e => {
-    const row = document.getElementById('notif-email-row')
+    const row = document.getElementById('notif-telegram-row')
     row.style.opacity = e.target.checked ? '1' : '0.4'
     row.style.pointerEvents = e.target.checked ? '' : 'none'
     showToast(t(e.target.checked ? 'notif_on' : 'notif_off'))

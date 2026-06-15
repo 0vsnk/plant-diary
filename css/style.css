@@ -1708,29 +1708,24 @@ img { display: block; max-width: 100%; }
 }
 .profile-row-icon { font-size: 18px; }
 
-.profile-email-edit {
-  display: flex;
-  gap: 8px;
-  width: 100%;
-  margin-top: 2px;
-}
-.profile-input {
-  flex: 1;
-  font-size: 14px !important;
-  padding: 9px 12px !important;
-}
-.btn-save-email {
+.btn-tg-connect {
   background: var(--accent-dim);
   color: var(--accent);
   border: 1.5px solid var(--accent);
-  padding: 9px 14px;
+  padding: 7px 14px;
   border-radius: var(--r-pill);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  transition: background var(--trans-fast);
+  flex-shrink: 0;
+  transition: background var(--trans-fast), color var(--trans-fast);
 }
-.btn-save-email:active { background: var(--accent); color: #111111; }
+.btn-tg-connect:active { background: var(--accent); color: #111111; }
+.btn-tg-connect.connected {
+  background: rgba(255,255,255,0.03);
+  color: var(--text2);
+  border-color: rgba(255,255,255,0.08);
+}
 
 /* Toggle switch — native iOS style */
 .toggle-switch { position: relative; display: inline-block; width: 51px; height: 31px; flex-shrink: 0; }
