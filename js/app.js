@@ -207,6 +207,8 @@ async function loadAllData() {
   renderPlantsTab()
   renderCalendar()
   await loadJournalData()
+  renderPlantsTab()
+  renderCalendar()
 }
 
 async function loadPlants() {
