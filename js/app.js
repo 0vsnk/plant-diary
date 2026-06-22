@@ -1813,6 +1813,7 @@ function buildJournalItem(item) {
   el.addEventListener('click', async () => {
     await openPlantDetail(item.plantId)
     if (item.type === 'note') {
+      state.noteFromJournal = true
       openFullNotes(item.plantId)
       openNoteDetail(item.data, item.plantId)
     }
@@ -2325,7 +2326,16 @@ function bindEvents() {
   })
   document.getElementById('btn-notes-add').addEventListener('click', openAddNoteForm)
   document.getElementById('btn-notes-delete-selected').addEventListener('click', deleteSelectedNotes)
-  document.getElementById('btn-note-detail-back').addEventListener('click', () => closeOverlay('overlay-note-detail'))
+  document.getElementById('btn-note-detail-back').addEventListener('click', () => {
+    if (state.noteFromJournal) {
+      state.noteFromJournal = false
+      closeOverlay('overlay-note-detail')
+      closeOverlay('overlay-notes')
+      closeOverlay('overlay-detail')
+    } else {
+      closeOverlay('overlay-note-detail')
+    }
+  })
 
   // Notes filter chips + sort
   document.getElementById('notes-filter-bar').addEventListener('click', e => {
