@@ -1781,15 +1781,18 @@ function buildJournalItem(item) {
   iconEl.innerHTML = typeInfo[item.type]?.icon || ''
   typeRow.appendChild(iconEl)
   typeRow.appendChild(createElement('span', 'journal-item-title', typeInfo[item.type]?.title || item.type))
-  content.appendChild(typeRow)
-  content.appendChild(createElement('div', 'journal-item-plant', item.plantName))
+
+  const top = createElement('div', 'journal-item-top')
+  top.appendChild(typeRow)
+  top.appendChild(createElement('div', 'journal-item-plant', item.plantName))
 
   if (item.type === 'note' && item.data.text) {
     const textEl = createElement('div', 'journal-item-note-text',
       item.data.text.length > 80 ? item.data.text.slice(0, 80) + '…' : item.data.text)
-    content.appendChild(textEl)
+    top.appendChild(textEl)
   }
 
+  content.appendChild(top)
   content.appendChild(createElement('div', 'journal-item-time', formatTime(item.date)))
   el.appendChild(content)
 
