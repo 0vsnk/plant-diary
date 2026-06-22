@@ -1332,7 +1332,7 @@ img { display: block; max-width: 100%; }
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 16px;
+  padding: 4px 16px 16px;
 }
 .calendar-container::-webkit-scrollbar { display: none; }
 
