@@ -986,8 +986,8 @@ img { display: block; max-width: 100%; }
   pointer-events: all;
 }
 #sheet-day-events::before { display: none; }
-#sheet-day-events { pointer-events: none; z-index: 50; }
-#sheet-day-events .sheet-inner { pointer-events: all; }
+#sheet-day-events { pointer-events: none; z-index: 50; bottom: calc(var(--tab-h) + var(--safe-bottom)); top: auto; }
+#sheet-day-events .sheet-inner { pointer-events: all; padding-bottom: 16px; }
 
 .sheet-inner {
   position: relative;
