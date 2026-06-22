@@ -1623,6 +1623,12 @@ function showDayEvents(date, events) {
   list.innerHTML = ''
   panel.classList.remove('hidden')
 
+  // Limit panel height to remaining space in the tab
+  const tabEl = document.getElementById('tab-calendar')
+  const calendarEl = document.getElementById('calendar-container')
+  const available = tabEl.clientHeight - calendarEl.clientHeight
+  panel.style.maxHeight = available + 'px'
+
   if (!events.length) {
     list.innerHTML = '<p style="font-size:14px;color:var(--text2)">Нічого заплановано</p>'
     return

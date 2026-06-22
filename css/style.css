@@ -1451,8 +1451,6 @@ img { display: block; max-width: 100%; }
   border-top: 1px solid var(--border2);
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
   overflow: hidden;
 }
 .day-events-header {
@@ -1470,7 +1468,6 @@ img { display: block; max-width: 100%; }
   flex-direction: column;
   gap: 8px;
   overflow-y: auto;
-  flex: 1;
 }
 .day-event-item {
   display: flex;
