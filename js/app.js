@@ -899,6 +899,7 @@ async function deleteNote(noteId, plantId) {
 
   showToast('Нотатку видалено')
   renderNotes(plantId)
+  renderJournal()
 
   // Refresh full-notes overlay if open
   const overlay = document.getElementById('overlay-notes')
@@ -1808,7 +1809,10 @@ function buildJournalItem(item) {
   content.appendChild(createElement('div', 'journal-item-time', formatTime(item.date)))
   el.appendChild(content)
 
-  el.addEventListener('click', () => openPlantDetail(item.plantId))
+  el.addEventListener('click', async () => {
+    await openPlantDetail(item.plantId)
+    if (item.type === 'note') openFullNotes(item.plantId)
+  })
   return el
 }
 
