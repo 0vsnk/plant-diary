@@ -1814,13 +1814,7 @@ function buildJournalItem(item) {
     await openPlantDetail(item.plantId)
     if (item.type === 'note') {
       openFullNotes(item.plantId)
-      setTimeout(() => {
-        const noteEl = document.querySelector(`[data-note-id="${item.data.id}"]`)
-        if (!noteEl) return
-        noteEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        noteEl.classList.add('note-highlight')
-        setTimeout(() => noteEl.classList.remove('note-highlight'), 2000)
-      }, 350)
+      openNoteDetail(item.data, item.plantId)
     }
   })
   return el

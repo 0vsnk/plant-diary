@@ -275,12 +275,7 @@
 <!-- ═══ PLANT DETAIL OVERLAY ═══ -->
 <div id="overlay-detail" class="overlay overlay-slide-right">
   <div class="overlay-inner">
-    <div class="detail-header" id="detail-header">
-      <div class="detail-photo-wrap" id="detail-photo-wrap">
-        <div class="detail-photo-placeholder" id="detail-photo-placeholder">🪴</div>
-        <img id="detail-photo-img" class="detail-photo hidden" alt="">
-      </div>
-      <div class="detail-header-gradient"></div>
+    <div class="detail-nav-bar">
       <button class="btn-back" id="btn-detail-back">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M9.33325 11.1666L5.99994 7.8333L9.33325 4.49998" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -292,6 +287,13 @@
         </svg>
       </button>
       <input type="file" id="input-change-photo" accept="image/*" class="hidden">
+    </div>
+    <div class="detail-header" id="detail-header">
+      <div class="detail-photo-wrap" id="detail-photo-wrap">
+        <div class="detail-photo-placeholder" id="detail-photo-placeholder">🪴</div>
+        <img id="detail-photo-img" class="detail-photo hidden" alt="">
+      </div>
+      <div class="detail-header-gradient"></div>
       <img class="detail-photo-scrim" src="scrim.png" alt="">
     </div>
 

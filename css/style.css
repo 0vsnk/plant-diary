@@ -519,10 +519,24 @@ img { display: block; max-width: 100%; }
   pointer-events: none;
 }
 
-.btn-back {
+.detail-nav-bar {
+  position: sticky;
+  top: 0;
+  height: 0;
+  overflow: visible;
+  z-index: 10;
+  pointer-events: none;
+}
+.detail-nav-bar .btn-back,
+.detail-nav-bar .btn-detail-more {
+  pointer-events: auto;
   position: absolute;
   top: calc(var(--safe-top) + 14px);
-  left: 14px;
+}
+.detail-nav-bar .btn-back { left: 14px; }
+.detail-nav-bar .btn-detail-more { right: 14px; }
+
+.btn-back {
   width: 38px; height: 38px;
   background: rgba(0,0,0,0.32);
   backdrop-filter: blur(12px);
@@ -532,7 +546,6 @@ img { display: block; max-width: 100%; }
   align-items: center;
   justify-content: center;
   color: #fff;
-  z-index: 2;
   border: none;
   transition: transform var(--trans-fast), background var(--trans-fast);
 }
@@ -818,18 +831,13 @@ img { display: block; max-width: 100%; }
 }
 .note-item {
   background: rgba(255,255,255,0.03);
-  border: 1px solid transparent;
+  border: none;
   border-radius: var(--r-md);
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   position: relative;
-  transition: border-color 0.3s ease, background 0.3s ease;
-}
-.note-item.note-highlight {
-  background: rgba(158,233,112,0.08);
-  border-color: rgba(158,233,112,0.4);
 }
 .note-item-content {
   display: flex;
@@ -1976,9 +1984,6 @@ img { display: block; max-width: 100%; }
    DETAIL — MORE BUTTON (top right)
 ═══════════════════════════════════════ */
 .btn-detail-more {
-  position: absolute;
-  top: calc(var(--safe-top) + 14px);
-  right: 14px;
   width: 38px; height: 38px;
   background: rgba(0,0,0,0.32);
   backdrop-filter: blur(12px);
