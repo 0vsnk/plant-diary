@@ -985,6 +985,9 @@ img { display: block; max-width: 100%; }
   background: rgba(0,0,0,0.65);
   pointer-events: all;
 }
+#sheet-day-events::before { display: none; }
+#sheet-day-events { pointer-events: none; }
+#sheet-day-events .sheet-inner { pointer-events: all; }
 
 .sheet-inner {
   position: relative;
@@ -1381,15 +1384,13 @@ img { display: block; max-width: 100%; }
 }
 .calendar-day {
   aspect-ratio: 1;
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
   border-radius: var(--r-sm);
   cursor: pointer;
   transition: background var(--trans-fast);
-  padding: 3px 2px;
 }
 .calendar-day:active { background: rgba(255,255,255,0.06); }
 .calendar-day.today .calendar-day-num {
@@ -1421,9 +1422,12 @@ img { display: block; max-width: 100%; }
   justify-content: center;
 }
 .calendar-day-dots {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   gap: 2px;
-  height: 5px;
   align-items: center;
 }
 .dot {
