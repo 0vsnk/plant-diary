@@ -1786,25 +1786,27 @@ function buildJournalItem(item) {
   top.appendChild(typeRow)
   top.appendChild(createElement('div', 'journal-item-plant', item.plantName))
 
-  if (item.type === 'note' && item.data.text) {
-    const textEl = createElement('div', 'journal-item-note-text',
-      item.data.text.length > 80 ? item.data.text.slice(0, 80) + '…' : item.data.text)
-    top.appendChild(textEl)
+  if (item.type === 'note' && (item.data.text || item.data.photo_url)) {
+    const noteBox = createElement('div', 'journal-item-note-box')
+    if (item.data.photo_url) {
+      const photos = createElement('div', 'journal-item-note-photos')
+      const img = document.createElement('img')
+      img.src = item.data.photo_url
+      img.alt = ''
+      img.loading = 'lazy'
+      photos.appendChild(img)
+      noteBox.appendChild(photos)
+    }
+    if (item.data.text) {
+      const txt = item.data.text.length > 120 ? item.data.text.slice(0, 120) + '…' : item.data.text
+      noteBox.appendChild(createElement('p', 'journal-item-note-text', txt))
+    }
+    top.appendChild(noteBox)
   }
 
   content.appendChild(top)
   content.appendChild(createElement('div', 'journal-item-time', formatTime(item.date)))
   el.appendChild(content)
-
-  if (item.type === 'note' && item.data.photo_url) {
-    const photoDiv = createElement('div', 'journal-item-photo')
-    const img = document.createElement('img')
-    img.src = item.data.photo_url
-    img.alt = ''
-    img.loading = 'lazy'
-    photoDiv.appendChild(img)
-    el.appendChild(photoDiv)
-  }
 
   el.addEventListener('click', () => openPlantDetail(item.plantId))
   return el
