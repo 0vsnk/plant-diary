@@ -1605,6 +1605,7 @@ img { display: block; max-width: 100%; }
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  min-height: 64px;
 }
 .journal-item-top {
   display: flex;
