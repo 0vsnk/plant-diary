@@ -986,7 +986,7 @@ img { display: block; max-width: 100%; }
   pointer-events: all;
 }
 #sheet-day-events::before { display: none; }
-#sheet-day-events { pointer-events: none; }
+#sheet-day-events { pointer-events: none; z-index: 50; }
 #sheet-day-events .sheet-inner { pointer-events: all; }
 
 .sheet-inner {
