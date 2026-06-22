@@ -1341,7 +1341,7 @@ img { display: block; max-width: 100%; }
 }
 .calendar-month-label {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 600;
   text-transform: capitalize;
 }
 .calendar-nav-btn {
@@ -1411,7 +1411,7 @@ img { display: block; max-width: 100%; }
   justify-content: center;
 }
 .calendar-day.other-month .calendar-day-num { color: var(--text3); }
-.calendar-day.has-events .calendar-day-num { font-weight: 600; }
+.calendar-day.has-events .calendar-day-num { font-weight: 400; }
 .calendar-day-num {
   font-size: 14px;
   color: var(--text);
@@ -1435,24 +1435,8 @@ img { display: block; max-width: 100%; }
 .dot-repotting { background: var(--warn); }
 .dot-note { background: #FBEC6B; }
 
-.calendar-day-events {
-  margin-top: 16px;
-  background: rgba(255,255,255,0.03);
-  border-radius: var(--r-xl);
-  border: 1px solid rgba(255,255,255,0.06);
-  overflow: hidden;
-}
-.day-events-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  font-size: 15px;
-  font-weight: 600;
-}
 #day-events-list {
-  padding: 12px 16px;
+  padding: 8px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;

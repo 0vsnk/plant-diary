@@ -1344,7 +1344,8 @@ function renderCalendar() {
   // Build events map: 'YYYY-MM-DD' → [{type, plantName}]
   const events = buildCalendarEvents(year, month)
 
-  const monthLabel = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric' }).format(date)
+  const monthName = new Intl.DateTimeFormat('uk-UA', { month: 'long' }).format(date)
+  const monthLabel = `${monthName}, ${year}`
 
   container.innerHTML = `
     <div class="calendar-nav">
@@ -1614,13 +1615,12 @@ async function toggleCalendarEvent(plantId, type, date, isDone) {
 const IC_CHECK = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`
 
 function showDayEvents(date, events) {
-  const panel = document.getElementById('calendar-day-events')
   const title = document.getElementById('day-events-title')
   const list = document.getElementById('day-events-list')
 
   title.textContent = formatDate(date)
   list.innerHTML = ''
-  panel.classList.remove('hidden')
+  openSheet('sheet-day-events')
 
   if (!events.length) {
     list.innerHTML = '<p style="font-size:14px;color:var(--text2)">Нічого заплановано</p>'
@@ -1808,7 +1808,17 @@ function switchTab(tabName) {
     el.classList.toggle('active', el.dataset.tab === tabName)
   })
 
-  if (tabName === 'calendar') renderCalendar()
+  if (tabName === 'calendar') {
+    renderCalendar()
+    const todayKey = dateKey(dayStart(new Date()))
+    const events = buildCalendarEvents(state.calendarDate.getFullYear(), state.calendarDate.getMonth())
+    const todayEvents = events[todayKey] || []
+    if (todayEvents.length) {
+      state.calendarSelectedDate = dayStart(new Date())
+      renderCalendar()
+      showDayEvents(new Date(), todayEvents)
+    }
+  }
   if (tabName === 'journal') renderJournal()
   if (tabName === 'profile') renderProfile()
 }
@@ -2404,7 +2414,7 @@ function bindEvents() {
 
   // Calendar day events close
   document.getElementById('btn-close-day-events').addEventListener('click', () => {
-    document.getElementById('calendar-day-events').classList.add('hidden')
+    closeSheet('sheet-day-events')
     state.calendarSelectedDate = null
     renderCalendar()
   })
