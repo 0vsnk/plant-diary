@@ -1632,7 +1632,7 @@ function showDayEvents(date, events) {
   const typeIcons = { water: IC_WATERDROP, fertilizer: IC_SOIL, repotting: IC_POT }
 
   const badgeColors = {
-    water:      { bg: 'rgba(100,181,246,0.15)', color: '#64b5f6' },
+    water:      { bg: 'rgba(158,233,112,0.15)', color: '#9EE970' },
     fertilizer: { bg: 'rgba(151,108,255,0.15)', color: '#976cff' },
     repotting:  { bg: 'rgba(158,233,112,0.15)', color: '#9EE970' },
   }
