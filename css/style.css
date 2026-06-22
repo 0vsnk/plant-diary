@@ -1439,7 +1439,7 @@ img { display: block; max-width: 100%; }
 
 .calendar-day-events {
   margin-top: 16px;
-  background: #111111;
+  background: #181818;
   border-radius: var(--r-xl) var(--r-xl) 0 0;
   border-top: 1px solid var(--border2);
   overflow: hidden;
