@@ -818,13 +818,18 @@ img { display: block; max-width: 100%; }
 }
 .note-item {
   background: rgba(255,255,255,0.03);
-  border: none;
+  border: 1px solid transparent;
   border-radius: var(--r-md);
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
   position: relative;
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.note-item.note-highlight {
+  background: rgba(158,233,112,0.08);
+  border-color: rgba(158,233,112,0.4);
 }
 .note-item-content {
   display: flex;

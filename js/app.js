@@ -628,6 +628,7 @@ function renderNotes(plantId) {
 
 function buildNoteItem(note, plantId, isPreview = false) {
   const item = createElement('div', 'note-item')
+  item.dataset.noteId = note.id
   const isSelected = state.selectedNoteIds.has(note.id)
 
   if (state.notesSelectMode) {
@@ -1811,7 +1812,16 @@ function buildJournalItem(item) {
 
   el.addEventListener('click', async () => {
     await openPlantDetail(item.plantId)
-    if (item.type === 'note') openFullNotes(item.plantId)
+    if (item.type === 'note') {
+      openFullNotes(item.plantId)
+      setTimeout(() => {
+        const noteEl = document.querySelector(`[data-note-id="${item.data.id}"]`)
+        if (!noteEl) return
+        noteEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        noteEl.classList.add('note-highlight')
+        setTimeout(() => noteEl.classList.remove('note-highlight'), 2000)
+      }, 350)
+    }
   })
   return el
 }
