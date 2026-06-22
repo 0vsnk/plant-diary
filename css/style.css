@@ -1468,6 +1468,8 @@ img { display: block; max-width: 100%; }
   flex-direction: column;
   gap: 8px;
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }
 .day-event-item {
   display: flex;

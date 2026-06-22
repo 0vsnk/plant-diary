@@ -1623,13 +1623,15 @@ function showDayEvents(date, events) {
   list.innerHTML = ''
   panel.classList.remove('hidden')
 
-  // List max-height = remaining space in tab minus panel header
-  const tabEl = document.getElementById('tab-calendar')
-  const calendarEl = document.getElementById('calendar-container')
-  const headerEl = panel.querySelector('.day-events-header')
-  const available = tabEl.clientHeight - calendarEl.clientHeight - headerEl.clientHeight
-  list.style.maxHeight = available + 'px'
+  // Set panel max-height after render so it never exceeds available space
   panel.style.maxHeight = ''
+  requestAnimationFrame(() => {
+    const tabEl = document.getElementById('tab-calendar')
+    const calendarEl = document.getElementById('calendar-container')
+    const tabPb = parseFloat(getComputedStyle(tabEl).paddingBottom) || 0
+    const maxH = tabEl.clientHeight - tabPb - calendarEl.clientHeight
+    panel.style.maxHeight = maxH + 'px'
+  })
 
   if (!events.length) {
     list.innerHTML = '<p style="font-size:14px;color:var(--text2)">Нічого заплановано</p>'
