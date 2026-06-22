@@ -1301,8 +1301,9 @@ img { display: block; max-width: 100%; }
 }
 .btn-icon:active { background: var(--accent-dim); color: var(--accent); }
 
-/* Sheet close button — circular, 5% white */
-.sheet-header .btn-icon {
+/* Sheet close button — circular, no border */
+.sheet-header .btn-icon,
+.day-events-header .btn-icon {
   background: rgba(255,255,255,0.03);
   border-radius: 50%;
   border: none;
