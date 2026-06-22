@@ -1450,9 +1450,9 @@ img { display: block; max-width: 100%; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 20px 16px;
+  padding: 20px 20px 8px;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 600;
 }
 #day-events-list {
   padding: 12px 16px;
