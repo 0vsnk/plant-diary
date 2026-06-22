@@ -1631,26 +1631,37 @@ function showDayEvents(date, events) {
   const typeLabels = { water: 'Полив', fertilizer: 'Добриво', repotting: 'Пересадка' }
   const typeIcons = { water: IC_WATERDROP, fertilizer: IC_SOIL, repotting: IC_POT }
 
+  const badgeColors = {
+    water:      { bg: 'rgba(100,181,246,0.15)', color: '#64b5f6' },
+    fertilizer: { bg: 'rgba(151,108,255,0.15)', color: '#976cff' },
+    repotting:  { bg: 'rgba(158,233,112,0.15)', color: '#9EE970' },
+  }
+
   const renderList = () => {
     list.innerHTML = ''
     for (const ev of events) {
       const done = ev.plantId ? isEventLogged(ev.plantId, ev.type, date) : false
+      const colors = badgeColors[ev.type] || { bg: 'rgba(255,255,255,0.08)', color: 'var(--text2)' }
 
-      const item = createElement('div', done ? 'day-event-item done' : 'day-event-item')
+      const item = createElement('div', 'day-event-item' + (done ? ' done' : ''))
 
       const checkBtn = document.createElement('button')
-      checkBtn.className = 'day-event-check' + (done ? (' done' + (ev.type === 'fertilizer' ? ' fertilizer-done' : '')) : '')
+      checkBtn.className = 'day-event-check' + (done ? ' done' : '')
       checkBtn.innerHTML = done ? IC_CHECK : ''
-
-      const iconEl = createElement('span', 'day-event-icon')
-      iconEl.innerHTML = typeIcons[ev.type] || ''
 
       const info = createElement('div', 'day-event-info')
       const plantEl = createElement('div', 'day-event-plant', ev.plantName)
-      const typeEl = createElement('div', 'day-event-type', typeLabels[ev.type] || ev.type)
-      info.append(plantEl, typeEl)
 
-      item.append(checkBtn, iconEl, info)
+      const badge = createElement('div', 'day-event-badge')
+      badge.style.background = colors.bg
+      badge.style.color = colors.color
+      const badgeIcon = createElement('span', 'day-event-badge-icon')
+      badgeIcon.innerHTML = typeIcons[ev.type] || ''
+      const badgeLabel = createElement('span', 'day-event-badge-label', typeLabels[ev.type] || ev.type)
+      badge.append(badgeIcon, badgeLabel)
+
+      info.append(plantEl, badge)
+      item.append(checkBtn, info)
 
       if (ev.plantId) {
         checkBtn.addEventListener('click', async () => {
