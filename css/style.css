@@ -1303,10 +1303,11 @@ img { display: block; max-width: 100%; }
 
 /* Sheet close button — circular, no border */
 .sheet-header .btn-icon,
-.day-events-header .btn-icon {
-  background: rgba(255,255,255,0.03);
-  border-radius: 50%;
-  border: none;
+.day-events-header .btn-icon,
+#btn-close-day-events {
+  background: rgba(255,255,255,0.03) !important;
+  border-radius: 50% !important;
+  border: none !important;
 }
 
 .btn-danger {
