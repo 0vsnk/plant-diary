@@ -1709,7 +1709,7 @@ function renderJournal() {
       if (state.journalFilter !== 'all') {
         if (state.journalFilter === 'water' && log.with_fertilizer) continue
         if (state.journalFilter === 'fertilizer' && !log.with_fertilizer) continue
-        if (state.journalFilter === 'note') continue
+        if (state.journalFilter === 'note' || state.journalFilter === 'repotting') continue
       }
       items.push({
         type: log.with_fertilizer ? 'fertilizer' : 'water',
@@ -1764,23 +1764,24 @@ function renderJournal() {
 function buildJournalItem(item) {
   const el = createElement('div', 'journal-item')
 
-  const accent = createElement('div', `journal-item-accent ${item.type}`)
-  el.appendChild(accent)
+  const line = createElement('div', `journal-item-line ${item.type}`)
+  el.appendChild(line)
 
   const content = createElement('div', 'journal-item-content')
-  const top = createElement('div', 'journal-item-top')
+  const typeRow = createElement('div', 'journal-item-type-row')
 
   const typeInfo = {
-    water: { icon: IC_WATERDROP, title: 'Полив' },
-    fertilizer: { icon: IC_SOIL, title: 'Добриво' },
-    note: { icon: IC_NOTE, title: 'Нотатка' },
+    water:      { icon: IC_WATERDROP, title: 'Полив' },
+    fertilizer: { icon: IC_SOIL,      title: 'Добриво' },
+    note:       { icon: IC_NOTE,      title: 'Нотатка' },
+    repotting:  { icon: IC_POT,       title: 'Пересадка' },
   }
 
   const iconEl = createElement('span', 'journal-item-icon')
   iconEl.innerHTML = typeInfo[item.type]?.icon || ''
-  top.appendChild(iconEl)
-  top.appendChild(createElement('span', 'journal-item-title', typeInfo[item.type]?.title || item.type))
-  content.appendChild(top)
+  typeRow.appendChild(iconEl)
+  typeRow.appendChild(createElement('span', 'journal-item-title', typeInfo[item.type]?.title || item.type))
+  content.appendChild(typeRow)
   content.appendChild(createElement('div', 'journal-item-plant', item.plantName))
 
   if (item.type === 'note' && item.data.text) {
